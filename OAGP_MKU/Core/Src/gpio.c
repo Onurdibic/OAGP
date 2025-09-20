@@ -51,22 +51,22 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(M2_CL_GPIO_Port, M2_CL_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(M2_AL_GPIO_Port, M2_AL_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, M2_BL_Pin|M2_AL_Pin|LED_Pin|M1_AL_Pin
+  HAL_GPIO_WritePin(GPIOB, M2_CL_Pin|M2_BL_Pin|LED_Pin|M1_AL_Pin
                           |M1_BL_Pin|M1_CL_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : M2_CL_Pin */
-  GPIO_InitStruct.Pin = M2_CL_Pin;
+  /*Configure GPIO pin : M2_AL_Pin */
+  GPIO_InitStruct.Pin = M2_AL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(M2_CL_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(M2_AL_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : M2_BL_Pin M2_AL_Pin LED_Pin M1_AL_Pin
+  /*Configure GPIO pins : M2_CL_Pin M2_BL_Pin LED_Pin M1_AL_Pin
                            M1_BL_Pin M1_CL_Pin */
-  GPIO_InitStruct.Pin = M2_BL_Pin|M2_AL_Pin|LED_Pin|M1_AL_Pin
+  GPIO_InitStruct.Pin = M2_CL_Pin|M2_BL_Pin|LED_Pin|M1_AL_Pin
                           |M1_BL_Pin|M1_CL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -79,13 +79,16 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : M2_HALL_C_Pin M2_HALL_B_Pin M2_HALL_A_Pin */
-  GPIO_InitStruct.Pin = M2_HALL_C_Pin|M2_HALL_B_Pin|M2_HALL_A_Pin;
+  /*Configure GPIO pins : M2_HALL_B_Pin M2_HALL_C_Pin M2_HALL_A_Pin */
+  GPIO_InitStruct.Pin = M2_HALL_B_Pin|M2_HALL_C_Pin|M2_HALL_A_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 

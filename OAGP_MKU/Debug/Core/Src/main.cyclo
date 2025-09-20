@@ -1,5 +1,7 @@
-../Core/Src/main.c:74:5:main	2
-../Core/Src/main.c:174:6:SystemClock_Config	3
-../Core/Src/main.c:208:6:motorKomutasyon	7
-../Core/Src/main.c:293:6:HAL_GPIO_EXTI_Callback	1
-../Core/Src/main.c:308:6:Error_Handler	1
+../Core/Src/main.cpp:104:5:int main()	1
+../Core/Src/main.cpp:187:6:void SystemClock_Config()	3
+../Core/Src/main.cpp:221:6:void HAL_GPIO_EXTI_Callback(uint16_t)	8
+../Core/Src/main.cpp:244:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	3
+../Core/Src/main.cpp:286:6:void Error_Handler()	1
+../Core/Src/main.cpp:295:1:void __static_initialization_and_destruction_0()	1
+../Core/Src/main.cpp:295:1:cpp)	1
