@@ -8,7 +8,9 @@
 #define MOTOR_H
 
 #include "stm32f1xx_hal.h"  // MCU modelinize göre güncelleyin
-
+#define HALLS_PER_REV 90
+#define DT_SEC 0.005f  // 5 ms
+#define RADIUS 0.085f  // metre
 // Motor yönleri için enum
 enum MotorDirection {
     ILERI = 0,
@@ -46,26 +48,6 @@ private:
     // Motor yönü
     MotorDirection direction;
 
-    // Hall state sayaçları (isteğe bağlı)
-    uint32_t mHallStateDefaultSayac {};
-    uint32_t mHallState1Sayac {};
-    uint32_t mHallState2Sayac {};
-    uint32_t mHallState3Sayac {};
-    uint32_t mHallState4Sayac {};
-    uint32_t mHallState5Sayac {};
-    uint32_t mHallState6Sayac {};
-
-    uint8_t mHallStateArray[4096];
-    uint8_t mHallStateArrayIleri[4096];
-    uint8_t mHallStateIleriDefaultSayac;
-    uint32_t mSayac = 0;
-
-    uint32_t sayacArttir()
-    {
-        if (mSayac < 4096) mSayac++;
-        return mSayac;
-    }
-
 public:
     // Constructor
     Motor(TIM_HandleTypeDef *htim_, TIM_HandleTypeDef *htim_timebase_,
@@ -84,18 +66,26 @@ public:
     void updateHall();
 
     // Komutasyon işlemi
-    void komutasyon();
+    void komutasyon(uint16_t dutyCycle);
 
     // Motor yönünü ayarla
     void setDirection(MotorDirection dir);
+
+    void hizHesapla(float deltaSaniye);
 
     // Motor yönünü al
     MotorDirection getDirection() const { return direction; }
 
     // Motor durumları
     bool aktif;         // Motor aktif mi
-    uint16_t dutyCycle; // PWM duty cycle
     uint16_t hallCounter = 0;
+
+    // Hesaplanan hız değerleri
+	float m_rev_s = 0.0f;   // devir/s
+	float m_rad_s = 0.0f;   // rad/s
+	float m_rpm   = 0.0f;   // rpm
+	float m_speed_ms = 0.0f; // doğrusal hız (m/s)
+
 };
 
 #endif // MOTOR_H

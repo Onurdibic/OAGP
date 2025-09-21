@@ -20,13 +20,16 @@
 #include "main.h"
 #include "tim.h"
 #include "gpio.h"
-
+#include "usart.h"
+#include "dma.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Motor.h"
 /* USER CODE END Includes */
-	   uint32_t dutyCycle = 0;
-	   uint32_t komutasyon = 0;
+#define RX_BUFFER_SIZE 128   // buffer boyutu, ihtiyacına göre artırabilirsin
+#define HALLS_PER_REV 90
+#define DT_SEC 0.005f  // 5 ms
+#define RADIUS 0.085f  // metre
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
@@ -74,27 +77,29 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint16_t motor1pwm=0;
+uint16_t motor2pwm=0;
+float hedefRPM_motor1 = 300.0f;
+float hedefRPM_motor2 = 0.0f;
+float hata=0;
+float Kp = 0.5f;
+float Ki = 0.6f;
+float integral = 0.0f;
+float I_LIMIT = 2000.0f;
 
-uint8_t M1_Hall_A, M1_Hall_B, M1_Hall_C;
+uint8_t rxBuffer[RX_BUFFER_SIZE];
+uint8_t rxData;
+uint8_t txByte = 0x55;
+volatile uint16_t rxIndex = 0;
 
-uint8_t M2_Hall_A, M2_Hall_B, M2_Hall_C;
+volatile uint8_t flag_5ms  = 0;
+volatile uint8_t flag_20ms = 0;
+volatile uint8_t flag_100ms = 0;
+volatile uint8_t flag_500ms = 0;
+volatile uint8_t flag_1000ms = 0;
 
-uint8_t M1HallState, M2HallState;
-uint8_t komutasyon_u8 = 0;
-uint8_t surusAktifFlag=0;
-uint8_t komutasyonSuresi=200;
-uint16_t dolulukOrani=200;
-float dt_sec=0;
-uint16_t m1Changes=0;
-uint16_t m2Changes=0;
-float m1_rad_s=0;
-float m2_rad_s=0;
-float m1_rpm=0;
-float m2_rpm=0;
-uint16_t counter=0;
-uint16_t sayi=75;
-float m1_speed_ms=0;
-float m2_speed_ms=0;
+volatile uint16_t tickCounter = 0;
+
 /* USER CODE END 0 */
 
 /**
@@ -129,14 +134,18 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM8_Init();
   MX_TIM2_Init();
+  MX_USART3_UART_Init();
+  MX_DMA_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim2);
+  HAL_UART_Receive_DMA(&huart3, &rxData, 1);
+
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);
-  HAL_TIM_Base_Start_IT(&htim2);
 
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
@@ -171,10 +180,67 @@ int main(void)
 
 	 // HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 //	  HAL_Delay(200);
-	  motor1.komutasyon();
-	  motor2.komutasyon();
+	  motor1.komutasyon(motor1pwm);
+	  motor2.komutasyon(motor2pwm);
+
+	  if(flag_5ms)
+	  {
+		  flag_5ms = 0;
+		  // 5 ms işlemleri
+	  }
+
+	  if(flag_20ms)
+	  {
+		  flag_20ms = 0;
+		  // 20 ms işlemleri
+		  // Motor1 hız kontrolü
+		  if(motor1.aktif)
+		  {
+			  float mevcutRPM = motor1.m_rpm;
+			  hata = hedefRPM_motor1 - mevcutRPM;
+
+			  integral += hata * 0.02f;  // 20 ms = 0.02 s
+			  if(integral > I_LIMIT)  integral = I_LIMIT;
+			  if(integral < -I_LIMIT) integral = -I_LIMIT;
+
+			  // PWM hesapla
+			  float kontrol = (Kp * hata) + (Ki * integral);
+
+			  motor1pwm = (int)kontrol;
+
+			  // PWM limitleri
+			  if(motor1pwm < 0)   motor1pwm = 0;
+			  if(motor1pwm > 650) motor1pwm = 650;
+		  }
+
+	  }
+
+	  if(flag_100ms)
+	  {
+		  flag_100ms = 0;
+		  // 100 ms işlemleri
 
 
+	  }
+
+	  if(flag_500ms)
+	  {
+		  flag_500ms = 0;
+		  // 500 ms işlemleri
+		  uint8_t txBuf[1] = {0x55};
+		  HAL_UART_Transmit_DMA(&huart3, txBuf, 1);
+
+	  }
+
+	  if(flag_1000ms)
+	  {
+		  flag_1000ms = 0;
+		  // 1 saniyelik işlemler
+		  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+
+		  motor1.hizHesapla(1);
+		  motor2.hizHesapla(1);
+	  }
 
   }
   /* USER CODE END 3 */
@@ -223,59 +289,52 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	if (GPIO_Pin == M1_HALL_A_Pin || GPIO_Pin == M1_HALL_B_Pin || GPIO_Pin == M1_HALL_C_Pin)
 	{
 		motor1.updateHall();
-		motor1.hallCounter++;
+//		motor1.hallCounter++;
 	}
 
 	if (GPIO_Pin == M2_HALL_A_Pin || GPIO_Pin == M2_HALL_B_Pin || GPIO_Pin == M2_HALL_C_Pin)
 	{
 		motor2.updateHall();
-		motor2.hallCounter++;
-	}
-	for(int i=0;i<sayi;i++)
-	{
-
+//		motor2.hallCounter++;
 	}
 }
-
-#define HALLS_PER_REV 90
-#define DT_SEC 0.005f  // 5 ms
-#define RADIUS 0.085f  // metre
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if(htim->Instance == TIM2)
     {
-        if(counter % 200 == 0)
-        {
-            HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
-            m1Changes = motor1.hallCounter;
-            m2Changes = motor2.hallCounter;
+       tickCounter++;  // 5 ms sayacı
 
-            // Mekanik devir/s
-            float m1_rev_s = m1Changes / (float)HALLS_PER_REV / 1;
-            float m2_rev_s = m2Changes / (float)HALLS_PER_REV / 1;
+	   if(tickCounter % 4 == 0)    // 20 ms (4 * 5 ms)
+		   flag_20ms = 1;
 
-            // Radyan/s
-            m1_rad_s = m1_rev_s * 2.0f * 3.14159265f;
-            m2_rad_s = m2_rev_s * 2.0f * 3.14159265f;
+	   if(tickCounter % 20 == 0)   // 100 ms (20 * 5 ms)
+		   flag_100ms = 1;
 
-            // RPM
-            m1_rpm = m1_rev_s * 60.0f;
-            m2_rpm = m2_rev_s * 60.0f;
+	   if(tickCounter % 100 == 0)  // 500 ms (100 * 5 ms)
+		   flag_500ms = 1;
 
-            // Doğrusal hız (m/s)
-            m1_speed_ms = m1_rad_s * RADIUS;
-            m2_speed_ms = m2_rad_s * RADIUS;
+	   if(tickCounter % 200 == 0)  // 1000 ms (200 * 5 ms = 1 sn)
+	   {
+		   flag_1000ms = 1;
+		   tickCounter = 0; // Sayaç sıfırla (overflow olmasın)
+	   }
 
-            // Sayaçları resetle
-            motor1.hallCounter = 0;
-            motor2.hallCounter = 0;
-            counter = 0;
-        }
-        counter++;
     }
 }
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART3)
+    {
+        // gelen byte’ı buffer’a koy
+        rxBuffer[rxIndex++] = rxData;
+        if(rxIndex >= RX_BUFFER_SIZE) rxIndex = 0;
+
+        // tekrar DMA başlat (1 byte)
+        HAL_UART_Receive_DMA(&huart3, &rxData, 1);
+    }
+}
 
 /* USER CODE END 4 */
 

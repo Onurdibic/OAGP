@@ -1,6 +1,6 @@
-C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_MKU/MotorKontrolLibrary/Inc/Motor.h:63:14:uint32_t Motor::sayacArttir()	2
 ../MotorKontrolLibrary/Src/Motor.cpp:11:1:Motor::Motor(TIM_HandleTypeDef*, TIM_HandleTypeDef*, uint32_t, uint32_t, uint32_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	1
-../MotorKontrolLibrary/Src/Motor.cpp:39:6:void Motor::init()	10
-../MotorKontrolLibrary/Src/Motor.cpp:50:6:void Motor::updateHall()	1
-../MotorKontrolLibrary/Src/Motor.cpp:58:6:void Motor::setDirection(MotorDirection)	1
-../MotorKontrolLibrary/Src/Motor.cpp:60:6:void Motor::komutasyon()	157
+../MotorKontrolLibrary/Src/Motor.cpp:38:6:void Motor::init()	10
+../MotorKontrolLibrary/Src/Motor.cpp:49:6:void Motor::updateHall()	1
+../MotorKontrolLibrary/Src/Motor.cpp:59:6:void Motor::hizHesapla(float)	1
+../MotorKontrolLibrary/Src/Motor.cpp:70:6:void Motor::setDirection(MotorDirection)	1
+../MotorKontrolLibrary/Src/Motor.cpp:72:6:void Motor::komutasyon(uint16_t)	151

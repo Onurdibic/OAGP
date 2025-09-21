@@ -31,7 +31,6 @@ Motor::Motor(TIM_HandleTypeDef *htim_,TIM_HandleTypeDef *htim_timebase_,
     HallB_Port = HallB_Port_; HallB_Pin = HallB_Pin_;
     HallC_Port = HallC_Port_; HallC_Pin = HallC_Pin_;
 
-    dutyCycle = 200;
     aktif = false;
     HallState = 0;
 }
@@ -53,11 +52,24 @@ void Motor::updateHall()
     uint8_t hb = HAL_GPIO_ReadPin(HallB_Port, HallB_Pin);
     uint8_t hc = HAL_GPIO_ReadPin(HallC_Port, HallC_Pin);
     HallState = (ha << 2) | (hb << 1) | hc;
+
+    hallCounter++;
+}
+
+void Motor::hizHesapla(float deltaSaniye)
+{
+
+	m_rev_s = hallCounter / (float)HALLS_PER_REV / deltaSaniye;
+	m_rad_s = m_rev_s * 2.0f * 3.14159265f;
+	m_rpm = m_rev_s * 60.0f;
+	m_speed_ms = m_rad_s * RADIUS;
+	hallCounter=0;
+
 }
 
 void Motor::setDirection(MotorDirection dir) { direction = dir; }
 
-void Motor::komutasyon()
+void Motor::komutasyon(uint16_t dutyCycle)
 {
     if (!aktif)
     {
@@ -82,7 +94,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_RESET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
-					//mHallStateArrayIleri[i++] = 5;
+
 					break;
 
     			case 4: // 6. state için
@@ -93,7 +105,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_RESET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
-					//mHallStateArrayIleri[i++] = 4;
+
 
 					break;
 
@@ -104,7 +116,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_RESET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
-					//mHallStateArrayIleri[i++] = 6;
+
 					break;
     			case 2: // 3. state için
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
@@ -113,7 +125,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_RESET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
-					//mHallStateArrayIleri[i++] = 2;
+
 					break;
 
     			case 3: // 1. state için
@@ -123,7 +135,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_RESET);
-					//mHallStateArrayIleri[i++] = 3;
+
 					break;
 
 				case 1: // 5. state için
@@ -133,7 +145,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_RESET);
-					//mHallStateArrayIleri[i++] = 1;
+
 					break;
 
 				default:
@@ -143,7 +155,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
-					//mHallStateIleriDefaultSayac++;
+
 					break;
 			}
     		break;
@@ -151,14 +163,7 @@ void Motor::komutasyon()
     	case GERI:
     		switch (HallState)
 			{
-				case 1: // 3. state için
-
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, dutyCycle);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_c, 0);
-//					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_RESET);
-//					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
-//					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
+				case 1: // 2.State için
 
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
@@ -166,19 +171,10 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_RESET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
-					mHallState1Sayac++;
-					if (mHallStateArray[mSayac - 1] != 1)
-						mHallStateArray[sayacArttir()] = 1;
+
 					break;
 
-				case 3: // 2. state için
-
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_c, dutyCycle);
-//					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_RESET);
-//					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
-//					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
+				case 3: // 6. state için
 
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
@@ -187,19 +183,9 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_RESET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
 
-					mHallState3Sayac ++;
-					if (mHallStateArray[mSayac - 1] != 3)
-					mHallStateArray[sayacArttir()] = 3;
 					break;
 
-				case 2: // 6. state için
-
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_c, dutyCycle);
-//					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
-//					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_RESET);
-//					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
+				case 2: // 4. state için
 
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, dutyCycle);
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
@@ -208,19 +194,9 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_RESET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
 
-					mHallState2Sayac ++;
-					if (mHallStateArray[mSayac - 1] != 2)
-					mHallStateArray[sayacArttir()] = 2;
 					break;
 
-				case 6: // 4. state için
-
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, dutyCycle);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_c, 0);
-//					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
-//					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_RESET);
-//					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
+				case 6: // 5. state için
 
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, dutyCycle);
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
@@ -228,19 +204,10 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_RESET);
-					mHallState6Sayac ++;
-					if (mHallStateArray[mSayac - 1] != 6)
-					mHallStateArray[sayacArttir()] = 6;
+
 					break;
 
-				case 4: // 5. state için
-
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, dutyCycle);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_c, 0);
-//					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
-//					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
-//					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_RESET);
+				case 4: // 1. state için
 
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, dutyCycle);
@@ -248,18 +215,10 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_RESET);
-					mHallState4Sayac ++;
-					if (mHallStateArray[mSayac - 1] != 4)
-					mHallStateArray[sayacArttir()] = 4;
+
 					break;
 
-				case 5: // 1
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, dutyCycle);
-//					__HAL_TIM_SET_COMPARE(htim, tim_channel_c, 0);
-//					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
-//					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
-//					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_RESET);
+				case 5: // 3.State için
 
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, dutyCycle);
@@ -267,9 +226,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_RESET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
-					mHallState5Sayac ++;
-					if (mHallStateArray[mSayac - 1] != 5)
-					mHallStateArray[sayacArttir()] = 5;
+
 					break;
 
 
@@ -280,7 +237,7 @@ void Motor::komutasyon()
 					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
 					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_SET);
-					mHallStateDefaultSayac ++;
+
 					break;
 			}
 
@@ -289,3 +246,4 @@ void Motor::komutasyon()
     }
 
 }
+
