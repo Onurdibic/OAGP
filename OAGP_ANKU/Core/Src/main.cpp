@@ -17,6 +17,10 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "main.h"
 #include "cmsis_os.h"
 #include "dma.h"
@@ -26,15 +30,27 @@
 #include "usart.h"
 #include "usb_host.h"
 #include "gpio.h"
+#include "freertos.h"
+
+#ifdef __cplusplus
+}
+#endif
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Mpu.h"
+#include "Mag.h"
+#include "Gps.h"
+#include "Paket.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+IMU imu(&hi2c1);
+MAG mag(&hi2c1);
+GPS gps(&huart2);
+Paket ArayuzPaket(&huart3);
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -55,7 +71,8 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_FREERTOS_Init(void);
+extern "C" void MX_FREERTOS_Init(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -106,8 +123,16 @@ int main(void)
   MX_SPI1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_DMA(&huart3, &rxData, 1);
 
+  mag.Yapilandir();
+  imu.Yapilandir();
+  gps.Yapilandir();
+  HAL_Delay(1000);
+  GPIOD->ODR ^= GPIO_PIN_12;
+  mag.XveYKalibreEt();
+  GPIOD->ODR ^= GPIO_PIN_12;
+  HAL_Delay(1000);
+  imu.kalibreEt();
 
   /* USER CODE END 2 */
 
@@ -121,6 +146,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+
   while (1)
   {
     /* USER CODE END WHILE */
@@ -178,14 +205,14 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	if (huart->Instance == USART2)
+	{
+		gps.UartRxCpltCallback();
+	}
+
     if(huart->Instance == USART3)
     {
-        // DMA ile gelen byte’ı buffer’a yaz
-        rxBuffer[rxIndex++] = rxData;
-        if(rxIndex >= RX_BUFFER_SIZE) rxIndex = 0;
-
-        // Tekrar DMA ile 1 byte al
-        HAL_UART_Receive_DMA(&huart3, &rxData, 1);
+    	ArayuzPaket.ArayuzDataAlveBayrakKaldir();
     }
 }
 

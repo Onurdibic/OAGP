@@ -1,4 +1,13 @@
-../Core/Src/freertos.c:71:6:vApplicationGetIdleTaskMemory	24	static
-../Core/Src/freertos.c:85:6:MX_FREERTOS_Init	72	static
-../Core/Src/freertos.c:128:6:StartDefaultTask	16	static
-../Core/Src/freertos.c:148:6:StartUartTask	24	static
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mpu.h:35:11:float IMU::konumxX()	16	static
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mpu.h:36:11:float IMU::konumyY()	16	static
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mpu.h:37:11:float IMU::hizxX()	16	static
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mpu.h:38:11:float IMU::hizyY()	16	static
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mpu.h:39:11:float IMU::x()	16	static
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mpu.h:40:11:float IMU::y()	16	static
+../Core/Src/freertos.cpp:109:6:void vApplicationGetIdleTaskMemory(StaticTask_t**, StackType_t**, uint32_t*)	24	static
+../Core/Src/freertos.cpp:123:6:void MX_FREERTOS_Init()	104	static
+../Core/Src/freertos.cpp:170:6:void StartDefaultTask(const void*)	16	static
+../Core/Src/freertos.cpp:190:6:void StartPaketTask(const void*)	16	static
+../Core/Src/freertos.cpp:235:6:void StartImuTask(const void*)	24	static
+../Core/Src/freertos.cpp:277:1:void __static_initialization_and_destruction_0()	16	static
+../Core/Src/freertos.cpp:277:1:cpp)	8	static

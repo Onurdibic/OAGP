@@ -1,0 +1,5 @@
+../ImuLibrary/Src/Mag.cpp:12:1:MAG::MAG(I2C_HandleTypeDef*)	1
+../ImuLibrary/Src/Mag.cpp:20:6:void MAG::Yapilandir()	1
+../ImuLibrary/Src/Mag.cpp:35:6:void MAG::MagDataOku(int16_t*, int16_t*, int16_t*)	1
+../ImuLibrary/Src/Mag.cpp:44:6:void MAG::XveYKalibreEt()	7
+../ImuLibrary/Src/Mag.cpp:85:8:float* MAG::HeadingOlustur(float, float)	3

@@ -1,0 +1,2 @@
+../ImuLibrary/Src/Madgwick.cpp:9:6:void MadgwickAHRS::updateIMU(float, float, float, float, float, float, float)	1
+../ImuLibrary/Src/Madgwick.cpp:70:6:void MadgwickAHRS::getEuler(float&, float&, float&)	2
