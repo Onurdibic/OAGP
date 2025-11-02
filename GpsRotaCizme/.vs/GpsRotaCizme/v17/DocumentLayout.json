@@ -1,0 +1,132 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|c:\\users\\t_rab\\source\\repos\\gpsrotacizme\\gpsrotacizme\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\gpsrotacizme\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\gpsrotacizme\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\gpsrotacizme\\mapyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\mapyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\gpsrotacizme\\paket.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\paket.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\gpsrotacizme\\grafikyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\grafikyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\gpsrotacizme\\pusulayonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\pusulayonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "GpsRotaCizme\\Form1.Designer.cs",
+              "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.Designer.cs",
+              "RelativeToolTip": "GpsRotaCizme\\Form1.Designer.cs",
+              "ViewState": "AgIAALgDAAAAAAAAAAAAAM0BAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-04T19:55:52.881Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.cs",
+              "RelativeDocumentMoniker": "GpsRotaCizme\\Form1.cs",
+              "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.cs",
+              "RelativeToolTip": "GpsRotaCizme\\Form1.cs",
+              "ViewState": "AgIAAOgAAAAAAAAAAAAAAPIAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-04T05:25:01.623Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs [Tasar\u0131m]",
+              "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.cs",
+              "RelativeDocumentMoniker": "GpsRotaCizme\\Form1.cs",
+              "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.cs [Tasar\u0131m]",
+              "RelativeToolTip": "GpsRotaCizme\\Form1.cs [Tasar\u0131m]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-04T05:22:50.474Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "GrafikYonetici.cs",
+              "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\GrafikYonetici.cs",
+              "RelativeDocumentMoniker": "GpsRotaCizme\\GrafikYonetici.cs",
+              "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\GrafikYonetici.cs",
+              "RelativeToolTip": "GpsRotaCizme\\GrafikYonetici.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-04T05:22:45.814Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MapYonetici.cs",
+              "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\MapYonetici.cs",
+              "RelativeDocumentMoniker": "GpsRotaCizme\\MapYonetici.cs",
+              "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\MapYonetici.cs",
+              "RelativeToolTip": "GpsRotaCizme\\MapYonetici.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAQwDsAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-04T05:22:45.018Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Paket.cs",
+              "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Paket.cs",
+              "RelativeDocumentMoniker": "GpsRotaCizme\\Paket.cs",
+              "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Paket.cs",
+              "RelativeToolTip": "GpsRotaCizme\\Paket.cs",
+              "ViewState": "AgIAADsAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-04T05:22:44.06Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "PusulaYonetici.cs",
+              "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\PusulaYonetici.cs",
+              "RelativeDocumentMoniker": "GpsRotaCizme\\PusulaYonetici.cs",
+              "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\PusulaYonetici.cs",
+              "RelativeToolTip": "GpsRotaCizme\\PusulaYonetici.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-04T05:22:41.774Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
