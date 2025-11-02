@@ -1,17 +1,14 @@
-/*
- * Motor.h
- *
- *  Created on: Sep 20, 2025
- *      Author: T_rab
- */
 #ifndef MOTOR_H
 #define MOTOR_H
 
-#include "stm32f1xx_hal.h"  // MCU modelinize göre güncelleyin
+#include "stm32f1xx_hal.h"  // MCU modeline göre güncelle
+
 #define HALLS_PER_REV 90
-#define DT_SEC 0.005f  // 5 ms
-#define RADIUS 0.085f  // metre
-// Motor yönleri için enum
+#define DT_SEC 0.005f   // 5 ms
+#define RADIUS 0.085f   // metre
+#define MOVING_AVG_SIZE 10
+
+// Motor yönleri
 enum MotorDirection {
     ILERI = 0,
     GERI  = 1
@@ -20,8 +17,8 @@ enum MotorDirection {
 class Motor {
 private:
     // Timer & PWM kanalları
-    TIM_HandleTypeDef *htim;           // PWM timer
-    TIM_HandleTypeDef *htim_timebase;  // Hall zamanı ölçmek için timer (örn: TIM2)
+    TIM_HandleTypeDef *htim;
+    TIM_HandleTypeDef *htim_timebase;
     uint32_t tim_channel_a;
     uint32_t tim_channel_b;
     uint32_t tim_channel_c;
@@ -44,9 +41,6 @@ private:
 
     // Hall sensöründen alınan state
     uint8_t HallState;
-
-    // Motor yönü
-    MotorDirection direction;
 
 public:
     // Constructor
@@ -71,21 +65,38 @@ public:
     // Motor yönünü ayarla
     void setDirection(MotorDirection dir);
 
-    void hizHesapla(float deltaSaniye);
-
     // Motor yönünü al
     MotorDirection getDirection() const { return direction; }
 
+    // Motor hızı hesaplama
+    void hizHesaplaFiltered(float deltaSaniye);
+
+    // PI kontrol ile PWM güncelle
+    int updatePWM(int rpm_hedef, float dt);
+
     // Motor durumları
-    bool aktif;         // Motor aktif mi
+    bool aktif;
+
+    // Ölçülen hız ve RPM
     uint16_t hallCounter = 0;
+    float m_rev_s = 0.0f;
+    float m_rad_s = 0.0f;
+    float m_rpm = 0.0f;
+    float m_speed_ms = 0.0f;
 
-    // Hesaplanan hız değerleri
-	float m_rev_s = 0.0f;   // devir/s
-	float m_rad_s = 0.0f;   // rad/s
-	float m_rpm   = 0.0f;   // rpm
-	float m_speed_ms = 0.0f; // doğrusal hız (m/s)
+private:
+    // Kayan ortalama buffer
+    float m_rpm_buffer[MOVING_AVG_SIZE] = {0};
+    float m_speed_buffer[MOVING_AVG_SIZE] = {0};
+    int ma_index = 0;
 
+    // PID parametreleri
+    float Kp = 0.3f;
+    float Ki = 0.6f;
+    float I_LIMIT = 2000.0f;
+
+    float integral = 0.0f;   // PI integral
+    MotorDirection direction;
 };
 
 #endif // MOTOR_H

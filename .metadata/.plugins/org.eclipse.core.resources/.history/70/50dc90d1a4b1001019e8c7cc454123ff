@@ -1,0 +1,56 @@
+#ifndef INC_PAKET_H_
+#define INC_PAKET_H_
+
+#include "stm32f1xx_hal.h"
+#include <stdint.h>
+#include "string.h"
+
+class Paket
+{
+public:
+	Paket(UART_HandleTypeDef* huart);
+    Paket(uint8_t baslik1_u8, uint8_t baslik2_u8, uint8_t paketTipi_u8, uint8_t dataBoyutu_u8);
+
+    void KomutPaketOlustur(float yon,float rpm);
+    void komutPaketCagir(uint8_t *kopyaDizi);
+
+    void PaketKesmeYapilandir();
+    void DataAlveBayrakKaldir();
+    void PaketCoz();
+
+    float gelenYonAl();
+    float gelenRpmAl();
+
+    uint8_t tekerpaket[13];
+
+private:
+    UART_HandleTypeDef* huart;
+
+    uint8_t CRC8Hesaplama(uint8_t *data, uint8_t baslangic, uint8_t bitis);
+    void floatToBytes(float *Deger_f, uint8_t* bytes);
+    float bytesToFloat(uint8_t* buffer_u8, int32_t startIndex_s32);
+
+    uint8_t komutpaket[13];
+    uint8_t Data;
+
+    // --- RING BUFFER ALANI ---
+    uint8_t ArayuzBuffer_u8[120];
+    uint16_t writeIndex_u16 = 0;
+    uint16_t readIndex_u16  = 0;
+    // --------------------------
+
+    uint8_t yonBytes_u8[4];
+    uint8_t rpmBytes_u8[4];
+
+    uint8_t baslik1_u8;
+    uint8_t baslik2_u8;
+    uint8_t paketTipi_u8;
+    uint8_t dataBoyutu_u8;
+    int16_t dataLength_s16 = 0;
+
+	float floatsonuc_f=0 ;
+	float gelenYon_f=0;
+	float gelenRpm_f=0;
+};
+
+#endif /* INC_PAKET_H_ */

@@ -5,6 +5,8 @@
  *      Author: T_rab
  */
 #include "Mpu.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 #define PWR_MGMT_1_REG 0X6B
 #define SMPLRT_DIV_REG 0X19
@@ -17,6 +19,7 @@
 
 IMU::IMU(I2C_HandleTypeDef *hi2c)
     : hi2c(hi2c),
+	  mag(hi2c),
 //	  lpfax(10.0,20.0),
 //	  lpfay(10.0,20.0),
 //	  kalmanax(0.05, 0.5, 10),
@@ -68,7 +71,7 @@ void IMU::sicaklikOku()
 	HAL_I2C_Master_Transmit(hi2c, MPU6500_ADDRESS, sicaklikBuffer, 1, 10);
 	HAL_I2C_Master_Receive(hi2c, MPU6500_ADDRESS, sicaklikBuffer, 2, 10);
 	hamSicaklik_u16 = (sicaklikBuffer[0] << 8 | sicaklikBuffer[1]);
-	Sicaklik_f=((float)((float)hamSicaklik_u16 / 333.87)) + 21;
+	Sicaklik_f=((float)((float)hamSicaklik_u16 / 333.87f)) + 21.f;
 }
 
 void IMU::gyroOku()
@@ -86,7 +89,7 @@ void IMU::gyroOku()
 
 void IMU::kalibreEt()
 {
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 500; i++)
     {
         GPIOD->ODR ^= GPIO_PIN_12;
 
@@ -96,19 +99,19 @@ void IMU::kalibreEt()
         gyroHesap[1] += gyroEksen[1];
         gyroHesap[2] += gyroEksen[2];
 
-        accOku();
-        accHesap[0] += accEksen[0];
-        accHesap[1] += accEksen[1];
+//        accOku();
+//        accHesap[0] += accEksen[0];
+//        accHesap[1] += accEksen[1];
 
-        while ((HAL_GetTick() - startTick) < 5) {}
+        while ((HAL_GetTick() - startTick) < 10) {}
     }
 
-    gyroHesap[0] /= 1000;
-    gyroHesap[1] /= 1000;
-    gyroHesap[2] /= 1000;
+    gyroHesap[0] /= 1000.f;
+    gyroHesap[1] /= 1000.f;
+    gyroHesap[2] /= 1000.f;
 
-    accHesap[0] /= 1000;
-    accHesap[1] /= 1000;
+//    accHesap[0] /= 1000;
+//    accHesap[1] /= 1000;
 }
 
 
@@ -120,9 +123,9 @@ void IMU::gercekDataOku()
     gyroEksen[0] -= gyroHesap[0];
     gyroEksen[1] -= gyroHesap[1];
     gyroEksen[2] -= gyroHesap[2];
-    accEksen[0] -= accHesap[0];
-    accEksen[1] -= accHesap[1];
-    accEksen[2] -= 100;
+//    accEksen[0] -= accHesap[0];
+//    accEksen[1] -= accHesap[1];
+//    accEksen[2] -= 100;
 
     //accEksen[0]=kalmanax.veriGuncelle(accEksen[0]);
     //accEksen[1]=kalmanay.veriGuncelle(accEksen[1]);
@@ -153,79 +156,72 @@ void IMU::DBC_ACI_BULMA()
     AccToKonum(accEksen[0], accEksen[1], accEksen[2]);
 }
 */
+
 void IMU::aciBul()
 {
 	gercekDataOku();
-	float gx = gyroEksen[0] / 131.0f * (M_PI / 180.0f); // jiroskop datasÄ± degeri dps -> rad/s (MPU6500 iÃ§in 131 LSB/dps @ Â±250 dps)
-	float gy = gyroEksen[1] / 131.0f * (M_PI / 180.0f);
-	float gz = gyroEksen[2] / 131.0f * (M_PI / 180.0f);
+
+	float gx = gyroEksen[0] / 131.0f * (PI / 180.0f); // jiroskop datasÄ± degeri dps -> rad/s (MPU6500 iÃ§in 131 LSB/dps @ Â±250 dps)
+	float gy = gyroEksen[1] / 131.0f * (PI / 180.0f);
+	float gz = gyroEksen[2] / 131.0f * (PI / 180.0f);
 
 	float ax = accEksen[0] / 16384.0f;  // Ä°vmeÃ¶lÃ§er deÄŸerini g birimine dÃ¶nÃ¼ÅŸtÃ¼r (Â±2g)
 	float ay = accEksen[1] / 16384.0f;
 	float az = accEksen[2] / 16384.0f;
 
-	float dt = 0.005f;
-	madgwick.updateIMU(gx, gy, gz, ax, ay, az, dt);
-	madgwick.getEuler(rollAci_f, pitchAcisi_f, gyroYawAci_f);
+	float dt = 0.01f;
+//	int16_t mx,my,mz;
+//
+//	mag.MagDataOku(&mx, &my, &mz);
+//
+//	mag.kalibreliX_f = (mx - mag.xOffset_f) * mag.xScaleFactor_f;
+//	mag.kalibreliY_f = (my - mag.yOffset_f) * mag.yScaleFactor_f;
+//	mag.kalibreliZ_f = (mz - mag.zOffset_f) * mag.zScaleFactor_f;
+//
+//	madgwick.update(gx, gy, gz, ax, ay, az, mag.kalibreliX_f,  mag.kalibreliY_f, -mz);
+//	madgwick.getEulerAngles(rollAci_f, pitchAcisi_f, yawAci_f);
 
-    AccToKonum(accEksen[0], accEksen[1], accEksen[2]);
+	madgwick.updateIMU(gx, gy, gz, ax, ay, az,dt);
+	madgwick.getEuler(rollAci_f, pitchAcisi_f, yawAci_f);
+	yawAci_f *= 1.75f;
+
+	if (yawAci_f < 0.0f) yawAci_f += 360.0f;
+	if (yawAci_f >= 360.0f) yawAci_f -= 360.0f;
+
 }
 
-
-void IMU::AccToKonum(float accX, float accY, float accZ)
+void IMU::AccToKonum(float dt)
 {
-    // 1. Madgwick quaternion bileÅŸenlerini al
+    // --- 1️⃣ Madgwick quaternion bileşenleri ---
     float q0 = madgwick.q0;
     float q1 = madgwick.q1;
     float q2 = madgwick.q2;
     float q3 = madgwick.q3;
 
-    // 2. YerÃ§ekimi vektÃ¶rÃ¼nÃ¼ hesapla (referans: Madgwick white paper)
+    // --- 2️⃣ Gravity vektörü ---
     float gX = 2.0f * (q1 * q3 - q0 * q2);
     float gY = 2.0f * (q0 * q1 + q2 * q3);
-    float gZ = q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3;
+    float gZ = q0*q0 - q1*q1 - q2*q2 + q3*q3;
 
-    // 3. Ä°vme verilerini g â†’ m/sÂ²'ye Ã§evir (Â±2g: 16384 LSB/g)
-    float accX_ms2 = (accX / 16384.0f) * 9.8066f;
-    float accY_ms2 = (accY / 16384.0f) * 9.8066f;
-    float accZ_ms2 = (accZ / 16384.0f) * 9.8066f;
+    // --- 3️⃣ Accel verisi ---
+    float ax = (accEksen[0]/16384.0f)*9.8066f;
+    float ay = (accEksen[1]/16384.0f)*9.8066f;
+    float az = (accEksen[2]/16384.0f)*9.8066f;
 
-    // 4. YerÃ§ekimi bileÅŸenlerini Ã§Ä±kararak net ivmeyi elde et
-    ivmeX = accX_ms2 - gX * 9.8066f;
-    ivmeY = accY_ms2 - gY * 9.8066f;
-    // ivmeZ istersen: ivmeZ = accZ_ms2 - gZ * 9.8066f;
+    // --- 4️⃣ Lineer ivme ---
+    ivmeX = ax - gX*9.8066f;
+    ivmeY = ay - gY*9.8066f;
+    ivmeZ = az - gZ*9.8066f;
 
-    // 5. HÄ±z ve konum hesabÄ±
-    hizX += ivmeX * 0.005f;
-    hizY += ivmeY * 0.005f;
+    // --- 5️⃣ Hız entegrasyonu ---
+    hizX += ivmeX * dt;
+    hizY += ivmeY * dt;
 
-    konumX += hizX * 0.005f;
-    konumY += hizY * 0.005f;
+    // --- 6️⃣ Konum entegrasyonu ---
+    konumX += hizX * dt;
+    konumY += hizY * dt;
 }
 
-/*
-void IMU::AccToKonum(float accX, float accY, float accZ)
-{
-    // YerÃ§ekimi bileÅŸenleri (aÃ§Ä±ya gÃ¶re)
-    float gY = sin(pitchAcisi_f * M_PI / 180.0f) * 9.8066f;
-    float gX = -sin(rollAci_f * M_PI / 180.0f) * cos(pitchAcisi_f * M_PI / 180.0f) * 9.8066f;
-
-    // Ä°vmeÃ¶lÃ§er deÄŸerlerini m/sÂ² cinsine Ã§evir
-    ivmeX = (accX / 16384.0f) * 9.8066f;
-    ivmeY = (accY / 16384.0f) * 9.8066f;
-
-    // YerÃ§ekimi bileÅŸenlerini Ã§Ä±kar
-    ivmeX -= gX;
-    ivmeY -= gY;
-
-    // HÄ±z ve konum hesabÄ±
-    hizX += ivmeX * 0.02f;
-    hizY += ivmeY * 0.02f;
-
-    konumX += hizX * 0.02f;
-    konumY += hizY * 0.02f;
-}
-*/
 void IMU::EnlemBoylamGuncelle(float heading , float enlem_f,float boylam_f)
 {
     // Heading radyan cinsinden
@@ -248,7 +244,7 @@ void IMU::EnlemBoylamGuncelle(float heading , float enlem_f,float boylam_f)
 }
 float* IMU::PitchAl(){ return &pitchAcisi_f;}
 float* IMU::RollAl(){return &rollAci_f;}
-float* IMU::YawAl(){return &gyroYawAci_f;}
+float* IMU::YawAl(){return &yawAci_f;}
 float* IMU::SicaklikAl(){return &Sicaklik_f;}
 float* IMU::LatAl(){return &enlem_f;}
 float* IMU::LongAl(){return &boylam_f;}

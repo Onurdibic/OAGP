@@ -1,17 +1,17 @@
-C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Madgwick.h:21:5:MadgwickAHRS::MadgwickAHRS(float)	1
-../ImuLibrary/Src/Mpu.cpp:18:1:IMU::IMU(I2C_HandleTypeDef*)	1
-../ImuLibrary/Src/Mpu.cpp:30:6:void IMU::Yapilandir()	2
-../ImuLibrary/Src/Mpu.cpp:51:6:void IMU::accOku()	1
-../ImuLibrary/Src/Mpu.cpp:63:6:void IMU::sicaklikOku()	1
-../ImuLibrary/Src/Mpu.cpp:74:6:void IMU::gyroOku()	1
-../ImuLibrary/Src/Mpu.cpp:87:6:void IMU::kalibreEt()	3
-../ImuLibrary/Src/Mpu.cpp:115:6:void IMU::gercekDataOku()	1
-../ImuLibrary/Src/Mpu.cpp:156:6:void IMU::aciBul()	1
-../ImuLibrary/Src/Mpu.cpp:175:6:void IMU::AccToKonum(float, float, float)	1
-../ImuLibrary/Src/Mpu.cpp:229:6:void IMU::EnlemBoylamGuncelle(float, float, float)	1
-../ImuLibrary/Src/Mpu.cpp:249:8:float* IMU::PitchAl()	1
-../ImuLibrary/Src/Mpu.cpp:250:8:float* IMU::RollAl()	1
-../ImuLibrary/Src/Mpu.cpp:251:8:float* IMU::YawAl()	1
-../ImuLibrary/Src/Mpu.cpp:252:8:float* IMU::SicaklikAl()	1
-../ImuLibrary/Src/Mpu.cpp:253:8:float* IMU::LatAl()	1
-../ImuLibrary/Src/Mpu.cpp:254:8:float* IMU::LongAl()	1
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Madgwick.h:23:5:MadgwickAHRS::MadgwickAHRS(float)	1
+../ImuLibrary/Src/Mpu.cpp:20:1:IMU::IMU(I2C_HandleTypeDef*)	1
+../ImuLibrary/Src/Mpu.cpp:33:6:void IMU::Yapilandir()	2
+../ImuLibrary/Src/Mpu.cpp:54:6:void IMU::accOku()	1
+../ImuLibrary/Src/Mpu.cpp:66:6:void IMU::sicaklikOku()	1
+../ImuLibrary/Src/Mpu.cpp:77:6:void IMU::gyroOku()	1
+../ImuLibrary/Src/Mpu.cpp:90:6:void IMU::kalibreEt()	3
+../ImuLibrary/Src/Mpu.cpp:118:6:void IMU::gercekDataOku()	1
+../ImuLibrary/Src/Mpu.cpp:160:6:void IMU::aciBul()	3
+../ImuLibrary/Src/Mpu.cpp:193:6:void IMU::AccToKonum(float)	1
+../ImuLibrary/Src/Mpu.cpp:225:6:void IMU::EnlemBoylamGuncelle(float, float, float)	1
+../ImuLibrary/Src/Mpu.cpp:245:8:float* IMU::PitchAl()	1
+../ImuLibrary/Src/Mpu.cpp:246:8:float* IMU::RollAl()	1
+../ImuLibrary/Src/Mpu.cpp:247:8:float* IMU::YawAl()	1
+../ImuLibrary/Src/Mpu.cpp:248:8:float* IMU::SicaklikAl()	1
+../ImuLibrary/Src/Mpu.cpp:249:8:float* IMU::LatAl()	1
+../ImuLibrary/Src/Mpu.cpp:250:8:float* IMU::LongAl()	1

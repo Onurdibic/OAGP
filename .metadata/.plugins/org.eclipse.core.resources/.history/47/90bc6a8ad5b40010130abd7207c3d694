@@ -1,0 +1,115 @@
+/*
+ * Gps.cpp
+ *
+ *  Created on: Jun 29, 2024
+ *      Author: onurd
+ */
+
+#include "Gps.h"
+#include <math.h>
+#include <stdbool.h>
+
+#define EARTH_RADIUS 6371000.0f  // Dünya yarıçapı (metre)
+
+GPS::GPS(UART_HandleTypeDef* huart)
+{
+    this->huart_ = huart;
+    this->rxIndex_u8 = 0;
+    this->rxData_u8 = 0;
+    this->latitude_f32 = 0;
+    this->longitude_f32 = 0;
+    this->gpsreset = true; // Başlangıçta GPS referans bekleyecek
+}
+
+void GPS::Yapilandir()
+{
+    lwgps_init(&gps_);
+    HAL_UART_Receive_DMA(huart_, &rxData_u8, 1);
+}
+
+void GPS::DataOku()
+{
+    if (rxData_u8 != '\n' && rxIndex_u8 < sizeof(rxBuffer_u8))
+    {
+        rxBuffer_u8[rxIndex_u8++] = rxData_u8;
+    }
+    else
+    {
+        lwgps_process(&gps_, rxBuffer_u8, rxIndex_u8 + 1);
+        GpsDataCek();
+
+        // Geçerli GPS verisi geldi mi kontrol et
+        if(fabs(gps_.longitude) >= 0.0001f && fabs(gps_.latitude) >= 0.0001f)
+        {
+            gpsreset = true;  // Dead reckoning referansı güncellenecek
+        }
+
+        rxIndex_u8 = 0;
+        rxData_u8 = 0;
+    }
+
+    HAL_UART_Receive_DMA(huart_, &rxData_u8, 1);
+}
+
+void GPS::GpsDataCek()
+{
+    latitude_f32 = gps_.latitude;
+    longitude_f32 = gps_.longitude;
+}
+
+// =============================
+// Ölü Hesaplama + GPS Resetli Versiyon (Güvenli Başlangıç)
+// =============================
+
+void GPS::YeniKonumHesapla(float enlem_girdi, float boylam_girdi, float heading_deg,
+                            float sag_hiz, float sol_hiz,
+                            float dt, bool* gpsSifirla,
+                            float* enlem_cikti, float* boylam_cikti)
+{
+    static float enlem_ref = 0.0f;   // Referans enlem
+    static float boylam_ref = 0.0f;  // Referans boylam
+    static bool gpsHazir = false;    // İlk geçerli GPS alındı mı?
+
+    // GPS geçerli ve reset tetiklenmişse
+    if (*gpsSifirla && fabs(enlem_girdi) >= 0.0001f && fabs(boylam_girdi) >= 0.0001f)
+    {
+        enlem_ref = enlem_girdi;
+        boylam_ref = boylam_girdi;
+        *gpsSifirla = false;
+        gpsHazir = true;  // Dead reckoning artık güvenle başlayabilir
+    }
+
+    // Eğer GPS henüz geçerli değilse, dead reckoning yapma
+    if (!gpsHazir)
+    {
+        *enlem_cikti = enlem_ref;
+        *boylam_cikti = boylam_ref;
+        return;
+    }
+
+    // Ortalama hız ve mesafe hesapla
+    float ortalama_hiz = (sag_hiz + sol_hiz) / 2.0f;
+    float mesafe = ortalama_hiz * dt;
+    float yon_rad = heading_deg * (M_PI / 180.0f);
+
+    // Yeni tahmini konum hesapla (ölü reckoning)
+    enlem_ref += (mesafe * cosf(yon_rad)) / EARTH_RADIUS * (180.0f / M_PI);
+    boylam_ref += (mesafe * sinf(yon_rad)) / (EARTH_RADIUS * cosf(enlem_ref * M_PI / 180.0f)) * (180.0f / M_PI);
+
+    *enlem_cikti = enlem_ref;
+    *boylam_cikti = boylam_ref;
+}
+
+// =============================
+// Latitude / Longitude Getter
+// =============================
+
+float* GPS::LatitudeAl()
+{
+    return &latitude_f32;
+}
+
+float* GPS::LongitudeAl()
+{
+    return &longitude_f32;
+}

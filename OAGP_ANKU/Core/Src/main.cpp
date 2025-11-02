@@ -25,10 +25,8 @@ extern "C" {
 #include "cmsis_os.h"
 #include "dma.h"
 #include "i2c.h"
-#include "i2s.h"
 #include "spi.h"
 #include "usart.h"
-#include "usb_host.h"
 #include "gpio.h"
 #include "freertos.h"
 
@@ -51,6 +49,8 @@ IMU imu(&hi2c1);
 MAG mag(&hi2c1);
 GPS gps(&huart2);
 Paket ArayuzPaket(&huart3);
+Paket ArabaArkaPaket(&huart4);
+Paket ArabaOnPaket(&huart5);
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -119,21 +119,24 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_I2C1_Init();
-  MX_I2S3_Init();
   MX_SPI1_Init();
   MX_USART3_UART_Init();
+  MX_USART2_UART_Init();
+  MX_UART4_Init();
+  MX_UART5_Init();
   /* USER CODE BEGIN 2 */
 
   mag.Yapilandir();
   imu.Yapilandir();
   gps.Yapilandir();
-  HAL_Delay(1000);
-  GPIOD->ODR ^= GPIO_PIN_12;
-  mag.XveYKalibreEt();
+
   GPIOD->ODR ^= GPIO_PIN_12;
   HAL_Delay(1000);
   imu.kalibreEt();
-
+  GPIOD->ODR ^= GPIO_PIN_12;
+  HAL_Delay(1000);
+  mag.XveYKalibreEt();
+  GPIOD->ODR ^= GPIO_PIN_12;
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -207,13 +210,20 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (huart->Instance == USART2)
 	{
-		gps.UartRxCpltCallback();
+		gps.DataOku();
 	}
-
     if(huart->Instance == USART3)
     {
-    	ArayuzPaket.ArayuzDataAlveBayrakKaldir();
+    	ArayuzPaket.DataAlveBayrakKaldir();
     }
+    if (huart->Instance == UART4)
+	{
+    	ArabaArkaPaket.DataAlveBayrakKaldir();
+	}
+    if (huart->Instance == UART5)
+	{
+    	ArabaOnPaket.DataAlveBayrakKaldir();
+	}
 }
 
 /* USER CODE END 4 */

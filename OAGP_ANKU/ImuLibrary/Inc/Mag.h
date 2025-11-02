@@ -11,6 +11,9 @@
 
 #include "stm32f4xx_hal.h"
 #include <cmath>
+
+#define PI 3.14f
+
 // HMC5883L Register Adresleri
 typedef enum
 {
@@ -50,15 +53,22 @@ public:
   void Yapilandir();
   void MagDataOku(int16_t *x_s16, int16_t *y_s16, int16_t *z_s16);
   void XveYKalibreEt();
+  void TumEkseniKalibreEt();
   void ZKalibreEt();
 
   float* HeadingOlustur(float pitch, float roll);
-
+  float xOffset_f, yOffset_f,zOffset_f;
+  int16_t x_s16, y_s16, z_s16;
+  float Xh;
+  float Yh;
+  float kalibreliX_f, kalibreliY_f, kalibreliZ_f;
+  float xScaleFactor_f, yScaleFactor_f,zScaleFactor_f;
 private:
   I2C_HandleTypeDef *hi2c;
-  int16_t x_s16, y_s16, z_s16;
-  float xOffset_f, yOffset_f,zOffset_f;
+
   float heading_f, headingAcisi_f;
+
+
 };
 
 

@@ -1,6 +1,7 @@
-../MotorKontrolLibrary/Src/Motor.cpp:11:1:Motor::Motor(TIM_HandleTypeDef*, TIM_HandleTypeDef*, uint32_t, uint32_t, uint32_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	24	static
-../MotorKontrolLibrary/Src/Motor.cpp:38:6:void Motor::init()	16	static
-../MotorKontrolLibrary/Src/Motor.cpp:49:6:void Motor::updateHall()	24	static
-../MotorKontrolLibrary/Src/Motor.cpp:59:6:void Motor::hizHesapla(float)	16	static
-../MotorKontrolLibrary/Src/Motor.cpp:70:6:void Motor::setDirection(MotorDirection)	16	static
-../MotorKontrolLibrary/Src/Motor.cpp:72:6:void Motor::komutasyon(uint16_t)	16	static
+../MotorKontrolLibrary/Src/Motor.cpp:10:1:Motor::Motor(TIM_HandleTypeDef*, TIM_HandleTypeDef*, uint32_t, uint32_t, uint32_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	24	static
+../MotorKontrolLibrary/Src/Motor.cpp:37:6:void Motor::init()	16	static
+../MotorKontrolLibrary/Src/Motor.cpp:48:6:void Motor::updateHall()	24	static
+../MotorKontrolLibrary/Src/Motor.cpp:58:6:void Motor::hizHesaplaFiltered(float)	48	static
+../MotorKontrolLibrary/Src/Motor.cpp:83:6:void Motor::setDirection(MotorDirection)	16	static
+../MotorKontrolLibrary/Src/Motor.cpp:85:5:int Motor::updatePWM(int, float)	40	static
+../MotorKontrolLibrary/Src/Motor.cpp:107:6:void Motor::komutasyon(uint16_t)	16	static

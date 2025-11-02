@@ -1,0 +1,174 @@
+#include "Paket.h"
+#include <string.h>
+
+enum Durumlar
+{
+	Baslik1Coz,
+	Baslik2Coz,
+	PaketTuruSec,
+	DataBoyutuAl,
+	DataOku
+};
+enum GelenPaketler
+{
+	ROTA=0x01,
+	VERSIYON=0x02,
+	YOKLAMA=0x03,
+	DUR=0x04,
+	KOMUT=0x07
+};
+
+enum Tekerler
+{
+	arkaSag=0x01,
+	arkaSol=0x02,
+	onSag=0x03,
+	onSol=0x04
+};
+
+Paket::Paket(UART_HandleTypeDef* huart)
+{
+	this->huart=huart;
+}
+
+Paket::Paket(uint8_t baslik1_u8, uint8_t baslik2_u8, uint8_t paketTipi_u8, uint8_t dataBoyutu_u8)
+{
+	this->baslik1_u8=baslik1_u8;
+	this->baslik2_u8=baslik2_u8;
+	this->paketTipi_u8=paketTipi_u8;
+	this->dataBoyutu_u8=dataBoyutu_u8;
+}
+
+void Paket::TekerPaketOlustur(float teker_f ,float hiz_f)
+{
+	tekerpaket[0] = baslik1_u8;
+	tekerpaket[1] = baslik2_u8;
+	tekerpaket[2] = paketTipi_u8;
+	tekerpaket[3] = dataBoyutu_u8;
+
+    floatToBytes(&teker_f, tekerBytes_u8);
+    floatToBytes(&hiz_f, hizBytes_u8);
+
+    memcpy(tekerpaket + 4, tekerBytes_u8, 4);
+    memcpy(tekerpaket + 8, hizBytes_u8, 4);
+
+    tekerpaket[12]=CRC8Hesaplama(tekerpaket,4, 12);
+}
+
+
+void Paket::PaketKesmeYapilandir()
+{
+	HAL_UART_Receive_DMA(huart, &Data, 1);
+}
+
+// -------------------- RING BUFFER: YAZMA KISMI --------------------
+void Paket::DataAlveBayrakKaldir()
+{
+	ArayuzBuffer_u8[writeIndex_u16] = Data;
+	writeIndex_u16 = (writeIndex_u16 + 1) % sizeof(ArayuzBuffer_u8);
+
+	HAL_UART_Receive_DMA(huart, &Data, 1);
+}
+// ----------------------------------------------------------------------
+
+
+// -------------------- RING BUFFER: OKUMA & ÇÖZME --------------------
+void Paket::PaketCoz()
+{
+    static Durumlar Durum = Baslik1Coz;
+    static GelenPaketler Paket = VERSIYON;
+    static uint8_t tempBuffer[20];
+    static uint8_t tempIndex = 0;
+
+    while (readIndex_u16 != writeIndex_u16)
+    {
+        uint8_t byte = ArayuzBuffer_u8[readIndex_u16];
+        readIndex_u16 = (readIndex_u16 + 1) % sizeof(ArayuzBuffer_u8);
+
+        switch (Durum)
+        {
+            case Baslik1Coz:
+                if (byte == 0x12)
+                    Durum = Baslik2Coz;
+                break;
+
+            case Baslik2Coz:
+                if (byte == 0x34)
+                    Durum = PaketTuruSec;
+                else
+                    Durum = Baslik1Coz;
+                break;
+
+            case PaketTuruSec:
+                Paket = (GelenPaketler)byte;
+                Durum = DataBoyutuAl;
+                break;
+
+            case DataBoyutuAl:
+                dataLength_s16 = byte;
+                tempIndex = 0;
+                Durum = DataOku;
+                break;
+
+            case DataOku:
+                tempBuffer[tempIndex++] = byte;
+
+                if (tempIndex >= dataLength_s16)
+                {
+                    // KOMUT PAKETİ GELDİYSE
+                    if (Paket == KOMUT && dataLength_s16 == 9)
+                    {
+                        if (tempBuffer[8] == CRC8Hesaplama(tempBuffer, 0, 8))
+                        {
+                            gelenYon_f = bytesToFloat(tempBuffer, 0);
+                            gelenRpm_f = bytesToFloat(tempBuffer, 4);
+
+                        }
+                    }
+                    Durum = Baslik1Coz;
+                }
+                break;
+        }
+    }
+}
+// ----------------------------------------------------------------------
+
+float Paket::gelenYonAl(){return gelenYon_f;}
+float Paket::gelenRpmAl(){return gelenRpm_f;}
+void Paket::tekerPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, tekerpaket, sizeof(tekerpaket));}
+
+uint8_t Paket::CRC8Hesaplama(uint8_t *data, uint8_t baslangic ,uint8_t bitis)
+{
+    uint8_t crc = 0x00;
+
+    for (uint8_t i = baslangic; i < bitis; i++)
+    {
+        crc ^= data[i];
+        for (uint8_t j = 0; j < 8; j++)
+        {
+            if (crc & 0x80)
+                crc = (crc << 1) ^ 0X07;
+            else
+                crc <<= 1;
+        }
+    }
+    return crc;
+}
+
+float Paket::bytesToFloat(uint8_t* buffer_u8, int32_t startIndex_s32)
+{
+	uint32_t intBits_u32 =(buffer_u8[(startIndex_s32 + 3)] << 24) |
+    					(buffer_u8[(startIndex_s32 + 2)] << 16) |
+						(buffer_u8[(startIndex_s32 + 1)] << 8)  |
+						(buffer_u8[(startIndex_s32 + 0)] << 0)  ;
+
+    memcpy(&floatsonuc_f, &intBits_u32, sizeof(floatsonuc_f));
+    return floatsonuc_f;
+}
+
+void Paket::floatToBytes(float *Deger_f, uint8_t* bytes)
+{
+    uint8_t* p = (uint8_t*)Deger_f;
+    for (int i = 0; i < 4; i++)
+        bytes[i] = p[i];
+}

@@ -1,0 +1,70 @@
+#ifndef INC_PAKET_H_
+#define INC_PAKET_H_
+
+#include "stm32f1xx_hal.h"
+#include <stdint.h>
+#include <string.h>
+
+class Paket
+{
+public:
+    // Constructor
+    Paket(UART_HandleTypeDef* huart);
+    Paket(uint8_t baslik1_u8, uint8_t baslik2_u8, uint8_t paketTipi_u8, uint8_t dataBoyutu_u8);
+
+    // Paket oluşturma
+    void KomutPaketOlustur(float yon, float rpm);      // Komut paketi oluştur
+    void TekerPaketOlustur(float saghiz_f ,float solhiz_f)// Teker paketi oluştur
+    void komutPaketCagir(uint8_t *kopyaDizi);          // Paketi kopya olarak çağır
+
+    // UART & Ring buffer
+    void PaketKesmeYapilandir();      // DMA ile veri almayı başlat
+    void DataAlveBayrakKaldir();      // DMA interrupt sonrası buffer'a ekle
+
+    // Paket çözme
+    void PaketCoz();
+    float gelenYonAl();
+    float gelenRpmAl();
+    void tekerPaketCagir(uint8_t *kopyaDizi);
+
+    // Paket byte dizileri
+    uint8_t tekerpaket[13];
+
+private:
+    UART_HandleTypeDef* huart;
+
+    // Yardımcı fonksiyonlar
+    uint8_t CRC8Hesaplama(uint8_t *data, uint8_t baslangic, uint8_t bitis);
+    void floatToBytes(float *Deger_f, uint8_t* bytes);
+    float bytesToFloat(uint8_t* buffer_u8, int32_t startIndex_s32);
+
+    // Paket verileri
+    uint8_t komutpaket[14];
+    uint8_t Data;
+
+    // Ring buffer
+    uint8_t ArayuzBuffer_u8[120];
+    uint16_t writeIndex_u16 = 0;
+    uint16_t readIndex_u16  = 0;
+
+    // Veri byte dizileri
+    uint8_t yonBytes_u8[4];
+    uint8_t rpmBytes_u8[4];   // Komut paketi için
+    uint8_t tekerBytes_u8[4]; // Teker paketi için
+    uint8_t hizBytes_u8[4];   // Teker paketi hızı için
+
+    // Paket başlık bilgileri
+    uint8_t baslik1_u8;
+    uint8_t baslik2_u8;
+    uint8_t paketTipi_u8;
+    uint8_t dataBoyutu_u8;
+    int16_t dataLength_s16 = 0;
+    uint8_t teker_u8;
+
+    // Çözülmüş veri
+    float floatsonuc_f = 0;
+    float gelenYon_f = 0;
+    float gelenRpm_f = 0;
+};
+
+#endif /* INC_PAKET_H_ */

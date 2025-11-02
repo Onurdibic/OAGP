@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Motor.h"
+#include "Paket.h"
 /* USER CODE END Includes */
 #define RX_BUFFER_SIZE 128   // buffer boyutu, ihtiyacına göre artırabilirsin
 #define HALLS_PER_REV 90
@@ -56,6 +57,9 @@ Motor motor2(&htim8,&htim2,TIM_CHANNEL_1, TIM_CHANNEL_3, TIM_CHANNEL_2,
              M2_HALL_B_GPIO_Port, M2_HALL_B_Pin,
              M2_HALL_C_GPIO_Port, M2_HALL_C_Pin);
 
+Paket ANKUPaket(&huart3);
+Paket TekerPaket(0x12, 0x34, 0x06, 0x09);
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -77,29 +81,40 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t motor1pwm=0;
-uint16_t motor2pwm=0;
-float hedefRPM_motor1 = 300.0f;
-float hedefRPM_motor2 = 0.0f;
-float hata=0;
-float Kp = 0.5f;
-float Ki = 0.6f;
-float integral = 0.0f;
-float I_LIMIT = 2000.0f;
+// Gelen komut değişkenleri
+float yon_f = 0.0f;
+float sagRpm_f = 0.0f;
+float solRpm_f = 0.0f;
+int counterrr=0;
+// PI hata değişkenleri (motor 1 ve 2)
+float hata1 = 0.0f;
+float hata2 = 0.0f;
 
+// Integral akümülatörleri (PI kontrol)
+float integral1 = 0.0f;
+float integral2 = 0.0f;
+
+// PWM çıkışları
+int pwm1 = 0;
+int pwm2 = 0;
+int motor1pwm = 0;
+int motor2pwm = 0;
+float sag_hiz =0;
+float sol_hiz=0;
 uint8_t rxBuffer[RX_BUFFER_SIZE];
 uint8_t rxData;
-uint8_t txByte = 0x55;
+uint8_t tekerBuffer[13];
+
 volatile uint16_t rxIndex = 0;
 
-volatile uint8_t flag_5ms  = 0;
+volatile uint8_t flag_10ms  = 0;
 volatile uint8_t flag_20ms = 0;
 volatile uint8_t flag_100ms = 0;
 volatile uint8_t flag_500ms = 0;
 volatile uint8_t flag_1000ms = 0;
 
 volatile uint16_t tickCounter = 0;
-
+int MotorPIKontrol(float rpm_hedef, float rpm_olculen, float *integral);
 /* USER CODE END 0 */
 
 /**
@@ -116,7 +131,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -134,11 +149,12 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM8_Init();
   MX_TIM2_Init();
-  MX_USART3_UART_Init();
   MX_DMA_Init();
+  MX_USART3_UART_Init();
+
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2);
-  HAL_UART_Receive_DMA(&huart3, &rxData, 1);
+  ANKUPaket.PaketKesmeYapilandir();
 
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
@@ -163,11 +179,13 @@ int main(void)
 
   motor1.init();
   motor2.init();
-
-  motor1.aktif = false;
-  motor2.aktif = false;
+  motor1.aktif = true;
+  motor2.aktif = true;
   motor1.setDirection(ILERI);
   motor2.setDirection(ILERI);
+  motor1.updateHall();
+  motor2.updateHall();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -178,57 +196,67 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	 // HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
-//	  HAL_Delay(200);
 	  motor1.komutasyon(motor1pwm);
 	  motor2.komutasyon(motor2pwm);
 
-	  if(flag_5ms)
+	  if(flag_10ms)
 	  {
-		  flag_5ms = 0;
-		  // 5 ms işlemleri
+		flag_10ms = 0;
+		// 10 ms işlemleri
+		ANKUPaket.PaketCoz();
+
 	  }
 
-	  if(flag_20ms)
+	  if (flag_20ms)
 	  {
-		  flag_20ms = 0;
-		  // 20 ms işlemleri
-		  // Motor1 hız kontrolü
-		  if(motor1.aktif)
+	      flag_20ms = 0;
+		  yon_f = ANKUPaket.gelenYonAl();
+		  sagRpm_f = ANKUPaket.gelenSagRpmAl();
+		  solRpm_f = ANKUPaket.gelenSolRpmAl();
+
+		  if (yon_f == 1) { motor1.setDirection(ILERI); motor2.setDirection(ILERI); }
+		  else if (yon_f == 2) { motor1.setDirection(GERI); motor2.setDirection(GERI); }
+
+//		  // --- PI Kontrol Önce Anlık RPM Değeri ---
+		  motor1.hizHesaplaFiltered(0.02f);
+		  motor2.hizHesaplaFiltered(0.02f);
+
+		  // PWM hesapla
+		  motor1pwm = motor1.updatePWM(sagRpm_f, 0.02f);
+		  motor2pwm = motor2.updatePWM(solRpm_f, 0.02f);
+
+		  // Komutasyonu ayrı çağır
+		  motor1.komutasyon(motor1pwm);
+		  motor2.komutasyon(motor2pwm);
+
+
+		  sag_hiz = motor1.m_speed_ms;
+		  sol_hiz = motor2.m_speed_ms;
+
+		  if (motor1.getDirection() == GERI)
 		  {
-			  float mevcutRPM = motor1.m_rpm;
-			  hata = hedefRPM_motor1 - mevcutRPM;
-
-			  integral += hata * 0.02f;  // 20 ms = 0.02 s
-			  if(integral > I_LIMIT)  integral = I_LIMIT;
-			  if(integral < -I_LIMIT) integral = -I_LIMIT;
-
-			  // PWM hesapla
-			  float kontrol = (Kp * hata) + (Ki * integral);
-
-			  motor1pwm = (int)kontrol;
-
-			  // PWM limitleri
-			  if(motor1pwm < 0)   motor1pwm = 0;
-			  if(motor1pwm > 650) motor1pwm = 650;
+		      sag_hiz = -sag_hiz;
+		      sol_hiz = -sol_hiz;
 		  }
 
+		  TekerPaket.TekerPaketOlustur(sag_hiz, sol_hiz);
+		  TekerPaket.tekerPaketCagir(tekerBuffer);
+		  HAL_UART_Transmit_DMA(&huart3, tekerBuffer, sizeof(tekerBuffer));
 	  }
 
 	  if(flag_100ms)
 	  {
 		  flag_100ms = 0;
 		  // 100 ms işlemleri
-
-
+//		  		  motor1.hizHesaplaFiltered(0.1f);
+//		  		  motor2.hizHesaplaFiltered(0.1f);
 	  }
 
 	  if(flag_500ms)
 	  {
 		  flag_500ms = 0;
 		  // 500 ms işlemleri
-		  uint8_t txBuf[1] = {0x55};
-		  HAL_UART_Transmit_DMA(&huart3, txBuf, 1);
+		  // --- PI Kontrol Önce Anlık RPM Değeri ---
 
 	  }
 
@@ -238,13 +266,13 @@ int main(void)
 		  // 1 saniyelik işlemler
 		  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 
-		  motor1.hizHesapla(1);
-		  motor2.hizHesapla(1);
 	  }
 
   }
   /* USER CODE END 3 */
 }
+
+
 
 /**
   * @brief System Clock Configuration
@@ -289,13 +317,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	if (GPIO_Pin == M1_HALL_A_Pin || GPIO_Pin == M1_HALL_B_Pin || GPIO_Pin == M1_HALL_C_Pin)
 	{
 		motor1.updateHall();
-//		motor1.hallCounter++;
 	}
 
 	if (GPIO_Pin == M2_HALL_A_Pin || GPIO_Pin == M2_HALL_B_Pin || GPIO_Pin == M2_HALL_C_Pin)
 	{
 		motor2.updateHall();
-//		motor2.hallCounter++;
 	}
 }
 
@@ -304,6 +330,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if(htim->Instance == TIM2)
     {
        tickCounter++;  // 5 ms sayacı
+       if(tickCounter % 2 == 0)    // 10 ms (2 * 5 ms)
+      		   flag_10ms = 1;
 
 	   if(tickCounter % 4 == 0)    // 20 ms (4 * 5 ms)
 		   flag_20ms = 1;
@@ -327,12 +355,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART3)
     {
-        // gelen byte’ı buffer’a koy
-        rxBuffer[rxIndex++] = rxData;
-        if(rxIndex >= RX_BUFFER_SIZE) rxIndex = 0;
-
-        // tekrar DMA başlat (1 byte)
-        HAL_UART_Receive_DMA(&huart3, &rxData, 1);
+    	ANKUPaket.DataAlveBayrakKaldir();
+    	counterrr++;
     }
 }
 

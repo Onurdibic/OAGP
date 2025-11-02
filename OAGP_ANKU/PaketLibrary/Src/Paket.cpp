@@ -15,14 +15,26 @@ enum Durumlar
 	DataBoyutuAl,
 	DataOku
 };
-enum Paketler
+enum GelenPaketler
 {
 	ROTA=0x01,
 	VERSIYON=0x02,
 	YOKLAMA=0x03,
 	DUR=0x04,
-	YON=0x05
+	YON=0x05,
+	TEKER=0x06
 };
+
+//enum GidenPaketler
+//{
+//	GPS=0x01,
+//	IMU=0x02,
+//	VERSIYON=0x03,
+//	YOKLAMA=0x04,
+//	ROTA =0x05,
+//	SISTEM=0x06,
+//	KOMUT=0x07
+//};
 
 Paket::Paket(UART_HandleTypeDef* huart)
 {
@@ -39,7 +51,7 @@ Paket::Paket(uint8_t baslik1_u8, uint8_t baslik2_u8, uint8_t paketTipi_u8, uint8
 
 void Paket::PaketKesmeYapilandir()
 {
-	HAL_UART_Receive_DMA(huart, &ArayuzData,1);
+	HAL_UART_Receive_DMA(huart, &Data,1);
 }
 
 void Paket::GpsPaketOlustur(float latitude,float longitude,float altitude,float derece)
@@ -80,20 +92,6 @@ void Paket::ImuPaketOlustur(float pitch,float roll,float heading,float sicaklik)
     imupaket[20] = CRC8Hesaplama(imupaket, 4,20);
 }
 
-void Paket::SistemPaketOlustur(float derece,float batarya)
-{
-	sistempaket[0] = baslik1_u8;
-	sistempaket[1] = baslik2_u8;
-	sistempaket[2] = paketTipi_u8;
-	sistempaket[3] = dataBoyutu_u8;
-	floatToBytes(&derece, dereceBytes_u8);
-	floatToBytes(&batarya, bataryaBytes_u8);
-	memcpy(sistempaket + 4, dereceBytes_u8, 4);
-	memcpy(sistempaket + 8, bataryaBytes_u8, 4);
-
-	sistempaket[12] = CRC8Hesaplama(sistempaket, 4,12);
-}
-
 void Paket::VersiyonPaketOlustur(uint8_t b,uint8_t o,uint8_t s)
 {
 	versiyonpaket[0] = baslik1_u8;
@@ -130,154 +128,173 @@ void Paket::RotaPaketOlustur()
 	rotapaket[7] = CRC8Hesaplama(rotapaket, 4,7);
 }
 
+void Paket::SistemPaketOlustur(float derece,float batarya)
+{
+	sistempaket[0] = baslik1_u8;
+	sistempaket[1] = baslik2_u8;
+	sistempaket[2] = paketTipi_u8;
+	sistempaket[3] = dataBoyutu_u8;
+	floatToBytes(&derece, dereceBytes_u8);
+	floatToBytes(&batarya, bataryaBytes_u8);
+	memcpy(sistempaket + 4, dereceBytes_u8, 4);
+	memcpy(sistempaket + 8, bataryaBytes_u8, 4);
+
+	sistempaket[12] = CRC8Hesaplama(sistempaket, 4,12);
+}
+
+void Paket::KomutPaketOlustur(float yon, float rpmSag, float rpmSol)
+{
+	komutpaket[0] = baslik1_u8;
+	komutpaket[1] = baslik2_u8;
+	komutpaket[2] = paketTipi_u8;
+	komutpaket[3] = dataBoyutu_u8;
+	floatToBytes(&yon, yonBytes_u8);
+	floatToBytes(&rpmSag, rpmSagBytes_u8);
+	floatToBytes(&rpmSol, rpmSolBytes_u8);
+	memcpy(komutpaket + 4, yonBytes_u8, 4);
+	memcpy(komutpaket + 8, rpmSagBytes_u8, 4);
+	memcpy(komutpaket + 12, rpmSolBytes_u8, 4);
+
+	komutpaket[16] = CRC8Hesaplama(komutpaket, 4,16);
+}
+
 void Paket::gpsPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, gpspaket, sizeof(gpspaket));}
 void Paket::imuPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, imupaket, sizeof(imupaket));}
-void Paket::sistemPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, sistempaket, sizeof(sistempaket));}
 void Paket::versiyonPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, versiyonpaket, sizeof(versiyonpaket));}
 void Paket::yoklamaPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, yoklamapaket, sizeof(yoklamapaket));}
 void Paket::rotaPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, rotapaket, sizeof(rotapaket));}
+void Paket::sistemPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, sistempaket, sizeof(sistempaket));}
+void Paket::komutPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, komutpaket, sizeof(komutpaket));}
 
-void Paket::ArayuzDataAlveBayrakKaldir()
+void Paket::DataAlveBayrakKaldir()
 {
-	if (ArayuzData!=0xFF)
-	{
-		ArayuzBuffer_u8[ArayuzIndex_u8] = ArayuzData;
-		ArayuzIndex_u8 = (ArayuzIndex_u8 + 1) % sizeof(ArayuzBuffer_u8);
-	}
-	else
-	{
-		PaketCozBayrak=true;
-	}
-	 HAL_UART_Receive_DMA(huart, &ArayuzData, 1);
+    ArayuzBuffer_u8[writeIndex_u16] = Data;
+    writeIndex_u16 = (writeIndex_u16 + 1) % sizeof(ArayuzBuffer_u8);
+
+    HAL_UART_Receive_DMA(huart, &Data, 1);
 }
 
 void Paket::PaketCoz()
 {
-    Durumlar Durum = Baslik1Coz;
-    Paketler Paket = VERSIYON;
-    bool islem = true;
+    static Durumlar Durum = Baslik1Coz;
+    static GelenPaketler Paket = VERSIYON;
 
-    while (islem)
+    while (readIndex_u16 != writeIndex_u16)
     {
+        uint8_t byte = ArayuzBuffer_u8[readIndex_u16];
+        readIndex_u16 = (readIndex_u16 + 1) % sizeof(ArayuzBuffer_u8);
+
         switch (Durum)
         {
+            // -------------------- HEADER 1 --------------------
             case Baslik1Coz:
-            	if (ArayuzBuffer_u8[startIndex_u32] == 0x12 && ArayuzBuffer_u8[startIndex_u32] != 0)
-                {
+                if (byte == 0x12)
                     Durum = Baslik2Coz;
-                }
-                startIndex_u32 = (startIndex_u32 + 1) % sizeof(ArayuzBuffer_u8);
                 break;
 
+            // -------------------- HEADER 2 --------------------
             case Baslik2Coz:
-                if (ArayuzBuffer_u8[startIndex_u32] == 0x34 && ArayuzBuffer_u8[startIndex_u32] != 0)
-                {
+                if (byte == 0x34)
                     Durum = PaketTuruSec;
-                    startIndex_u32 = (startIndex_u32 + 1) % sizeof(ArayuzBuffer_u8);
-                }
                 else
-                {
                     Durum = Baslik1Coz;
-                    startIndex_u32 = (startIndex_u32 + 1) % sizeof(ArayuzBuffer_u8);
-                }
                 break;
 
+            // -------------------- PAKET TÜRÜ --------------------
             case PaketTuruSec:
-                if (ArayuzBuffer_u8[startIndex_u32] != 0)
-                {
-                    Paket = (Paketler)ArayuzBuffer_u8[startIndex_u32];
-                    Durum = DataBoyutuAl;
-                    startIndex_u32 = (startIndex_u32 + 1) % sizeof(ArayuzBuffer_u8);
-                }
-                else
-                {
-                    Durum = Baslik1Coz;
-                    startIndex_u32 = (startIndex_u32 + 1) % sizeof(ArayuzBuffer_u8);
-                }
+                Paket = (GelenPaketler)byte;
+                Durum = DataBoyutuAl;
                 break;
 
+            // -------------------- DATA BOYUTU --------------------
             case DataBoyutuAl:
-                if (ArayuzBuffer_u8[startIndex_u32] != 0)
-                {
-                    dataLength_s16 = ArayuzBuffer_u8[startIndex_u32];
-                    Durum = DataOku;
-                    startIndex_u32 = (startIndex_u32 + 1) % sizeof(ArayuzBuffer_u8);
-                }
-                else
-                {
-                    Durum = Baslik1Coz;
-                    startIndex_u32 = (startIndex_u32 + 1) % sizeof(ArayuzBuffer_u8);
-                }
+                dataLength_s16 = byte;
+                tempIndex = 0;
+                Durum = DataOku;
                 break;
 
+            // -------------------- DATA OKUMA --------------------
             case DataOku:
-                if (Paket == ROTA && dataLength_s16 == 9)
-                {
-                	if (ArayuzBuffer_u8[(startIndex_u32 + 8) % sizeof(ArayuzBuffer_u8)] == CRC8Hesaplama(ArayuzBuffer_u8,startIndex_u32,startIndex_u32 + 8))
-                	{
-                		if(GidilecekNoktaBayrak==false)
-                		{
-                			ArayuzEnlem_f = bytesToFloat(ArayuzBuffer_u8, startIndex_u32);
-                			ArayuzBoylam_f = bytesToFloat(ArayuzBuffer_u8, (startIndex_u32 + 4) % sizeof(ArayuzBuffer_u8));
-                		}
-                		GidilecekNoktaBayrak = true;
-                		RotaGeldiBayrak=true;
-                	}
+                tempBuffer[tempIndex++] = byte;
 
-                    startIndex_u32 = (startIndex_u32 + dataLength_s16) % sizeof(ArayuzBuffer_u8);
+                if (tempIndex >= dataLength_s16)
+                {
+                    bool crcDogru = false;
+
+                    switch (Paket)
+                    {
+                    	// -------------------- TEKER --------------------
+						case TEKER:
+							if (dataLength_s16 == 9 &&tempBuffer[8] == CRC8Hesaplama(tempBuffer, 0, 8))
+							{
+								saghiz_f = bytesToFloat(tempBuffer, 0);
+								solhiz_f = bytesToFloat(tempBuffer, 4);
+							}
+							break;
+                        // -------------------- ROTA --------------------
+                        case ROTA:
+                            if (dataLength_s16 == 9 && tempBuffer[8] == CRC8Hesaplama(tempBuffer, 0, 8))
+                            {
+                                if (!GidilecekNoktaBayrak)
+                                {
+                                    ArayuzEnlem_f = bytesToFloat(tempBuffer, 0);
+                                    ArayuzBoylam_f = bytesToFloat(tempBuffer, 4);
+                                }
+                                GidilecekNoktaBayrak = true;
+                                RotaGeldiBayrak = true;
+                            }
+                            break;
+
+                        // -------------------- VERSİYON --------------------
+                        case VERSIYON:
+                            if (dataLength_s16 == 4 && tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
+                            {
+                                VersiyonPaketBayrak = true;
+                            }
+                            break;
+
+                        // -------------------- YOKLAMA --------------------
+                        case YOKLAMA:
+                            if (dataLength_s16 == 4 &&
+                                tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
+                            {
+                                YoklamaFlag = true;
+                                YoklamaPaketFlag = true;
+                            }
+                            break;
+
+                        // -------------------- DUR --------------------
+                        case DUR:
+                            if (dataLength_s16 == 4 &&
+                                tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
+                            {
+                                arabaDurBayrak = true;
+                            }
+                            break;
+
+                        // -------------------- YÖN --------------------
+                        case YON:
+                            if (dataLength_s16 == 4 &&
+                                tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
+                            {
+                                switch (tempBuffer[0])
+                                {
+                                    case 0x01: ileriGitBayrak = true; break;
+                                    case 0x02: geriGitBayrak = true; break;
+                                    case 0x03: sagaGitBayrak = true; break;
+                                    case 0x04: solaGitBayrak = true; break;
+                                    case 0x05: ileriDurBayrak = true; break;
+                                    case 0x06: geriDurBayrak = true; break;
+                                }
+                            }
+                            break;
+
+                        default:
+                            // Tanımsız paket tipi
+                            break;
+                    }
+
                     Durum = Baslik1Coz;
-                    islem = false;
-                }
-                else if (Paket == VERSIYON && dataLength_s16 == 4)
-                {
-                	if (ArayuzBuffer_u8[(startIndex_u32 + 3) % sizeof(ArayuzBuffer_u8)] == CRC8Hesaplama(ArayuzBuffer_u8,startIndex_u32,startIndex_u32 + 3))
-                	{
-                		VersiyonPaketBayrak=true;
-                	}
-
-                    startIndex_u32 = (startIndex_u32 + dataLength_s16) % sizeof(ArayuzBuffer_u8);
-                    Durum = Baslik1Coz;
-                    islem = false;
-                }
-                else if (Paket == YOKLAMA && dataLength_s16 == 4)
-                {
-                	if (ArayuzBuffer_u8[(startIndex_u32 + 3) % sizeof(ArayuzBuffer_u8)] == CRC8Hesaplama(ArayuzBuffer_u8,startIndex_u32,startIndex_u32 + 3))
-                	{
-                		YoklamaFlag=true;
-                		YoklamaPaketFlag=true;
-                	}
-
-
-                    startIndex_u32 = (startIndex_u32 + dataLength_s16) % sizeof(ArayuzBuffer_u8);
-                    Durum = Baslik1Coz;
-                    islem = false;
-                }
-                else if(Paket == DUR && dataLength_s16==4)
-                {
-                	if (ArayuzBuffer_u8[(startIndex_u32 + 3) % sizeof(ArayuzBuffer_u8)] == CRC8Hesaplama(ArayuzBuffer_u8,startIndex_u32,startIndex_u32 + 3))
-                	{
-                		arabaDurBayrak=true;
-                	}
-
-                	startIndex_u32 = (startIndex_u32 + dataLength_s16) % sizeof(ArayuzBuffer_u8);
-                	Durum = Baslik1Coz;
-                	islem = false;
-                }
-                else if(Paket == YON && dataLength_s16==4)
-				{
-					if (ArayuzBuffer_u8[(startIndex_u32 + 3) % sizeof(ArayuzBuffer_u8)] == CRC8Hesaplama(ArayuzBuffer_u8,startIndex_u32,startIndex_u32 + 3))
-					{
-
-					}
-
-					startIndex_u32 = (startIndex_u32 + dataLength_s16) % sizeof(ArayuzBuffer_u8);
-					Durum = Baslik1Coz;
-					islem = false;
-				}
-                else
-                {
-                    Durum = Baslik1Coz;
-                    islem = false;
                 }
                 break;
         }
@@ -293,16 +310,16 @@ uint8_t Paket::CRC8Hesaplama(uint8_t *data, uint8_t baslangic ,uint8_t bitis)
 
     for (uint8_t i = baslangic; i < bitis; i++)
     {
-        crc ^= data[i]; // CRC deÄŸerini, dizinin bir sonraki byte ile XOR
-        for (uint8_t j = 0; j < 8; j++) //Her bir byte iÃ§in dÃ¶ngÃ¼
+        crc ^= data[i]; // CRC deÃ„Å¸erini, dizinin bir sonraki byte ile XOR
+        for (uint8_t j = 0; j < 8; j++) //Her bir byte iÃƒÂ§in dÃƒÂ¶ngÃƒÂ¼
         {
-            if (crc & 0x80)//CRC deÄŸerinin en soldaki biti 1 mi
+            if (crc & 0x80)//CRC deÃ„Å¸erinin en soldaki biti 1 mi
             {
-                crc = (crc << 1) ^ 0X07; //En yÃ¼ksek bit birse CRC deÄŸerini bir bit sola kaydÄ±r ve XOR iÅŸlemi yap
+                crc = (crc << 1) ^ 0X07; //En yÃƒÂ¼ksek bit birse CRC deÃ„Å¸erini bir bit sola kaydÃ„Â±r ve XOR iÃ…Å¸lemi yap
             }
             else
             {
-                crc <<= 1; //En yÃ¼ksek bit sÄ±fÄ±rsa CRC deÄŸerini bir bit sola kaydÄ±r
+                crc <<= 1; //En yÃƒÂ¼ksek bit sÃ„Â±fÃ„Â±rsa CRC deÃ„Å¸erini bir bit sola kaydÃ„Â±r
             }
         }
     }
@@ -328,6 +345,5 @@ void Paket::floatToBytes(float *Deger_f, uint8_t* bytes)
         bytes[i] = p[i];
     }
 }
-
 
 

@@ -16,10 +16,15 @@ class GPS {
 public:
     GPS(UART_HandleTypeDef* huart);
     void Yapilandir();
-    void UartRxCpltCallback();
+    void DataOku();
     float* LatitudeAl();
     float* LongitudeAl();
     void GpsDataCek();
+    void YeniKonumHesapla(float enlem_girdi, float boylam_girdi, float heading_deg,
+                                float sag_hiz, float sol_hiz, float dt,
+                                bool* gpsSifirla, float* enlem_cikti, float* boylam_cikti);
+
+    bool gpsreset=false;
 
 private:
     UART_HandleTypeDef* huart_;
@@ -29,6 +34,9 @@ private:
     uint8_t rxData_u8;
     float latitude_f32;
     float longitude_f32;
+    float enlem_ref = 0.0f;   // Referans enlem
+    float boylam_ref = 0.0f;  // Referans boylam
+    bool gpsHazir = false;    // İlk geçerli GPS alındı mı?
 };
 
 #endif /* MYOTONOMDRIVERS_INC_GPS_H_ */

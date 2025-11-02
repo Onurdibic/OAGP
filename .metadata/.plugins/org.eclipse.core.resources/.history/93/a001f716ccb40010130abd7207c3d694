@@ -1,0 +1,95 @@
+/*
+ * Gps.cpp
+ *
+ *  Created on: Jun 29, 2024
+ *      Author: onurd
+ */
+#include "Gps.h"
+#include <math.h>
+#include <stdbool.h>
+
+#define EARTH_RADIUS 6371000.0f  // Dünya yarıçapı (metre)
+
+GPS::GPS(UART_HandleTypeDef* huart)
+{
+	this->huart_=huart;
+	this->rxIndex_u8=0;
+	this->rxData_u8=0;
+	this->latitude_f32=0;
+	this->longitude_f32=0;
+}
+
+void GPS::Yapilandir()
+{
+    lwgps_init(&gps_);
+    HAL_UART_Receive_DMA(huart_, &rxData_u8, 1);
+}
+
+void GPS::DataOku()
+{
+    if (rxData_u8 != '\n' && rxIndex_u8 < sizeof(rxBuffer_u8))
+    {
+        rxBuffer_u8[rxIndex_u8++] = rxData_u8;
+    }
+    else
+    {
+        lwgps_process(&gps_, rxBuffer_u8, rxIndex_u8 + 1);
+        GpsDataCek();
+        gpsreset=true;
+        rxIndex_u8 = 0;
+        rxData_u8 = 0;
+    }
+    HAL_UART_Receive_DMA(huart_, &rxData_u8, 1);
+}
+
+void GPS::GpsDataCek()
+{
+	latitude_f32 = gps_.latitude;
+	longitude_f32 = gps_.longitude;
+}
+
+// =============================
+// Ölü Hesaplama + GPS Resetli Versiyon
+// =============================
+
+void GPS::YeniKonumHesapla(float latitude_in, float longitude_in,  float heading_deg,float sag_hiz,float sol_hiz,
+    float dt,bool gpsReset,float* latitude_out,float* longitude_out)
+{
+    static float lat_ref = 0.0f;
+    static float lon_ref = 0.0f;
+    static bool ilkCalisma = true;
+
+    // GPS reseti veya ilk çalışmada referans güncelle
+    if (gpsReset || ilkCalisma)
+    {
+        lat_ref = latitude_in;
+        lon_ref = longitude_in;
+        ilkCalisma = false;
+    }
+
+    // Ortalama hız (arka sağ + arka sol)
+    float ort_hiz = (sag_hiz + sol_hiz) / 2.0f;
+
+    // Kat edilen mesafe (m)
+    float d = ort_hiz * dt;
+
+    // Yönü radyana çevir
+    float heading_rad = heading_deg * (M_PI / 180.0f);
+
+    // Yeni tahmini konum hesapla
+    lat_ref += (d * cosf(heading_rad)) / EARTH_RADIUS * (180.0f / M_PI);
+    lon_ref += (d * sinf(heading_rad)) / (EARTH_RADIUS * cosf(lat_ref * M_PI / 180.0f)) * (180.0f / M_PI);
+
+    // Çıkışlara yaz
+    *latitude_out = lat_ref;
+    *longitude_out = lon_ref;
+
+    gpsReset=false;
+}
+
+
+
+float* GPS::LatitudeAl(){return &latitude_f32;}
+
+float* GPS::LongitudeAl(){return &longitude_f32;}
+

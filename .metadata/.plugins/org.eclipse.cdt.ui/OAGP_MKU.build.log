@@ -1,0 +1,10 @@
+13:32:14 **** Incremental Build of configuration Debug for project OAGP_MKU ****
+make -j22 all 
+arm-none-eabi-size  OAGP_MKU.elf 
+   text	   data	    bss	    dec	    hex	filename
+  27264	     12	   2876	  30152	   75c8	OAGP_MKU.elf
+Finished building: default.size.stdout
+ 
+
+13:32:14 Build Finished. 0 errors, 0 warnings. (took 189ms)
+

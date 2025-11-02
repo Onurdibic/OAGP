@@ -13,12 +13,16 @@
 #include "stdint.h"
 #include "Madgwick.h"
 #include <cmath>
+#include "Mag.h"
+
+#define PI 3.14f
+
 class IMU
 {
 public:
     IMU(I2C_HandleTypeDef *hi2c);
     MadgwickAHRS madgwick;
-
+    MAG mag;
     void Yapilandir();
     void accOku();
     void gyroOku();
@@ -27,19 +31,14 @@ public:
     void gercekDataOku();
     void aciBul();
     void EnlemBoylamGuncelle(float heading , float latitude,float longitude);
-    void AccToKonum(float accX, float accY, float accZ);
+    void AccToKonum(float dt);
+    void lineerIvmeHesapla(float pitch,float roll,float heading);
     float* PitchAl();
     float* RollAl();
     float* YawAl();
     float* SicaklikAl();
-    float konumxX(){ return konumX;}
-    float konumyY(){return konumY; }
-    float hizxX(){ return hizX;}
-    float hizyY(){return hizY; }
-    float x(){return ivmeX;}
-    float y(){return ivmeY;}
-    float xx(){return accEksen[0];}
-    float yy(){return accEksen[1];}
+
+
     float *LatAl();
     float *LongAl();
     float hizX;
@@ -49,6 +48,8 @@ public:
     float ivmeX ;
     float ivmeY;
     float ivmeZ ;
+    float lineerIvmeX,lineerIvmeY,lineerIvmeZ;
+
 private:
 
     I2C_HandleTypeDef *hi2c;
@@ -65,7 +66,7 @@ private:
     int16_t accToplamVektor_s16;
     float accPitchAci_f, accRollAci_f;
     float gyroRollAci_f, gyroPitchAci_f, gyroYawAci_f;
-    float rollAci_f, pitchAcisi_f;
+    float rollAci_f, pitchAcisi_f,yawAci_f;
     uint16_t hamSicaklik_u16;
     float Sicaklik_f;
 

@@ -5,10 +5,9 @@
  *      Author: T_rab
  */
 
-
 #include "Motor.h"
 
-Motor::Motor(TIM_HandleTypeDef *htim_,TIM_HandleTypeDef *htim_timebase_,
+Motor::Motor(TIM_HandleTypeDef *htim_, TIM_HandleTypeDef *htim_timebase_,
              uint32_t ch_a, uint32_t ch_b, uint32_t ch_c,
              GPIO_TypeDef *AL_Port, uint16_t AL_Pin_,
              GPIO_TypeDef *BL_Port, uint16_t BL_Pin_,
@@ -56,18 +55,54 @@ void Motor::updateHall()
     hallCounter++;
 }
 
-void Motor::hizHesapla(float deltaSaniye)
+void Motor::hizHesaplaFiltered(float deltaSaniye)
 {
+    float rev_s = hallCounter / (float)HALLS_PER_REV / deltaSaniye;
+    float rad_s = rev_s * 2.0f * 3.14159265f;
+    float rpm = rev_s * 60.0f;
+    float speed = rad_s * RADIUS;
 
-	m_rev_s = hallCounter / (float)HALLS_PER_REV / deltaSaniye;
-	m_rad_s = m_rev_s * 2.0f * 3.14159265f;
-	m_rpm = m_rev_s * 60.0f;
-	m_speed_ms = m_rad_s * RADIUS;
-	hallCounter=0;
+    hallCounter = 0;
 
+    m_rpm_buffer[ma_index] = rpm;
+    m_speed_buffer[ma_index] = speed;
+    ma_index = (ma_index + 1) % MOVING_AVG_SIZE;
+
+    float rpm_sum = 0, speed_sum = 0;
+    for(int i = 0; i < MOVING_AVG_SIZE; i++) {
+        rpm_sum += m_rpm_buffer[i];
+        speed_sum += m_speed_buffer[i];
+    }
+
+    m_rpm = rpm_sum / MOVING_AVG_SIZE;
+    m_speed_ms = speed_sum / MOVING_AVG_SIZE;
+    m_rev_s = m_rpm / 60.0f;
+    m_rad_s = m_rev_s * 2.0f * 3.14159265f;
 }
 
 void Motor::setDirection(MotorDirection dir) { direction = dir; }
+
+int Motor::updatePWM(int rpm_hedef, float dt)
+{
+    float hata = rpm_hedef - m_rpm;
+    integral += hata * dt;
+
+    // integral sınırı
+    if(integral > I_LIMIT) integral = I_LIMIT;
+    if(integral < -I_LIMIT) integral = -I_LIMIT;
+
+    int pwm = (int)((Kp * hata) + (Ki * integral));
+
+    if(pwm < 0) pwm = 0;
+    if(pwm > 650) pwm = 650;
+
+    // rpm hedef 0 ise integral sıfırla
+    if(rpm_hedef == 0) integral = 0;
+
+    return pwm;
+}
+
+
 
 void Motor::komutasyon(uint16_t dutyCycle)
 {
