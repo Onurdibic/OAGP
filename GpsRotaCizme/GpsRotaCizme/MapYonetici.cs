@@ -7,7 +7,6 @@ using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 
-
 namespace GpsRotaCizme
 {
     internal class MapYonetici
@@ -17,7 +16,11 @@ namespace GpsRotaCizme
         private List<PointLatLng> points;
         private GMapOverlay rotaYeri;
 
+        private GMapOverlay kalmanYeri;   // 🔵 Kalman için yeni overlay
+
         Bitmap bmp = new Bitmap(5, 5);
+        Bitmap bmpKalman = new Bitmap(5, 5);   // ⚫ Kalman için siyah nokta
+
         public MapYonetici(GMapControl mapControl)
         {
             map = mapControl;
@@ -26,24 +29,36 @@ namespace GpsRotaCizme
             map.MinZoom = 13;
             map.MaxZoom = 24;
             map.Zoom = 20;
+
             points = new List<PointLatLng>();
+
             isaretciYeri = new GMapOverlay("isaretciYeri");
             rotaYeri = new GMapOverlay("rotaYeri");
+            kalmanYeri = new GMapOverlay("kalmanYeri"); // ⚫ Kalman için overlay
 
             map.Overlays.Add(isaretciYeri);
             map.Overlays.Add(rotaYeri);
+            map.Overlays.Add(kalmanYeri);
+
+            // GPS mavi nokta
+            using (Graphics gfx = Graphics.FromImage(bmp))
+            {
+                gfx.FillEllipse(Brushes.Blue, 0, 0, 3, 3);
+            }
+
+            // Kalman siyah nokta
+            using (Graphics gfx = Graphics.FromImage(bmpKalman))
+            {
+                gfx.FillEllipse(Brushes.Black, 0, 0, 3, 3);
+            }
         }
 
+        // 🔵 GPS güncellemesi
         public void MapGuncelle(double lat, double lon)
         {
             PointLatLng nokta = new PointLatLng(lat, lon);
             points.Add(nokta);
             map.Position = nokta;
-            // Küçük bir nokta işaretçisi
-            using (Graphics gfx = Graphics.FromImage(bmp))
-            {
-                gfx.FillEllipse(Brushes.Blue, 0, 0, 3, 3);
-            }
 
             GMarkerGoogle marker = new GMarkerGoogle(nokta, bmp);
             isaretciYeri.Markers.Add(marker);
@@ -57,6 +72,7 @@ namespace GpsRotaCizme
             }
         }
 
+        // 🔴 Manuel işaretçi
         public void IsaretciEkle(PointLatLng nokta)
         {
             GMarkerGoogle marker = new GMarkerGoogle(nokta, GMarkerGoogleType.red_dot);
@@ -64,5 +80,14 @@ namespace GpsRotaCizme
             map.Refresh();
         }
 
+        // ⚫ KALMAN NOKTA EKLEME
+        public void KalmanNoktaEkle(double lat, double lon)
+        {
+            PointLatLng nokta = new PointLatLng(lat, lon);
+            GMarkerGoogle marker = new GMarkerGoogle(nokta, bmpKalman);
+            kalmanYeri.Markers.Add(marker);
+
+            map.Refresh();
+        }
     }
 }

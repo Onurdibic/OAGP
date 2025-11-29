@@ -26,6 +26,7 @@ public:
 
     // -------------------- PAKET OLUŞTURMA --------------------
     void GpsPaketOlustur(float latitude, float longitude, float altitude, float derece);
+    void KalmanPaketOlustur(float latitude, float longitude);
     void ImuPaketOlustur(float pitch, float roll, float yaw, float sicaklik);
     void VersiyonPaketOlustur(uint8_t b, uint8_t o, uint8_t s);
     void YoklamaPaketOlustur();
@@ -35,6 +36,7 @@ public:
 
     // -------------------- PAKET KOPYALAMA --------------------
     void gpsPaketCagir(uint8_t *kopyaDizi);
+    void kalmanPaketCagir(uint8_t *kopyaDizi);
     void imuPaketCagir(uint8_t *kopyaDizi);
     void sistemPaketCagir(uint8_t *kopyaDizi);
     void versiyonPaketCagir(uint8_t *kopyaDizi);
@@ -65,6 +67,8 @@ public:
     bool solaGitBayrak         = false;
     bool ileriDurBayrak        = false;
     bool geriDurBayrak         = false;
+    bool kalibrasyonMAGBayrak  = false;
+    bool kalibrasyonIMUBayrak  = false;
 
 
     //--------------------TEKER VERİLERİ----------------------
@@ -100,7 +104,8 @@ private:
 
     // -------------------- PAKET DİZİLERİ --------------------
     uint8_t gpspaket[17];
-    uint8_t imupaket[21];
+    uint8_t kalmanpaket[13];
+    uint8_t imupaket[17];
     uint8_t versiyonpaket[8];
     uint8_t yoklamapaket[8];
     uint8_t rotapaket[8];

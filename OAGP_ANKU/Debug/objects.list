@@ -36,6 +36,7 @@
 "./ImuLibrary/Src/Madgwick.o"
 "./ImuLibrary/Src/Mag.o"
 "./ImuLibrary/Src/Mpu.o"
+"./MatrisLibrary/Src/Matris.o"
 "./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.o"
 "./Middlewares/Third_Party/FreeRTOS/Source/croutine.o"
 "./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o"

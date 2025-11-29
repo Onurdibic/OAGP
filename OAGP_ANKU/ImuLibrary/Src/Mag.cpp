@@ -6,6 +6,7 @@
  */
 
 #include "Mag.h"
+#include "cmsis_os.h"
 
 #define HMC5883L_ADDRESS 0x1E << 1 // I2C adresi
 
@@ -52,6 +53,7 @@ void MAG::XveYKalibreEt()
   // 2000 örnek alarak min/max bul
   for (int i = 0; i < 2000; i++)
   {
+	GPIOD->ODR ^= GPIO_PIN_13;
     uint32_t startTick = HAL_GetTick();
     MagDataOku(&xEksen_s16, &yEksen_s16, &zEksen_s16);
 
@@ -60,7 +62,7 @@ void MAG::XveYKalibreEt()
     if (yEksen_s16 < yMin) yMin = yEksen_s16;
     if (yEksen_s16 > yMax) yMax = yEksen_s16;
 
-    while ((HAL_GetTick() - startTick) < 5) {}
+    osDelay(5);
   }
 
   // Offset (merkez) hesapla
@@ -86,7 +88,7 @@ void MAG::TumEkseniKalibreEt()
     int16_t xMax = -32000, yMax = -32000, zMax = -32000;
 
     // 2000 örnek alarak min/max bul
-    for (int i = 0; i < 1500; i++)
+    for (int i = 0; i < 1000; i++)
     {
         uint32_t startTick = HAL_GetTick();
         MagDataOku(&xEksen_s16, &yEksen_s16, &zEksen_s16);
@@ -100,7 +102,7 @@ void MAG::TumEkseniKalibreEt()
         if (zEksen_s16 < zMin) zMin = zEksen_s16;
         if (zEksen_s16 > zMax) zMax = zEksen_s16;
 
-        while ((HAL_GetTick() - startTick) < 10) {}  // 5 ms bekleme
+        while ((HAL_GetTick() - startTick) < 20) {}
     }
 
     // Offset (hard-iron düzeltmesi)

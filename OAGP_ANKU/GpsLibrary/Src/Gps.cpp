@@ -18,7 +18,8 @@ GPS::GPS(UART_HandleTypeDef* huart)
     this->rxData_u8 = 0;
     this->latitude_f32 = 0;
     this->longitude_f32 = 0;
-    this->gpsreset = false;
+    this->gpsdeadreset = false;
+    this->gpskalmanreset = false;
 }
 
 void GPS::Yapilandir()
@@ -39,9 +40,10 @@ void GPS::DataOku()
         GpsDataCek();
 
         // Geçerli GPS verisi geldi mi kontrol et
-        if(fabs(gps_.longitude) >= 0.0001f && fabs(gps_.latitude) >= 0.0001f)
+        if(fabs(gps_.longitude) >= 1.0f && fabs(gps_.latitude) >= 1.0f)
         {
-            gpsreset = true;  // Dead reckoning referansı güncellenecek
+            gpsdeadreset = true;  // Dead reckoning referansı güncellenecek
+            gpskalmanreset = true;
         }
 
         rxIndex_u8 = 0;
@@ -70,7 +72,7 @@ void GPS::YeniKonumHesapla(float enlem_girdi, float boylam_girdi, float heading_
     static float y_ref = 0.0f;   // yerel kuzey-güney ekseni (metre)
 
     // GPS geçerli ve reset tetiklenmişse
-    if (*gpsSifirla && fabs(enlem_girdi) >= 0.0001f && fabs(boylam_girdi) >= 0.0001f)
+    if (*gpsSifirla && fabs(enlem_girdi) >= 1.0f && fabs(boylam_girdi) >= 1.0f)
     {
         enlem_ref = enlem_girdi;
         boylam_ref = boylam_girdi;

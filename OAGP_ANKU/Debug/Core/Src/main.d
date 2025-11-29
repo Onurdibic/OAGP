@@ -57,7 +57,8 @@ Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
  C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/GpsLibrary/Inc/Gps.h \
  ../Core/Inc/lwgps/lwgps.h ../Core/Inc/lwgps/lwgps_opt.h \
  ../Core/Inc/lwgps/lwgps_opts.h \
- C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/PaketLibrary/Inc/Paket.h
+ C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/PaketLibrary/Inc/Paket.h \
+ C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/MatrisLibrary/Inc/Matris.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -123,3 +124,4 @@ C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/GpsLibrary/Inc/Gps.h:
 ../Core/Inc/lwgps/lwgps_opt.h:
 ../Core/Inc/lwgps/lwgps_opts.h:
 C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/PaketLibrary/Inc/Paket.h:
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/MatrisLibrary/Inc/Matris.h:

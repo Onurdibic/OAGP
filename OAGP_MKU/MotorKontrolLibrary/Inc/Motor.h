@@ -92,7 +92,7 @@ private:
 
     // PID parametreleri
     float Kp = 0.3f;
-    float Ki = 0.6f;
+    float Ki = 0.5f;
     float I_LIMIT = 2000.0f;
 
     float integral = 0.0f;   // PI integral

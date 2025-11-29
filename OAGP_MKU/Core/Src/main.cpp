@@ -90,6 +90,14 @@ int counterrr=0;
 float hata1 = 0.0f;
 float hata2 = 0.0f;
 
+float prev_motor1pwm = 0.0f;
+float prev_motor2pwm = 0.0f;
+
+float maxIncrease_motor1 = 0.0f;
+float maxIncrease_motor2 = 0.0f;
+
+float pwmLimit1 = 255.0f;
+float pwmLimit2 = 255.0f;
 // Integral akümülatörleri (PI kontrol)
 float integral1 = 0.0f;
 float integral2 = 0.0f;
@@ -210,39 +218,77 @@ int main(void)
 	  if (flag_20ms)
 	  {
 	      flag_20ms = 0;
-		  yon_f = ANKUPaket.gelenYonAl();
-		  sagRpm_f = ANKUPaket.gelenSagRpmAl();
-		  solRpm_f = ANKUPaket.gelenSolRpmAl();
 
-		  if (yon_f == 1) { motor1.setDirection(ILERI); motor2.setDirection(ILERI); }
-		  else if (yon_f == 2) { motor1.setDirection(GERI); motor2.setDirection(GERI); }
+	      yon_f = ANKUPaket.gelenYonAl();
+//	      sagRpm_f = ANKUPaket.gelenSagRpmAl();
+//	      solRpm_f = ANKUPaket.gelenSolRpmAl();
 
-//		  // --- PI Kontrol Önce Anlık RPM Değeri ---
-		  motor1.hizHesaplaFiltered(0.02f);
-		  motor2.hizHesaplaFiltered(0.02f);
+	      if (yon_f == 1) { motor1.setDirection(ILERI); motor2.setDirection(ILERI); }
+	      else if (yon_f == 2) { motor1.setDirection(GERI); motor2.setDirection(GERI); }
 
-		  // PWM hesapla
-		  motor1pwm = motor1.updatePWM(sagRpm_f, 0.02f);
-		  motor2pwm = motor2.updatePWM(solRpm_f, 0.02f);
+	      // --- Hız Filtreleme ---
+	      motor1.hizHesaplaFiltered(0.02f);
+	      motor2.hizHesaplaFiltered(0.02f);
 
-		  // Komutasyonu ayrı çağır
-		  motor1.komutasyon(motor1pwm);
-		  motor2.komutasyon(motor2pwm);
+	      // --- PWM hesapla ---
+	      motor1pwm = motor1.updatePWM(sagRpm_f, 0.02f);
+	      motor2pwm = motor2.updatePWM(solRpm_f, 0.02f);
+
+//	      // Motor 1 limitleri
+//	      if (sagRpm_f == 150)      pwmLimit1 = 90.0f;
+//	      else if (sagRpm_f == 200) pwmLimit1 = 115.0f;
+//	      else if (sagRpm_f == 250) pwmLimit1 = 140.0f;
+//
+//	      // Motor 2 limitleri
+//	      if (solRpm_f == 150)      pwmLimit2 = 90.0f;
+//	      else if (solRpm_f == 200) pwmLimit2 = 115.0f;
+//	      else if (solRpm_f == 250) pwmLimit2 = 140.0f;
+
+//	      // Limit uygula
+//	      if (motor1pwm > pwmLimit1) motor1pwm = pwmLimit1;
+//	      if (motor2pwm > pwmLimit2) motor2pwm = pwmLimit2;
 
 
-		  sag_hiz = motor1.m_speed_ms;
-		  sol_hiz = motor2.m_speed_ms;
+	      // --- PWM Artış Hesabı (Sadece artış, azalma yok) ---
+	      float inc1 = 0.0f;
+	      float inc2 = 0.0f;
 
-		  if (motor1.getDirection() == GERI)
-		  {
-		      sag_hiz = -sag_hiz;
-		      sol_hiz = -sol_hiz;
-		  }
+	      if (motor1pwm > prev_motor1pwm)
+	          inc1 = motor1pwm - prev_motor1pwm;
 
-		  TekerPaket.TekerPaketOlustur(sag_hiz, sol_hiz);
-		  TekerPaket.tekerPaketCagir(tekerBuffer);
-		  HAL_UART_Transmit_DMA(&huart3, tekerBuffer, sizeof(tekerBuffer));
+	      if (motor2pwm > prev_motor2pwm)
+	          inc2 = motor2pwm - prev_motor2pwm;
+
+	      // Maksimum artışı güncelle
+	      if (inc1 > maxIncrease_motor1) maxIncrease_motor1 = inc1;
+	      if (inc2 > maxIncrease_motor2) maxIncrease_motor2 = inc2;
+
+	      // PWM'leri sakla
+	      prev_motor1pwm = motor1pwm;
+	      prev_motor2pwm = motor2pwm;
+
+	      // --- Komutasyon çağır ---
+	      motor1.komutasyon(motor1pwm);
+	      motor2.komutasyon(motor2pwm);
+
+	      // --- Hız çıkışları ---
+	      sag_hiz = motor1.m_speed_ms;
+	      sol_hiz = motor2.m_speed_ms;
+
+	      if (motor1.getDirection() == GERI)
+	      {
+	          sag_hiz = -sag_hiz;
+	          sol_hiz = -sol_hiz;
+	      }
+
+	      // --- Paket oluştur & gönder ---
+	      TekerPaket.TekerPaketOlustur(sag_hiz, sol_hiz);
+	      TekerPaket.tekerPaketCagir(tekerBuffer);
+	      HAL_UART_Transmit_DMA(&huart3, tekerBuffer, sizeof(tekerBuffer));
 	  }
+
+
+
 
 	  if(flag_100ms)
 	  {

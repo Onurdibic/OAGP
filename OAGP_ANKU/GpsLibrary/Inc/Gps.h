@@ -24,7 +24,8 @@ public:
                                 float sag_hiz, float sol_hiz, float dt,
                                 bool* gpsSifirla, float* enlem_cikti, float* boylam_cikti);
 
-    bool gpsreset=false;
+    bool gpsdeadreset=false;
+    bool gpskalmanreset=false;
 
 private:
     UART_HandleTypeDef* huart_;

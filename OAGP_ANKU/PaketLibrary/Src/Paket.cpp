@@ -22,7 +22,8 @@ enum GelenPaketler
 	YOKLAMA=0x03,
 	DUR=0x04,
 	YON=0x05,
-	TEKER=0x06
+	TEKER=0x06,
+	KALIBRASYON = 0x07
 };
 
 //enum GidenPaketler
@@ -33,7 +34,8 @@ enum GelenPaketler
 //	YOKLAMA=0x04,
 //	ROTA =0x05,
 //	SISTEM=0x06,
-//	KOMUT=0x07
+//	KOMUT=0x07,
+//  KALMAN=0x08
 //};
 
 Paket::Paket(UART_HandleTypeDef* huart)
@@ -72,6 +74,23 @@ void Paket::GpsPaketOlustur(float latitude,float longitude,float altitude,float 
     gpspaket[16]=CRC8Hesaplama(gpspaket,4, 16);
 }
 
+void Paket::KalmanPaketOlustur(float latitude,float longitude)
+{
+    kalmanpaket[0] = baslik1_u8;
+    kalmanpaket[1] = baslik2_u8;
+    kalmanpaket[2] = paketTipi_u8;
+    kalmanpaket[3] = dataBoyutu_u8;
+
+    floatToBytes(&latitude, latBytes_u8);
+    floatToBytes(&longitude, lonBytes_u8);
+
+    memcpy(kalmanpaket + 4, latBytes_u8, 4);
+    memcpy(kalmanpaket + 8, lonBytes_u8, 4);
+
+    kalmanpaket[12]=CRC8Hesaplama(kalmanpaket,4, 12);
+}
+
+
 void Paket::ImuPaketOlustur(float pitch,float roll,float heading,float sicaklik)
 {
     imupaket[0] = baslik1_u8;
@@ -87,9 +106,8 @@ void Paket::ImuPaketOlustur(float pitch,float roll,float heading,float sicaklik)
     memcpy(imupaket + 4, pitchBytes_u8, 4);
     memcpy(imupaket + 8, rollBytes_u8, 4);
     memcpy(imupaket + 12, headingBytes_u8, 4);
-    memcpy(imupaket + 16, sicaklikBytes_u8, 4);
 
-    imupaket[20] = CRC8Hesaplama(imupaket, 4,20);
+    imupaket[16] = CRC8Hesaplama(imupaket, 4,16);
 }
 
 void Paket::VersiyonPaketOlustur(uint8_t b,uint8_t o,uint8_t s)
@@ -165,6 +183,7 @@ void Paket::yoklamaPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, yoklamapaket
 void Paket::rotaPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, rotapaket, sizeof(rotapaket));}
 void Paket::sistemPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, sistempaket, sizeof(sistempaket));}
 void Paket::komutPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, komutpaket, sizeof(komutpaket));}
+void Paket::kalmanPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, kalmanpaket, sizeof(kalmanpaket));}
 
 void Paket::DataAlveBayrakKaldir()
 {
@@ -255,8 +274,7 @@ void Paket::PaketCoz()
 
                         // -------------------- YOKLAMA --------------------
                         case YOKLAMA:
-                            if (dataLength_s16 == 4 &&
-                                tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
+                            if (dataLength_s16 == 4 && tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
                             {
                                 YoklamaFlag = true;
                                 YoklamaPaketFlag = true;
@@ -265,8 +283,7 @@ void Paket::PaketCoz()
 
                         // -------------------- DUR --------------------
                         case DUR:
-                            if (dataLength_s16 == 4 &&
-                                tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
+                            if (dataLength_s16 == 4 &&tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
                             {
                                 arabaDurBayrak = true;
                             }
@@ -274,8 +291,7 @@ void Paket::PaketCoz()
 
                         // -------------------- YÖN --------------------
                         case YON:
-                            if (dataLength_s16 == 4 &&
-                                tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
+                            if (dataLength_s16 == 4 &&tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
                             {
                                 switch (tempBuffer[0])
                                 {
@@ -288,6 +304,20 @@ void Paket::PaketCoz()
                                 }
                             }
                             break;
+                         // -------------------- KALIBRASYON --------------------
+						 case KALIBRASYON:
+							if (dataLength_s16 == 2 && tempBuffer[1] == CRC8Hesaplama(tempBuffer, 0, 1))
+							{
+								if (tempBuffer[0] == 0x01)
+								{
+									kalibrasyonMAGBayrak = true;
+								}
+								else if (tempBuffer[0] == 0x02)
+								{
+									kalibrasyonIMUBayrak = true;
+								}
+							}
+							break;
 
                         default:
                             // Tanımsız paket tipi

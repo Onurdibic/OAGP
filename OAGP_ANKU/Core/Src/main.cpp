@@ -41,6 +41,7 @@ extern "C" {
 #include "Mag.h"
 #include "Gps.h"
 #include "Paket.h"
+#include "Matris.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,6 +52,10 @@ GPS gps(&huart2);
 Paket ArayuzPaket(&huart3);
 Paket ArabaArkaPaket(&huart4);
 Paket ArabaOnPaket(&huart5);
+extern Paket GpsPaket;
+extern uint8_t GpsVeriPaket[17];
+extern Paket KalmanPaket;
+extern uint8_t KalmanVeriPaket[13];
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -83,9 +88,13 @@ extern "C" void MX_FREERTOS_Init(void);
 #define RX_BUFFER_SIZE 128
 uint8_t rxBuffer[RX_BUFFER_SIZE];   // CPU buffer
 volatile uint16_t rxIndex = 0;
-
+uint8_t txState=0;
 uint8_t rxData;
 
+extern float enlemCikti_f;
+extern float boylamCikti_f;
+extern float enlemKalmanCikti_f;
+extern float boylamKalmanCikti_f;
 /* USER CODE END 0 */
 
 /**
@@ -128,15 +137,17 @@ int main(void)
 
   mag.Yapilandir();
   imu.Yapilandir();
+
+//  GPIOD->ODR ^= GPIO_PIN_12;
+//  HAL_Delay(1000);
+//  imu.kalibreEt();
+//  GPIOD->ODR ^= GPIO_PIN_12;
+//  HAL_Delay(1000);
+//  mag.XveYKalibreEt();
+//  GPIOD->ODR ^= GPIO_PIN_12;
   gps.Yapilandir();
 
-  GPIOD->ODR ^= GPIO_PIN_12;
-  HAL_Delay(1000);
-  imu.kalibreEt();
-  GPIOD->ODR ^= GPIO_PIN_12;
-  HAL_Delay(1000);
-  mag.XveYKalibreEt();
-  GPIOD->ODR ^= GPIO_PIN_12;
+  // --- Matris Test SONU ---
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -224,6 +235,28 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
     	ArabaOnPaket.DataAlveBayrakKaldir();
 	}
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if(huart->Instance == USART3)
+    {
+        if(txState == 1)
+        {
+            GpsPaket.GpsPaketOlustur(enlemCikti_f,boylamCikti_f,0,0);
+            GpsPaket.gpsPaketCagir(GpsVeriPaket);
+            HAL_UART_Transmit_DMA(&huart3, GpsVeriPaket, 17);
+
+            txState = 2;
+        }
+        else if(txState == 2)
+        {
+        	KalmanPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f);
+        	KalmanPaket.kalmanPaketCagir(KalmanVeriPaket);
+			HAL_UART_Transmit_DMA(&huart3, KalmanVeriPaket, 13);
+            txState = 0;
+        }
+    }
 }
 
 /* USER CODE END 4 */

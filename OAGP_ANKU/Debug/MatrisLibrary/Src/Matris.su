@@ -1,0 +1,15 @@
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/c++/13.3.1/cmath:234:3:constexpr float std::fabs(float)	16	static
+../MatrisLibrary/Src/Matris.cpp:6:10:MatrixF* create_matrix(uint16_t, uint16_t)	24	static
+../MatrisLibrary/Src/Matris.cpp:21:6:void free_matrix(MatrixF*)	16	static
+../MatrisLibrary/Src/Matris.cpp:27:6:void matrix_zero(MatrixF*)	16	static
+../MatrisLibrary/Src/Matris.cpp:31:6:void matrix_identity(MatrixF*)	24	static
+../MatrisLibrary/Src/Matris.cpp:37:6:void matrix_copy(MatrixF*, MatrixF*)	16	static
+../MatrisLibrary/Src/Matris.cpp:41:6:void matrix_add(MatrixF*, MatrixF*, MatrixF*)	32	static
+../MatrisLibrary/Src/Matris.cpp:47:6:void matrix_sub(MatrixF*, MatrixF*, MatrixF*)	32	static
+../MatrisLibrary/Src/Matris.cpp:53:6:void matrix_transpose(MatrixF*, MatrixF*)	24	static
+../MatrisLibrary/Src/Matris.cpp:59:6:void matrix_mult(MatrixF*, MatrixF*, MatrixF*)	40	static
+../MatrisLibrary/Src/Matris.cpp:71:9:uint8_t matrix_inv2x2(MatrixF*, MatrixF*)	48	static
+../MatrisLibrary/Src/Matris.cpp:90:10:KalmanF* kalman_create(uint16_t, uint16_t)	24	static
+../MatrisLibrary/Src/Matris.cpp:105:6:void kalman_free(KalmanF*)	16	static
+../MatrisLibrary/Src/Matris.cpp:113:6:void kalman_predict(KalmanF*, MatrixF*)	56	static
+../MatrisLibrary/Src/Matris.cpp:140:6:void kalman_update(KalmanF*, MatrixF*)	112	static

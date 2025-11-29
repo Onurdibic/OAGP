@@ -7,7 +7,10 @@
 #include "Mpu.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "cmsis_os.h"
 
+#define CONFIG          0x1A
+#define ACCEL_CONFIG2   0x1D
 #define PWR_MGMT_1_REG 0X6B
 #define SMPLRT_DIV_REG 0X19
 #define GYRO_CNFG_REG 0X1B
@@ -35,20 +38,34 @@ void IMU::Yapilandir()
 	uint8_t kontrol_u8;
 
 	HAL_I2C_Mem_Read(hi2c, MPU6500_ADDRESS , WHO_AM_I, 1, &kontrol_u8, 1, 1000);
-	if (kontrol_u8 == 0x70)
-	{
-		data_u8 = 0x00;
-		HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS , PWR_MGMT_1_REG, 1, &data_u8, 1, 1000);
-		// SMPLRT_DIV register
-		data_u8 = 0x07;
-		HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS ,SMPLRT_DIV_REG, 1, &data_u8, 1, 1000);
-		//  ACCEL_CONFIG Register Â±2g(00),Â±4g(01),Â±8g(10),Â±16g(11) 4:3
-		data_u8 = 0x00;
-		HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS, ACC_CNFG_REG, 1, &data_u8, 1, 1000);
-		//  GYRO_CONFIG Register +250dps(00),+500dps(01),+1000dps(10),+2000dps(11) 4:3
-		data_u8 = 0x00;
-		HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS , GYRO_CNFG_REG, 1, &data_u8, 1, 1000);
-	}
+//	 if (kontrol_u8 == 0x70)
+	    {
+	        // Güç yönetimi: PLL'e geç
+	        uint8_t data_u8 = 0x01;
+	        HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS , PWR_MGMT_1_REG, 1, &data_u8, 1, 1000);
+
+	        // ------------ DLPF AYARLARI -------------
+	        // GYRO DLPF = 41 Hz (CONFIG register = 0x03)
+	        data_u8 = 0x03;
+	        HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS, CONFIG, 1, &data_u8, 1, 1000);
+
+	        // ACCEL DLPF = 44 Hz (ACCEL_CONFIG2 = 0x03)
+	        data_u8 = 0x03;
+	        HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS, ACCEL_CONFIG2, 1, &data_u8, 1, 1000);
+	        // -----------------------------------------
+
+	        // SMPLRT_DIV = 7 → 1 kHz/(1+7) = 125 Hz
+	        data_u8 = 0x07;
+	        HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS , SMPLRT_DIV_REG, 1, &data_u8, 1, 1000);
+
+	        // ACCEL ±2g
+	        data_u8 = 0x00;
+	        HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS, ACC_CNFG_REG, 1, &data_u8, 1, 1000);
+
+	        // GYRO ±250 dps
+	        data_u8 = 0x00;
+	        HAL_I2C_Mem_Write(hi2c, MPU6500_ADDRESS , GYRO_CNFG_REG, 1, &data_u8, 1, 1000);
+	    }
 }
 
 void IMU::accOku()
@@ -103,7 +120,7 @@ void IMU::kalibreEt()
 //        accHesap[0] += accEksen[0];
 //        accHesap[1] += accEksen[1];
 
-        while ((HAL_GetTick() - startTick) < 10) {}
+        osDelay(20);
     }
 
     gyroHesap[0] /= 1000.f;
@@ -169,7 +186,7 @@ void IMU::aciBul()
 	float ay = accEksen[1] / 16384.0f;
 	float az = accEksen[2] / 16384.0f;
 
-	float dt = 0.01f;
+	float dt = 0.02f;
 //	int16_t mx,my,mz;
 //
 //	mag.MagDataOku(&mx, &my, &mz);
