@@ -28,6 +28,7 @@ public:
     void GpsPaketOlustur(float latitude, float longitude, float altitude, float derece);
     void KalmanPaketOlustur(float latitude, float longitude);
     void ImuPaketOlustur(float pitch, float roll, float yaw, float sicaklik);
+    void RPMPaketOlustur(float sagrpm_f ,float solrpm_f);
     void VersiyonPaketOlustur(uint8_t b, uint8_t o, uint8_t s);
     void YoklamaPaketOlustur();
     void RotaPaketOlustur();
@@ -38,6 +39,7 @@ public:
     void gpsPaketCagir(uint8_t *kopyaDizi);
     void kalmanPaketCagir(uint8_t *kopyaDizi);
     void imuPaketCagir(uint8_t *kopyaDizi);
+    void rpmPaketCagir(uint8_t *kopyaDizi);
     void sistemPaketCagir(uint8_t *kopyaDizi);
     void versiyonPaketCagir(uint8_t *kopyaDizi);
     void yoklamaPaketCagir(uint8_t *kopyaDizi);
@@ -74,6 +76,8 @@ public:
     //--------------------TEKER VERİLERİ----------------------
     float saghiz_f=0.0f;
     float solhiz_f=0.0f;
+    float sagrpm_f=0.0f;
+    float solrpm_f=0.0f;
 
 private:
     // -------------------- UART --------------------
@@ -105,6 +109,7 @@ private:
     // -------------------- PAKET DİZİLERİ --------------------
     uint8_t gpspaket[17];
     uint8_t kalmanpaket[13];
+    uint8_t rpmpaket[13];
     uint8_t imupaket[17];
     uint8_t versiyonpaket[8];
     uint8_t yoklamapaket[8];
@@ -125,6 +130,8 @@ private:
     uint8_t yonBytes_u8[4];
     uint8_t rpmSagBytes_u8[4];
     uint8_t rpmSolBytes_u8[4];
+    uint8_t solrpmBytes_u8[4];
+ 	uint8_t sagrpmBytes_u8[4];
 
     // -------------------- ÖZEL FONKSİYONLAR --------------------
     uint8_t CRC8Hesaplama(uint8_t *data, uint8_t baslangic, uint8_t bitis);

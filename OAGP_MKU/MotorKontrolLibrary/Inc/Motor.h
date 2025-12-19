@@ -39,8 +39,7 @@ private:
     GPIO_TypeDef *HallC_Port;
     uint16_t HallC_Pin;
 
-    // Hall sensöründen alınan state
-    uint8_t HallState;
+
 
 public:
     // Constructor
@@ -55,7 +54,8 @@ public:
 
     // Motoru başlat
     void init();
-
+    // Hall sensöründen alınan state
+        uint8_t HallState;
     // Hall sensörlerini oku ve deltaTime hesapla
     void updateHall();
 
@@ -72,8 +72,11 @@ public:
     void hizHesaplaFiltered(float deltaSaniye);
 
     // PI kontrol ile PWM güncelle
-    int updatePWM(int rpm_hedef, float dt);
-
+//    int updatePWM(int rpm_hedef, float dt);
+    int updatePWM(int rpm_hedef, float dt,int max_pwm);
+    void allFloat(void);
+    void highPWM(uint32_t ch, uint16_t duty);
+    void lowON(uint32_t ch);
     // Motor durumları
     bool aktif;
 
@@ -91,7 +94,7 @@ private:
     int ma_index = 0;
 
     // PID parametreleri
-    float Kp = 0.3f;
+    float Kp = 0.4f;
     float Ki = 0.5f;
     float I_LIMIT = 2000.0f;
 

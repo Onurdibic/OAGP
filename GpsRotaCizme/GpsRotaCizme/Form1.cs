@@ -91,7 +91,8 @@ namespace GpsRotaCizme
             YOKLAMA=0x04,
             ROTA =0x05,
             SISTEM=0x06,
-            KALMAN = 0x08
+            KALMAN = 0x08,
+            RPM=0x09
         }
         private enum GidenPaketler
         {
@@ -286,6 +287,9 @@ namespace GpsRotaCizme
                                 case GelenPaketler.KALMAN:
                                     KalmanPaketIsle(dataBuffer, mevcutDataUzunlugu);
                                     break;
+                                case GelenPaketler.RPM:
+                                    RPMPaketIsle(dataBuffer, mevcutDataUzunlugu);
+                                    break;
                                 case GelenPaketler.IMU:
                                     ImuPaketIsle(dataBuffer, mevcutDataUzunlugu);
                                     
@@ -371,6 +375,22 @@ namespace GpsRotaCizme
             }
         }
 
+        private void RPMPaketIsle(byte[] dataBuffer, Int16 dataLength_s16)
+        {
+            if (dataLength_s16 == 9 && yoklamaFlag == true)
+            {
+                CRC8 = CRC8Hesaplama(dataBuffer, startIndex, startIndex + 8);
+                if (dataBuffer[(startIndex + 8) % BufferSize] == CRC8)
+                {
+                    float sagRPM = FloataDonustur(dataBuffer, startIndex);
+                    float solRPM = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
+                    label4.Text = sagRPM.ToString();
+                    label41.Text = solRPM.ToString();
+
+                }
+            }
+        }
+
         private void ImuPaketIsle(byte[] dataBuffer, Int16 dataLength_s16)
         {
             if (dataLength_s16 == 13 && yoklamaFlag==true)
@@ -382,8 +402,8 @@ namespace GpsRotaCizme
                     float Roll = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
                     float Yaw = FloataDonustur(dataBuffer, (startIndex + 8) % BufferSize);
                     //float Sicaklik = FloataDonustur(dataBuffer, (startIndex + 12) % BufferSize);
-
-                    if (Pitch != 0 && Roll != 0 && Yaw != 0)
+                    if ( Yaw != 0)
+                    //if (Pitch != 0 && Roll != 0 && Yaw != 0)
                     {
                         label16.Text = Pitch.ToString("F2");
                         label18.Text = Roll.ToString("F2");
@@ -641,7 +661,7 @@ namespace GpsRotaCizme
 
         private void button2_Click(object sender, EventArgs e)
         {
-            yoklamaTimer.Stop();
+            //yoklamaTimer.Stop();
             serialPort.Close();
             comboBox2.Visible = true;
             comboBox3.Visible = true;

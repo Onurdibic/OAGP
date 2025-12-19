@@ -3,5 +3,5 @@
 ../MotorKontrolLibrary/Src/Motor.cpp:48:6:void Motor::updateHall()	1
 ../MotorKontrolLibrary/Src/Motor.cpp:58:6:void Motor::hizHesaplaFiltered(float)	2
 ../MotorKontrolLibrary/Src/Motor.cpp:83:6:void Motor::setDirection(MotorDirection)	1
-../MotorKontrolLibrary/Src/Motor.cpp:85:5:int Motor::updatePWM(int, float)	6
-../MotorKontrolLibrary/Src/Motor.cpp:107:6:void Motor::komutasyon(uint16_t)	151
+../MotorKontrolLibrary/Src/Motor.cpp:105:5:int Motor::updatePWM(int, float, int)	6
+../MotorKontrolLibrary/Src/Motor.cpp:150:6:void Motor::komutasyon(uint16_t)	151

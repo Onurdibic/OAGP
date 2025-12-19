@@ -15,7 +15,7 @@ public:
     // Paket oluşturma
 
     void TekerPaketOlustur(float saghiz_f ,float solhiz_f);// Teker paketi oluştur
-
+    void RPMPaketOlustur(float sagrpm_f ,float solrpm_f);
     // UART & Ring buffer
     void PaketKesmeYapilandir();      // DMA ile veri almayı başlat
     void DataAlveBayrakKaldir();      // DMA interrupt sonrası buffer'a ekle
@@ -26,9 +26,10 @@ public:
     float gelenSagRpmAl();
     float gelenSolRpmAl();
     void tekerPaketCagir(uint8_t *kopyaDizi);
-
+    void rpmPaketCagir(uint8_t *kopyaDizi);
     // Paket byte dizileri
-    uint8_t tekerpaket[17];
+    uint8_t tekerpaket[13];
+    uint8_t rpmpaket[13];
 
 private:
     UART_HandleTypeDef* huart;
@@ -51,8 +52,10 @@ private:
     // Veri byte dizileri
     uint8_t yonBytes_u8[4];
     uint8_t rpmBytes_u8[4];   // Komut paketi için
-    uint8_t solhizBytes_u8[4]; // Teker paketi için
-    uint8_t saghizBytes_u8[4];   // Teker paketi hızı için
+    uint8_t solhizBytes_u8[4];
+    uint8_t saghizBytes_u8[4];
+    uint8_t solrpmBytes_u8[4];
+	uint8_t sagrpmBytes_u8[4];
 
     // Paket başlık bilgileri
     uint8_t baslik1_u8;

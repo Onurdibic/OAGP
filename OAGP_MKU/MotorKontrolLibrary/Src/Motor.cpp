@@ -47,9 +47,9 @@ void Motor::init()
 
 void Motor::updateHall()
 {
-    uint8_t ha = HAL_GPIO_ReadPin(HallA_Port, HallA_Pin);
-    uint8_t hb = HAL_GPIO_ReadPin(HallB_Port, HallB_Pin);
-    uint8_t hc = HAL_GPIO_ReadPin(HallC_Port, HallC_Pin);
+    uint8_t ha = !HAL_GPIO_ReadPin(HallA_Port, HallA_Pin);
+    uint8_t hb = !HAL_GPIO_ReadPin(HallB_Port, HallB_Pin);
+    uint8_t hc = !HAL_GPIO_ReadPin(HallC_Port, HallC_Pin);
     HallState = (ha << 2) | (hb << 1) | hc;
 
     hallCounter++;
@@ -82,26 +82,69 @@ void Motor::hizHesaplaFiltered(float deltaSaniye)
 
 void Motor::setDirection(MotorDirection dir) { direction = dir; }
 
-int Motor::updatePWM(int rpm_hedef, float dt)
+//int Motor::updatePWM(int rpm_hedef, float dt)
+//{
+//    float hata = rpm_hedef - m_rpm;
+//    integral += hata * dt;
+//
+//    // integral sınırı
+//    if(integral > I_LIMIT) integral = I_LIMIT;
+//    if(integral < -I_LIMIT) integral = -I_LIMIT;
+//
+//    int pwm = (int)((Kp * hata) + (Ki * integral));
+//
+//    if(pwm < 0) pwm = 0;
+//    if(pwm > 650) pwm = 650;
+//
+//    // rpm hedef 0 ise integral sıfırla
+//    if(rpm_hedef == 0) integral = 0;
+//
+//    return pwm;
+//}
+
+int Motor::updatePWM(int rpm_hedef, float dt, int max_pwm)
 {
     float hata = rpm_hedef - m_rpm;
-    integral += hata * dt;
 
-    // integral sınırı
-    if(integral > I_LIMIT) integral = I_LIMIT;
-    if(integral < -I_LIMIT) integral = -I_LIMIT;
+    // --- Oransal ---
+    float p_term = Kp * hata;
 
-    int pwm = (int)((Kp * hata) + (Ki * integral));
+    // --- İntegral (şimdilik artır, sonra gerekirse geri alacağız) ---
+    float integral_candidate = integral + hata * dt;
 
-    if(pwm < 0) pwm = 0;
-    if(pwm > 650) pwm = 650;
+    // integral sınırı (mutlak güvenlik)
+    if (integral_candidate > I_LIMIT)  integral_candidate = I_LIMIT;
+    if (integral_candidate < -I_LIMIT) integral_candidate = -I_LIMIT;
 
-    // rpm hedef 0 ise integral sıfırla
-    if(rpm_hedef == 0) integral = 0;
+    float i_term = Ki * integral_candidate;
 
-    return pwm;
+    int pwm_candidate = (int)(p_term + i_term);
+
+    // --- ALT / ÜST PWM sınırı ---
+    if (pwm_candidate < 0)
+        pwm_candidate = 0;
+
+    // 🔴 ASIL KRİTİK KISIM: PWM üst limite takıldı mı?
+    if (pwm_candidate > max_pwm)
+    {
+        pwm_candidate = max_pwm;
+
+        // ⚠️ Anti-windup:
+        // Motor zorlanıyor → integral BÜYÜMESİN
+        // integral'i GÜNCELLEME
+    }
+    else
+    {
+        // Limitte değil → integral güvenle güncellenebilir
+        integral = integral_candidate;
+    }
+
+    // Hedef sıfırsa integral sıfırlansın
+    if (rpm_hedef == 0)
+        integral = 0;
+
+    return pwm_candidate;
 }
-
 
 
 void Motor::komutasyon(uint16_t dutyCycle)
@@ -119,9 +162,20 @@ void Motor::komutasyon(uint16_t dutyCycle)
 
     switch(direction)
     {
-    	case ILERI:
+    	case GERI:
     		switch (HallState)
 			{
+
+    			case 1: // 5. state için
+					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, dutyCycle);
+					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
+					__HAL_TIM_SET_COMPARE(htim, tim_channel_c, 0);
+					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
+					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
+					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_RESET);
+
+					break;
+
     			case 5: // 4. state için
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, dutyCycle);
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
@@ -173,16 +227,6 @@ void Motor::komutasyon(uint16_t dutyCycle)
 
 					break;
 
-				case 1: // 5. state için
-					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, dutyCycle);
-					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
-					__HAL_TIM_SET_COMPARE(htim, tim_channel_c, 0);
-					HAL_GPIO_WritePin(AL_GPIO_Port, AL_Pin, GPIO_PIN_SET);
-					HAL_GPIO_WritePin(BL_GPIO_Port, BL_Pin, GPIO_PIN_SET);
-					HAL_GPIO_WritePin(CL_GPIO_Port, CL_Pin, GPIO_PIN_RESET);
-
-					break;
-
 				default:
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_a, 0);
 					__HAL_TIM_SET_COMPARE(htim, tim_channel_b, 0);
@@ -195,7 +239,7 @@ void Motor::komutasyon(uint16_t dutyCycle)
 			}
     		break;
 
-    	case GERI:
+    	case ILERI:
     		switch (HallState)
 			{
 				case 1: // 2.State için
@@ -281,4 +325,5 @@ void Motor::komutasyon(uint16_t dutyCycle)
     }
 
 }
+
 

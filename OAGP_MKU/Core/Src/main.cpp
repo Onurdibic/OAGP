@@ -47,6 +47,8 @@ Motor motor1(&htim1,&htim2,TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3,
              M1_HALL_B_GPIO_Port, M1_HALL_B_Pin,
              M1_HALL_C_GPIO_Port, M1_HALL_C_Pin);
 
+
+
 Motor motor2(&htim8,&htim2,TIM_CHANNEL_1, TIM_CHANNEL_3, TIM_CHANNEL_2,
 
 			 M2_AL_GPIO_Port, M2_AL_Pin,
@@ -59,7 +61,7 @@ Motor motor2(&htim8,&htim2,TIM_CHANNEL_1, TIM_CHANNEL_3, TIM_CHANNEL_2,
 
 Paket ANKUPaket(&huart3);
 Paket TekerPaket(0x12, 0x34, 0x06, 0x09);
-
+Paket RPMPaket(0x12, 0x34, 0x08, 0x09);
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -81,6 +83,60 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+typedef struct {
+    int rpm;
+    int maxPwm;
+} RpmLimit;
+
+const RpmLimit rpmLimitTable[] = {
+    {0,   130},
+    {10,  130},
+    {20,  130},
+    {30,  130},
+    {40,  130},
+    {50,  130},
+    {60,  130},
+    {70,  130},
+    {80,  130},
+    {90,  130},
+    {100, 130},
+    {110, 130},
+    {120, 130},
+    {130, 140},
+    {140, 150},
+    {150, 160},
+    {160, 170},
+    {170, 180},
+    {180, 190},
+    {190, 200},
+    {200, 210},
+    {210, 220},
+    {220, 230},
+    {230, 240},
+    {240, 250},
+    {250, 260},
+    {260, 270},
+    {270, 280},
+    {280, 290},
+    {290, 300},
+    {300, 310},
+    {310, 320},
+    {320, 330},
+    {330, 340},
+    {340, 350},
+    {350, 360},
+    {360, 370},
+    {370, 380},
+    {380, 390},
+    {390, 400},
+    {400, 410},
+    {410, 420},
+    {420, 430}
+};
+
+const int rpmLimitTableSize = sizeof(rpmLimitTable) / sizeof(rpmLimitTable[0]);
+
 // Gelen komut değişkenleri
 float yon_f = 0.0f;
 float sagRpm_f = 0.0f;
@@ -112,6 +168,7 @@ float sol_hiz=0;
 uint8_t rxBuffer[RX_BUFFER_SIZE];
 uint8_t rxData;
 uint8_t tekerBuffer[13];
+uint8_t rpmBuffer[13];
 
 volatile uint16_t rxIndex = 0;
 
@@ -123,6 +180,23 @@ volatile uint8_t flag_1000ms = 0;
 
 volatile uint16_t tickCounter = 0;
 int MotorPIKontrol(float rpm_hedef, float rpm_olculen, float *integral);
+
+int getMaxPwmFromRpm(float rpm)
+{
+    int last = rpmLimitTable[0].maxPwm;
+
+    for (int i = 0; i < rpmLimitTableSize; i++)
+    {
+        if (rpm >= rpmLimitTable[i].rpm)
+            last = rpmLimitTable[i].maxPwm;
+        else
+            break;
+    }
+
+    return last;
+}
+
+
 /* USER CODE END 0 */
 
 /**
@@ -171,6 +245,9 @@ int main(void)
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);
 
+  __HAL_TIM_MOE_ENABLE(&htim1);
+  __HAL_TIM_MOE_ENABLE(&htim8);
+
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
@@ -206,7 +283,6 @@ int main(void)
 
 	  motor1.komutasyon(motor1pwm);
 	  motor2.komutasyon(motor2pwm);
-
 	  if(flag_10ms)
 	  {
 		flag_10ms = 0;
@@ -219,10 +295,12 @@ int main(void)
 	  {
 	      flag_20ms = 0;
 
+	      // --- Yön Al ---
 	      yon_f = ANKUPaket.gelenYonAl();
-//	      sagRpm_f = ANKUPaket.gelenSagRpmAl();
-//	      solRpm_f = ANKUPaket.gelenSolRpmAl();
-
+	      sagRpm_f = ANKUPaket.gelenSagRpmAl();
+	      solRpm_f = ANKUPaket.gelenSolRpmAl();
+//	      sagRpm_f = 200;
+//		  solRpm_f = 100;
 	      if (yon_f == 1) { motor1.setDirection(ILERI); motor2.setDirection(ILERI); }
 	      else if (yon_f == 2) { motor1.setDirection(GERI); motor2.setDirection(GERI); }
 
@@ -230,44 +308,34 @@ int main(void)
 	      motor1.hizHesaplaFiltered(0.02f);
 	      motor2.hizHesaplaFiltered(0.02f);
 
+	      // --- RPM bazlı maksimum PWM limit uygula ---
+		  int sagMaxPwm = getMaxPwmFromRpm(motor1.m_rpm); // Anlık RPM okuma
+		  int solMaxPwm = getMaxPwmFromRpm(motor2.m_rpm);
+
 	      // --- PWM hesapla ---
-	      motor1pwm = motor1.updatePWM(sagRpm_f, 0.02f);
-	      motor2pwm = motor2.updatePWM(solRpm_f, 0.02f);
+	      motor1pwm = motor1.updatePWM(sagRpm_f, 0.02f,sagMaxPwm);
+	      motor2pwm = motor2.updatePWM(solRpm_f, 0.02f,solMaxPwm);
 
-//	      // Motor 1 limitleri
-//	      if (sagRpm_f == 150)      pwmLimit1 = 90.0f;
-//	      else if (sagRpm_f == 200) pwmLimit1 = 115.0f;
-//	      else if (sagRpm_f == 250) pwmLimit1 = 140.0f;
-//
-//	      // Motor 2 limitleri
-//	      if (solRpm_f == 150)      pwmLimit2 = 90.0f;
-//	      else if (solRpm_f == 200) pwmLimit2 = 115.0f;
-//	      else if (solRpm_f == 250) pwmLimit2 = 140.0f;
-
-//	      // Limit uygula
-//	      if (motor1pwm > pwmLimit1) motor1pwm = pwmLimit1;
-//	      if (motor2pwm > pwmLimit2) motor2pwm = pwmLimit2;
-
+	      if (motor1pwm > sagMaxPwm) motor1pwm = sagMaxPwm;
+	      if (motor2pwm > solMaxPwm) motor2pwm = solMaxPwm;
 
 	      // --- PWM Artış Hesabı (Sadece artış, azalma yok) ---
-	      float inc1 = 0.0f;
-	      float inc2 = 0.0f;
+//	      float inc1 = 0.0f;
+//	      float inc2 = 0.0f;
+//
+//	      if (motor1pwm > prev_motor1pwm)
+//	          inc1 = motor1pwm - prev_motor1pwm;
+//
+//	      if (motor2pwm > prev_motor2pwm)
+//	          inc2 = motor2pwm - prev_motor2pwm;
+//
+//	      if (inc1 > maxIncrease_motor1) maxIncrease_motor1 = inc1;
+//	      if (inc2 > maxIncrease_motor2) maxIncrease_motor2 = inc2;
+//
+//	      prev_motor1pwm = motor1pwm;
+//	      prev_motor2pwm = motor2pwm;
 
-	      if (motor1pwm > prev_motor1pwm)
-	          inc1 = motor1pwm - prev_motor1pwm;
-
-	      if (motor2pwm > prev_motor2pwm)
-	          inc2 = motor2pwm - prev_motor2pwm;
-
-	      // Maksimum artışı güncelle
-	      if (inc1 > maxIncrease_motor1) maxIncrease_motor1 = inc1;
-	      if (inc2 > maxIncrease_motor2) maxIncrease_motor2 = inc2;
-
-	      // PWM'leri sakla
-	      prev_motor1pwm = motor1pwm;
-	      prev_motor2pwm = motor2pwm;
-
-	      // --- Komutasyon çağır ---
+	      // --- Komutasyon uygula ---
 	      motor1.komutasyon(motor1pwm);
 	      motor2.komutasyon(motor2pwm);
 
@@ -287,15 +355,21 @@ int main(void)
 	      HAL_UART_Transmit_DMA(&huart3, tekerBuffer, sizeof(tekerBuffer));
 	  }
 
-
-
-
 	  if(flag_100ms)
 	  {
 		  flag_100ms = 0;
 		  // 100 ms işlemleri
 //		  		  motor1.hizHesaplaFiltered(0.1f);
 //		  		  motor2.hizHesaplaFiltered(0.1f);
+	  // --- Paket oluştur & gönder ---
+//		  RPMPaket.RPMPaketOlustur(
+//		      motor1.m_rpm,
+//		      motor2.m_rpm
+//		  );
+//
+//		  RPMPaket.rpmPaketCagir(rpmBuffer);
+//		  HAL_UART_Transmit_DMA(&huart3, rpmBuffer, sizeof(rpmBuffer));
+
 	  }
 
 	  if(flag_500ms)
@@ -363,11 +437,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	if (GPIO_Pin == M1_HALL_A_Pin || GPIO_Pin == M1_HALL_B_Pin || GPIO_Pin == M1_HALL_C_Pin)
 	{
 		motor1.updateHall();
+		//motor1.komutasyon(motor1pwm);
 	}
 
 	if (GPIO_Pin == M2_HALL_A_Pin || GPIO_Pin == M2_HALL_B_Pin || GPIO_Pin == M2_HALL_C_Pin)
 	{
 		motor2.updateHall();
+		//motor2.komutasyon(motor2pwm);
 	}
 }
 
@@ -395,6 +471,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	   }
 
     }
+
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)

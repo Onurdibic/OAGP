@@ -42,13 +42,14 @@ extern IMU imu;
 extern MAG mag;
 extern GPS gps;
 Paket GpsPaket(0x12, 0x34, 0x01, 0x0D); //veri boyutu 13
-Paket KalmanPaket(0x12, 0x34, 0x08, 0x09); //veri boyutu 13
 Paket ImuPaket(0x12, 0x34, 0x02, 0x0D);//veri boyutu 13
 Paket VersiyonPaket(0x12, 0x34, 0x03, 0x04); //veri boyutu 4
 Paket YoklamaPaket(0x12, 0x34, 0x04, 0x04);//veri boyutu 4
 Paket RotaPaket(0x12, 0x34, 0x05, 0x04);//veri boyutu 4
 Paket SistemPaket(0x12, 0x34, 0x06, 0x09);//veri boyutu 9
 Paket KomutPaket(0x12,0x34, 0x07, 0x0D); //veri boyutu 13
+Paket KalmanPaket(0x12, 0x34, 0x08, 0x09); //veri boyutu 9
+Paket RPMPaket(0x12,0x34, 0x09, 0x09); //veri boyutu 9
 
 extern Paket ArayuzPaket;
 extern Paket ArabaArkaPaket;
@@ -100,6 +101,7 @@ uint8_t RotaVeriPaket[8]={0};
 uint8_t SistemVeriPaket[13]={0};
 uint8_t KomutVeriPaket[17]={0};
 uint8_t KalmanVeriPaket[13]={0};
+uint8_t RPMVeriPaket[13]={0};
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -219,7 +221,7 @@ void StartDefaultTask(void const * argument)
         // IMU paketi gönderimi
         if(ArayuzPaket.YoklamaFlag)
         {
-            ImuPaket.ImuPaketOlustur(pitch, roll, heading, imucipsicaklik);
+            ImuPaket.ImuPaketOlustur(pitch,roll, heading, imucipsicaklik);
             ImuPaket.imuPaketCagir(ImuVeriPaket);
 
             if(txState == 0)
@@ -227,6 +229,7 @@ void StartDefaultTask(void const * argument)
 				HAL_UART_Transmit_DMA(&huart3, ImuVeriPaket, 17);
 				txState = 1;
 			}
+
         }
         if(counter>=6)
         {
@@ -268,23 +271,23 @@ void StartPaketTask(void const * argument)
 		ArayuzPaket.PaketCoz();
 
 
-		if(ArayuzPaket.VersiyonPaketBayrak==true)
-		{
-			a=1;
-			VersiyonPaket.VersiyonPaketOlustur(0, 0, 7);
-			VersiyonPaket.versiyonPaketCagir(VersiyonVeriPaket);
-			HAL_UART_Transmit(&huart3, VersiyonVeriPaket, sizeof(VersiyonVeriPaket), 1000);
-			ArayuzPaket.VersiyonPaketBayrak=false;
-		}
-		if(ArayuzPaket.YoklamaPaketFlag==true)
-		{
-			a=2;
-			YoklamaPaket.YoklamaPaketOlustur();
-			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
-			HAL_UART_Transmit(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket), 1000);
-			ArayuzPaket.YoklamaPaketFlag=false;
-			yoklamaCounter++;
-		}
+//		if(ArayuzPaket.VersiyonPaketBayrak==true)
+//		{
+//			a=1;
+//			VersiyonPaket.VersiyonPaketOlustur(0, 0, 7);
+//			VersiyonPaket.versiyonPaketCagir(VersiyonVeriPaket);
+//			HAL_UART_Transmit(&huart3, VersiyonVeriPaket, sizeof(VersiyonVeriPaket), 1000);
+//			ArayuzPaket.VersiyonPaketBayrak=false;
+//		}
+//		if(ArayuzPaket.YoklamaPaketFlag==true)
+//		{
+//			a=2;
+//			YoklamaPaket.YoklamaPaketOlustur();
+//			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
+//			HAL_UART_Transmit(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket), 1000);
+//			ArayuzPaket.YoklamaPaketFlag=false;
+//			yoklamaCounter++;
+//		}
 		if(ArayuzPaket.ileriGitBayrak==true)
 		{
 			a=3;
@@ -310,10 +313,10 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.sagaGitBayrak==true)
 		{
 			a=5;
-			KomutPaket.KomutPaketOlustur(1, 150, 250);
+			KomutPaket.KomutPaketOlustur(1, 100, 250);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 150, 250);
+			KomutPaket.KomutPaketOlustur(1, 100, 250);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			ArayuzPaket.sagaGitBayrak=false;
@@ -321,10 +324,10 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.solaGitBayrak==true)
 		{
 			a=6;
-			KomutPaket.KomutPaketOlustur(1, 250, 150);
+			KomutPaket.KomutPaketOlustur(1, 250, 100);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 250, 150);
+			KomutPaket.KomutPaketOlustur(1, 250, 100);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			ArayuzPaket.solaGitBayrak=false;
@@ -366,8 +369,14 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.kalibrasyonMAGBayrak==true)
 		{
 			a=10;
-
+			KomutPaket.KomutPaketOlustur(1, 0,70);
+			KomutPaket.komutPaketCagir(KomutVeriPaket);
+			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
+			KomutPaket.KomutPaketOlustur(2, 70,0);
+			KomutPaket.komutPaketCagir(KomutVeriPaket);
+			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			mag.XveYKalibreEt();
+
 			ArayuzPaket.kalibrasyonMAGBayrak=false;
 		}
 
@@ -435,8 +444,8 @@ void StartKonumTask(void const * argument)
 	            ArabaArkaPaket.saghiz_f,ArabaArkaPaket.solhiz_f,dt_f,
 	            &gps.gpsdeadreset,&enlemCikti_f,&boylamCikti_f);
 
-	//	float ortalama_hiz = (ArabaArkaPaket.saghiz_f + ArabaArkaPaket.solhiz_f) / 2.0f;
-		float ortalama_hiz = (2.0 + 2.0) / 2.0f;
+		float ortalama_hiz = (ArabaArkaPaket.saghiz_f + ArabaArkaPaket.solhiz_f) / 2.0f;
+		//float ortalama_hiz = (2.0 + 2.0) / 2.0f;
 		float mesafe = ortalama_hiz * 0.02;
 		float heading_rad = heading * (M_PI/180.0f);
 		if(enlem_f >= 1.0f && boylam_f >= 1.0f)

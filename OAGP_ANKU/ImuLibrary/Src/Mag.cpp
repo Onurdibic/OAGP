@@ -7,9 +7,11 @@
 
 #include "Mag.h"
 #include "cmsis_os.h"
+#include "main.h"
+#include "Paket.h"
 
 #define HMC5883L_ADDRESS 0x1E << 1 // I2C adresi
-
+extern Paket ArayuzPaket;
 MAG::MAG(I2C_HandleTypeDef *hi2c)
 {
   this->hi2c = hi2c;
@@ -79,6 +81,8 @@ void MAG::XveYKalibreEt()
   // Her eksen için ölçek faktörü
   xScaleFactor_f = avgScale / xScale;
   yScaleFactor_f = avgScale / yScale;
+  ArayuzPaket.geriDurBayrak=true;
+  ArayuzPaket.ileriDurBayrak=true;
 }
 
 void MAG::TumEkseniKalibreEt()

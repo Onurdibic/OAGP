@@ -64,13 +64,18 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(M2_AL_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : M2_CL_Pin M2_BL_Pin LED_Pin M1_AL_Pin
-                           M1_BL_Pin M1_CL_Pin */
-  GPIO_InitStruct.Pin = M2_CL_Pin|M2_BL_Pin|LED_Pin|M1_AL_Pin
-                          |M1_BL_Pin|M1_CL_Pin;
+  /*Configure GPIO pins : M2_CL_Pin M2_BL_Pin LED_Pin */
+  GPIO_InitStruct.Pin = M2_CL_Pin|M2_BL_Pin|LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : M1_AL_Pin M1_BL_Pin M1_CL_Pin */
+  GPIO_InitStruct.Pin = M1_AL_Pin|M1_BL_Pin|M1_CL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : M1_HALL_C_Pin M1_HALL_B_Pin M1_HALL_A_Pin */

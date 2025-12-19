@@ -19,7 +19,7 @@ namespace GpsRotaCizme
         private GMapOverlay kalmanYeri;   // 🔵 Kalman için yeni overlay
 
         Bitmap bmp = new Bitmap(5, 5);
-        Bitmap bmpKalman = new Bitmap(5, 5);   // ⚫ Kalman için siyah nokta
+        Bitmap bmpKalman = new Bitmap(10, 10);   // ⚫ Kalman için siyah nokta
 
         public MapYonetici(GMapControl mapControl)
         {
@@ -49,7 +49,7 @@ namespace GpsRotaCizme
             // Kalman siyah nokta
             using (Graphics gfx = Graphics.FromImage(bmpKalman))
             {
-                gfx.FillEllipse(Brushes.Black, 0, 0, 3, 3);
+                gfx.FillEllipse(Brushes.Black, 0, 0, 6, 6);
             }
         }
 
@@ -81,6 +81,7 @@ namespace GpsRotaCizme
         }
 
         // ⚫ KALMAN NOKTA EKLEME
+        /*
         public void KalmanNoktaEkle(double lat, double lon)
         {
             PointLatLng nokta = new PointLatLng(lat, lon);
@@ -88,6 +89,22 @@ namespace GpsRotaCizme
             kalmanYeri.Markers.Add(marker);
 
             map.Refresh();
+        }*/
+        // ⚫ KALMAN NOKTA EKLEME (önceki silinir)
+
+        public void KalmanNoktaEkle(double lat, double lon)
+        {
+            PointLatLng nokta = new PointLatLng(lat, lon);
+
+            // Önceki Kalman noktasını temizle
+            kalmanYeri.Markers.Clear();
+
+            // Yeni Kalman noktasını ekle
+            GMarkerGoogle marker = new GMarkerGoogle(nokta, bmpKalman);
+            kalmanYeri.Markers.Add(marker);
+
+            map.Refresh();
         }
+
     }
 }

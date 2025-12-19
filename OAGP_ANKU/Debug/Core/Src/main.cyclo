@@ -1,8 +1,9 @@
-../Core/Src/main.cpp:104:5:int main()	1
-../Core/Src/main.cpp:178:6:void SystemClock_Config()	3
-../Core/Src/main.cpp:220:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	5
-../Core/Src/main.cpp:240:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	4
-../Core/Src/main.cpp:272:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	2
-../Core/Src/main.cpp:290:6:void Error_Handler()	1
-../Core/Src/main.cpp:299:1:void __static_initialization_and_destruction_0()	1
-../Core/Src/main.cpp:299:1:cpp)	1
+../Core/Src/main.cpp:111:5:int main()	1
+../Core/Src/main.cpp:185:6:void SystemClock_Config()	3
+../Core/Src/main.cpp:227:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	5
+../Core/Src/main.cpp:247:7:float HizdanRPM(float)	1
+../Core/Src/main.cpp:252:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	7
+../Core/Src/main.cpp:315:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	2
+../Core/Src/main.cpp:333:6:void Error_Handler()	1
+../Core/Src/main.cpp:342:1:void __static_initialization_and_destruction_0()	1
+../Core/Src/main.cpp:342:1:cpp)	1

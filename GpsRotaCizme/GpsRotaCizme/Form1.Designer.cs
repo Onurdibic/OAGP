@@ -109,6 +109,8 @@
             this.geriButton = new System.Windows.Forms.Button();
             this.sagButton = new System.Windows.Forms.Button();
             this.ileriButton = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label41 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
@@ -847,6 +849,8 @@
             // 
             // Manuel
             // 
+            this.Manuel.Controls.Add(this.label41);
+            this.Manuel.Controls.Add(this.label4);
             this.Manuel.Controls.Add(this.geriDurButon);
             this.Manuel.Controls.Add(this.ileriDurButon);
             this.Manuel.Controls.Add(this.solButton);
@@ -928,6 +932,24 @@
             this.ileriButton.UseVisualStyleBackColor = false;
             this.ileriButton.Click += new System.EventHandler(this.ileriButton_Click);
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(922, 119);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(44, 16);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "label4";
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(819, 119);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(51, 16);
+            this.label41.TabIndex = 12;
+            this.label41.Text = "label41";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -959,6 +981,7 @@
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.Manuel.ResumeLayout(false);
+            this.Manuel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1037,6 +1060,8 @@
         private System.Windows.Forms.Button ileriDurButon;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.Label label4;
     }
 }
 

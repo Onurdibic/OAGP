@@ -56,6 +56,13 @@ extern Paket GpsPaket;
 extern uint8_t GpsVeriPaket[17];
 extern Paket KalmanPaket;
 extern uint8_t KalmanVeriPaket[13];
+extern Paket RPMPaket;
+extern uint8_t RPMVeriPaket[13];
+extern Paket YoklamaPaket;
+extern uint8_t YoklamaVeriPaket[8];
+extern Paket VersiyonPaket;
+extern uint8_t VersiyonVeriPaket[8];
+extern int a;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -237,10 +244,32 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
+float HizdanRPM(float speed_ms)
+{
+    return (speed_ms * 60.0f) / (2.0f * 3.14159265f * 0.085);
+}
+
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     if(huart->Instance == USART3)
     {
+    	if(ArayuzPaket.VersiyonPaketBayrak==true)
+		{
+			a=1;
+			VersiyonPaket.VersiyonPaketOlustur(0, 0, 7);
+			VersiyonPaket.versiyonPaketCagir(VersiyonVeriPaket);
+			HAL_UART_Transmit_DMA(&huart3, VersiyonVeriPaket, sizeof(VersiyonVeriPaket));
+			ArayuzPaket.VersiyonPaketBayrak=false;
+		}
+		if(ArayuzPaket.YoklamaPaketFlag==true)
+		{
+			a=2;
+			YoklamaPaket.YoklamaPaketOlustur();
+			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
+			HAL_UART_Transmit_DMA(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket));
+			ArayuzPaket.YoklamaPaketFlag=false;
+			//yoklamaCounter++;
+		}
         if(txState == 1)
         {
             GpsPaket.GpsPaketOlustur(enlemCikti_f,boylamCikti_f,0,0);
@@ -254,8 +283,22 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
         	KalmanPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f);
         	KalmanPaket.kalmanPaketCagir(KalmanVeriPaket);
 			HAL_UART_Transmit_DMA(&huart3, KalmanVeriPaket, 13);
+            txState = 3;
+        }
+        else if(txState == 3)
+        {
+            float sag_rpm = HizdanRPM(ArabaOnPaket.saghiz_f);
+            float sol_rpm = HizdanRPM(ArabaOnPaket.solhiz_f);
+
+            RPMPaket.RPMPaketOlustur(sag_rpm, sol_rpm);
+            RPMPaket.rpmPaketCagir(RPMVeriPaket);
+            HAL_UART_Transmit_DMA(&huart3, RPMVeriPaket, 13);
+
             txState = 0;
         }
+
+
+
     }
 }
 

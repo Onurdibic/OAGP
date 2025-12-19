@@ -1,9 +1,10 @@
 C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_MKU/MotorKontrolLibrary/Inc/Motor.h:69:20:MotorDirection Motor::getDirection() const	1
-../Core/Src/main.cpp:132:5:int main()	13
-../Core/Src/main.cpp:327:6:void SystemClock_Config()	3
-../Core/Src/main.cpp:361:6:void HAL_GPIO_EXTI_Callback(uint16_t)	7
-../Core/Src/main.cpp:374:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	7
-../Core/Src/main.cpp:400:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	2
-../Core/Src/main.cpp:415:6:void Error_Handler()	1
-../Core/Src/main.cpp:424:1:void __static_initialization_and_destruction_0()	1
-../Core/Src/main.cpp:424:1:cpp)	1
+../Core/Src/main.cpp:184:5:int getMaxPwmFromRpm(float)	3
+../Core/Src/main.cpp:206:5:int main()	11
+../Core/Src/main.cpp:401:6:void SystemClock_Config()	3
+../Core/Src/main.cpp:435:6:void HAL_GPIO_EXTI_Callback(uint16_t)	7
+../Core/Src/main.cpp:450:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	7
+../Core/Src/main.cpp:477:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	2
+../Core/Src/main.cpp:492:6:void Error_Handler()	1
+../Core/Src/main.cpp:501:1:void __static_initialization_and_destruction_0()	1
+../Core/Src/main.cpp:501:1:cpp)	1

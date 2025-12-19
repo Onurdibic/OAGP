@@ -1,9 +1,9 @@
-../Core/Src/freertos.cpp:140:6:void vApplicationGetIdleTaskMemory(StaticTask_t**, StackType_t**, uint32_t*)	24	static
-../Core/Src/freertos.cpp:154:6:void MX_FREERTOS_Init()	160	static
-../Core/Src/freertos.cpp:209:6:void StartDefaultTask(const void*)	24	static
-../Core/Src/freertos.cpp:254:6:void StartPaketTask(const void*)	24	static
-../Core/Src/freertos.cpp:394:6:void StartImuTask(const void*)	32	static
-../Core/Src/freertos.cpp:423:6:void StartKonumTask(const void*)	40	static
-../Core/Src/freertos.cpp:454:6:void StartKalmanTask(const void*)	144	static
-../Core/Src/freertos.cpp:524:1:void __static_initialization_and_destruction_0()	16	static
-../Core/Src/freertos.cpp:524:1:cpp)	8	static
+../Core/Src/freertos.cpp:142:6:void vApplicationGetIdleTaskMemory(StaticTask_t**, StackType_t**, uint32_t*)	24	static
+../Core/Src/freertos.cpp:156:6:void MX_FREERTOS_Init()	160	static
+../Core/Src/freertos.cpp:211:6:void StartDefaultTask(const void*)	24	static
+../Core/Src/freertos.cpp:257:6:void StartPaketTask(const void*)	24	static
+../Core/Src/freertos.cpp:403:6:void StartImuTask(const void*)	32	static
+../Core/Src/freertos.cpp:432:6:void StartKonumTask(const void*)	40	static
+../Core/Src/freertos.cpp:463:6:void StartKalmanTask(const void*)	144	static
+../Core/Src/freertos.cpp:533:1:void __static_initialization_and_destruction_0()	16	static
+../Core/Src/freertos.cpp:533:1:cpp)	8	static

@@ -9,6 +9,7 @@ enum Durumlar
 	DataBoyutuAl,
 	DataOku
 };
+
 enum GelenPaketler
 {
 	ROTA=0x01,
@@ -53,6 +54,22 @@ void Paket::TekerPaketOlustur(float saghiz_f ,float solhiz_f)
     memcpy(tekerpaket + 8, solhizBytes_u8, 4);
 
     tekerpaket[12]=CRC8Hesaplama(tekerpaket,4, 12);
+}
+
+void Paket::RPMPaketOlustur(float sagrpm_f ,float solrpm_f)
+{
+	rpmpaket[0] = baslik1_u8;
+	rpmpaket[1] = baslik2_u8;
+	rpmpaket[2] = paketTipi_u8;
+	rpmpaket[3] = dataBoyutu_u8;
+
+    floatToBytes(&sagrpm_f, sagrpmBytes_u8);
+    floatToBytes(&solrpm_f, solrpmBytes_u8);
+
+    memcpy(rpmpaket + 4, sagrpmBytes_u8, 4);
+    memcpy(rpmpaket + 8, solrpmBytes_u8, 4);
+
+    rpmpaket[12]=CRC8Hesaplama(rpmpaket,4, 12);
 }
 
 
@@ -138,6 +155,7 @@ float Paket::gelenSagRpmAl(){return gelenSagRpm_f;}
 float Paket::gelenSolRpmAl(){return gelenSolRpm_f;}
 
 void Paket::tekerPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, tekerpaket, sizeof(tekerpaket));}
+void Paket::rpmPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, rpmpaket, sizeof(rpmpaket));}
 
 uint8_t Paket::CRC8Hesaplama(uint8_t *data, uint8_t baslangic ,uint8_t bitis)
 {

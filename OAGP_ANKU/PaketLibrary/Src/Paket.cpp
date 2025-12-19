@@ -23,7 +23,8 @@ enum GelenPaketler
 	DUR=0x04,
 	YON=0x05,
 	TEKER=0x06,
-	KALIBRASYON = 0x07
+	KALIBRASYON=0x07,
+	RPM=0x08
 };
 
 //enum GidenPaketler
@@ -35,7 +36,8 @@ enum GelenPaketler
 //	ROTA =0x05,
 //	SISTEM=0x06,
 //	KOMUT=0x07,
-//  KALMAN=0x08
+//  KALMAN=0x08,
+//  RPM=0x09
 //};
 
 Paket::Paket(UART_HandleTypeDef* huart)
@@ -109,6 +111,23 @@ void Paket::ImuPaketOlustur(float pitch,float roll,float heading,float sicaklik)
 
     imupaket[16] = CRC8Hesaplama(imupaket, 4,16);
 }
+
+void Paket::RPMPaketOlustur(float sagrpm_f ,float solrpm_f)
+{
+	rpmpaket[0] = baslik1_u8;
+	rpmpaket[1] = baslik2_u8;
+	rpmpaket[2] = paketTipi_u8;
+	rpmpaket[3] = dataBoyutu_u8;
+
+    floatToBytes(&sagrpm_f, sagrpmBytes_u8);
+    floatToBytes(&solrpm_f, solrpmBytes_u8);
+
+    memcpy(rpmpaket + 4, sagrpmBytes_u8, 4);
+    memcpy(rpmpaket + 8, solrpmBytes_u8, 4);
+
+    rpmpaket[12]=CRC8Hesaplama(rpmpaket,4, 12);
+}
+
 
 void Paket::VersiyonPaketOlustur(uint8_t b,uint8_t o,uint8_t s)
 {
@@ -184,6 +203,7 @@ void Paket::rotaPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, rotapaket, size
 void Paket::sistemPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, sistempaket, sizeof(sistempaket));}
 void Paket::komutPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, komutpaket, sizeof(komutpaket));}
 void Paket::kalmanPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, kalmanpaket, sizeof(kalmanpaket));}
+void Paket::rpmPaketCagir(uint8_t *kopyaDizi){memcpy(kopyaDizi, rpmpaket, sizeof(rpmpaket));}
 
 void Paket::DataAlveBayrakKaldir()
 {
@@ -248,6 +268,14 @@ void Paket::PaketCoz()
 							{
 								saghiz_f = bytesToFloat(tempBuffer, 0);
 								solhiz_f = bytesToFloat(tempBuffer, 4);
+							}
+							break;
+						// -------------------- RPM --------------------
+						case RPM:
+							if (dataLength_s16 == 9 &&tempBuffer[8] == CRC8Hesaplama(tempBuffer, 0, 8))
+							{
+								sagrpm_f = bytesToFloat(tempBuffer, 0);
+								solrpm_f = bytesToFloat(tempBuffer, 4);
 							}
 							break;
                         // -------------------- ROTA --------------------
