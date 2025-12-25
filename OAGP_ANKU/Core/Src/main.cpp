@@ -62,7 +62,10 @@ extern Paket YoklamaPaket;
 extern uint8_t YoklamaVeriPaket[8];
 extern Paket VersiyonPaket;
 extern uint8_t VersiyonVeriPaket[8];
+extern Paket ImuPaket;
+extern uint8_t ImuVeriPaket[8];
 extern int a;
+extern float pitch,roll, heading, imucipsicaklik;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -270,33 +273,42 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 			ArayuzPaket.YoklamaPaketFlag=false;
 			//yoklamaCounter++;
 		}
-        if(txState == 1)
-        {
-            GpsPaket.GpsPaketOlustur(enlemCikti_f,boylamCikti_f,0,0);
-            GpsPaket.gpsPaketCagir(GpsVeriPaket);
-            HAL_UART_Transmit_DMA(&huart3, GpsVeriPaket, 17);
+		if(ArayuzPaket.YoklamaFlag)
+		{
+			if(txState == 1)
+			{
+				ImuPaket.ImuPaketOlustur(pitch,roll, heading, imucipsicaklik);
+				ImuPaket.imuPaketCagir(ImuVeriPaket);
+				HAL_UART_Transmit_DMA(&huart3, ImuVeriPaket, 17);
+				txState = 2;
+			}
+			else if(txState == 2)
+			{
+				GpsPaket.GpsPaketOlustur(enlemCikti_f,boylamCikti_f,0,0);
+				GpsPaket.gpsPaketCagir(GpsVeriPaket);
+				HAL_UART_Transmit_DMA(&huart3, GpsVeriPaket, 17);
 
-            txState = 2;
-        }
-        else if(txState == 2)
-        {
-        	KalmanPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f);
-        	KalmanPaket.kalmanPaketCagir(KalmanVeriPaket);
-			HAL_UART_Transmit_DMA(&huart3, KalmanVeriPaket, 13);
-            txState = 3;
-        }
-        else if(txState == 3)
-        {
-            float sag_rpm = HizdanRPM(ArabaOnPaket.saghiz_f);
-            float sol_rpm = HizdanRPM(ArabaOnPaket.solhiz_f);
+				txState = 3;
+			}
+			else if(txState == 3)
+			{
+				KalmanPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f);
+				KalmanPaket.kalmanPaketCagir(KalmanVeriPaket);
+				HAL_UART_Transmit_DMA(&huart3, KalmanVeriPaket, 13);
+				txState = 4;
+			}
+			else if(txState == 4)
+			{
+				float sag_rpm = HizdanRPM(ArabaOnPaket.saghiz_f);
+				float sol_rpm = HizdanRPM(ArabaOnPaket.solhiz_f);
 
-            RPMPaket.RPMPaketOlustur(sag_rpm, sol_rpm);
-            RPMPaket.rpmPaketCagir(RPMVeriPaket);
-            HAL_UART_Transmit_DMA(&huart3, RPMVeriPaket, 13);
+				RPMPaket.RPMPaketOlustur(sag_rpm, sol_rpm);
+				RPMPaket.rpmPaketCagir(RPMVeriPaket);
+				HAL_UART_Transmit_DMA(&huart3, RPMVeriPaket, 13);
 
-            txState = 0;
-        }
-
+				txState = 0;
+			}
+		}
 
 
     }

@@ -53,7 +53,7 @@ void MAG::XveYKalibreEt()
   int16_t xMax = -3200, yMax = -3200;
 
   // 2000 örnek alarak min/max bul
-  for (int i = 0; i < 2000; i++)
+  for (int i = 0; i < 1000; i++)
   {
 	GPIOD->ODR ^= GPIO_PIN_13;
     uint32_t startTick = HAL_GetTick();
@@ -64,7 +64,7 @@ void MAG::XveYKalibreEt()
     if (yEksen_s16 < yMin) yMin = yEksen_s16;
     if (yEksen_s16 > yMax) yMax = yEksen_s16;
 
-    osDelay(5);
+    osDelay(20);
   }
 
   // Offset (merkez) hesapla
@@ -85,49 +85,49 @@ void MAG::XveYKalibreEt()
   ArayuzPaket.ileriDurBayrak=true;
 }
 
-void MAG::TumEkseniKalibreEt()
-{
-    int16_t xEksen_s16, yEksen_s16, zEksen_s16;
-    int16_t xMin = 32000, yMin = 32000, zMin = 32000;
-    int16_t xMax = -32000, yMax = -32000, zMax = -32000;
-
-    // 2000 örnek alarak min/max bul
-    for (int i = 0; i < 1000; i++)
-    {
-        uint32_t startTick = HAL_GetTick();
-        MagDataOku(&xEksen_s16, &yEksen_s16, &zEksen_s16);
-
-        if (xEksen_s16 < xMin) xMin = xEksen_s16;
-        if (xEksen_s16 > xMax) xMax = xEksen_s16;
-
-        if (yEksen_s16 < yMin) yMin = yEksen_s16;
-        if (yEksen_s16 > yMax) yMax = yEksen_s16;
-
-        if (zEksen_s16 < zMin) zMin = zEksen_s16;
-        if (zEksen_s16 > zMax) zMax = zEksen_s16;
-
-        while ((HAL_GetTick() - startTick) < 20) {}
-    }
-
-    // Offset (hard-iron düzeltmesi)
-    xOffset_f = (xMax + xMin) / 2.0f;
-    yOffset_f = (yMax + yMin) / 2.0f;
-    zOffset_f = (zMax + zMin) / 2.0f;
-
-    // Ölçek (soft-iron düzeltmesi)
-    float xScale = (xMax - xMin) / 2.0f;
-    float yScale = (yMax - yMin) / 2.0f;
-    float zScale = (zMax - zMin) / 2.0f;
-
-    // Ortalama ölçek
-    float avgScale = (xScale + yScale + zScale) / 3.0f;
-
-    // Her eksen için ölçek faktörleri
-    xScaleFactor_f = avgScale / xScale;
-    yScaleFactor_f = avgScale / yScale;
-    zScaleFactor_f = avgScale / zScale;
-
-}
+//void MAG::TumEkseniKalibreEt()
+//{
+//    int16_t xEksen_s16, yEksen_s16, zEksen_s16;
+//    int16_t xMin = 32000, yMin = 32000, zMin = 32000;
+//    int16_t xMax = -32000, yMax = -32000, zMax = -32000;
+//
+//    // 2000 örnek alarak min/max bul
+//    for (int i = 0; i < 1000; i++)
+//    {
+//        uint32_t startTick = HAL_GetTick();
+//        MagDataOku(&xEksen_s16, &yEksen_s16, &zEksen_s16);
+//
+//        if (xEksen_s16 < xMin) xMin = xEksen_s16;
+//        if (xEksen_s16 > xMax) xMax = xEksen_s16;
+//
+//        if (yEksen_s16 < yMin) yMin = yEksen_s16;
+//        if (yEksen_s16 > yMax) yMax = yEksen_s16;
+//
+//        if (zEksen_s16 < zMin) zMin = zEksen_s16;
+//        if (zEksen_s16 > zMax) zMax = zEksen_s16;
+//
+//        while ((HAL_GetTick() - startTick) < 20) {}
+//    }
+//
+//    // Offset (hard-iron düzeltmesi)
+//    xOffset_f = (xMax + xMin) / 2.0f;
+//    yOffset_f = (yMax + yMin) / 2.0f;
+//    zOffset_f = (zMax + zMin) / 2.0f;
+//
+//    // Ölçek (soft-iron düzeltmesi)
+//    float xScale = (xMax - xMin) / 2.0f;
+//    float yScale = (yMax - yMin) / 2.0f;
+//    float zScale = (zMax - zMin) / 2.0f;
+//
+//    // Ortalama ölçek
+//    float avgScale = (xScale + yScale + zScale) / 3.0f;
+//
+//    // Her eksen için ölçek faktörleri
+//    xScaleFactor_f = avgScale / xScale;
+//    yScaleFactor_f = avgScale / yScale;
+//    zScaleFactor_f = avgScale / zScale;
+//
+//}
 
 
 float* MAG::HeadingOlustur(float pitch, float roll)

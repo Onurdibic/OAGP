@@ -22,6 +22,8 @@
 #include "gpio.h"
 #include "usart.h"
 #include "dma.h"
+#include <cstdlib>
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Motor.h"
@@ -62,6 +64,7 @@ Motor motor2(&htim8,&htim2,TIM_CHANNEL_1, TIM_CHANNEL_3, TIM_CHANNEL_2,
 Paket ANKUPaket(&huart3);
 Paket TekerPaket(0x12, 0x34, 0x06, 0x09);
 Paket RPMPaket(0x12, 0x34, 0x08, 0x09);
+MotorDirection baseDir;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -291,51 +294,117 @@ int main(void)
 
 	  }
 
+//	  if (flag_20ms)
+//	  {
+//	      flag_20ms = 0;
+//
+//	      // --- Yön Al ---
+//	      yon_f = ANKUPaket.gelenYonAl();
+//	      sagRpm_f = ANKUPaket.gelenSagRpmAl();
+//	      solRpm_f = ANKUPaket.gelenSolRpmAl();
+////	      sagRpm_f = 100;
+////		  solRpm_f = 100;
+//	      if (yon_f == 1) { motor1.setDirection(ILERI); motor2.setDirection(ILERI); }
+//	      else if (yon_f == 2) { motor1.setDirection(GERI); motor2.setDirection(GERI); }
+//
+//	      // --- Hız Filtreleme ---
+//	      motor1.hizHesaplaFiltered(0.02f);
+//	      motor2.hizHesaplaFiltered(0.02f);
+//
+//	      // --- RPM bazlı maksimum PWM limit uygula ---
+//		  int sagMaxPwm = getMaxPwmFromRpm(motor1.m_rpm); // Anlık RPM okuma
+//		  int solMaxPwm = getMaxPwmFromRpm(motor2.m_rpm);
+//
+//	      // --- PWM hesapla ---
+//	      motor1pwm = motor1.updatePWM(sagRpm_f, 0.02f,sagMaxPwm);
+//	      motor2pwm = motor2.updatePWM(solRpm_f, 0.02f,solMaxPwm);
+//
+//	      if (motor1pwm > sagMaxPwm) motor1pwm = sagMaxPwm;
+//	      if (motor2pwm > solMaxPwm) motor2pwm = solMaxPwm;
+//
+//	      // --- PWM Artış Hesabı (Sadece artış, azalma yok) ---
+////	      float inc1 = 0.0f;
+////	      float inc2 = 0.0f;
+////
+////	      if (motor1pwm > prev_motor1pwm)
+////	          inc1 = motor1pwm - prev_motor1pwm;
+////
+////	      if (motor2pwm > prev_motor2pwm)
+////	          inc2 = motor2pwm - prev_motor2pwm;
+////
+////	      if (inc1 > maxIncrease_motor1) maxIncrease_motor1 = inc1;
+////	      if (inc2 > maxIncrease_motor2) maxIncrease_motor2 = inc2;
+////
+////	      prev_motor1pwm = motor1pwm;
+////	      prev_motor2pwm = motor2pwm;
+//
+//	      // --- Komutasyon uygula ---
+//	      motor1.komutasyon(motor1pwm);
+//	      motor2.komutasyon(motor2pwm);
+//
+//	      // --- Hız çıkışları ---
+//	      sag_hiz = motor1.m_speed_ms;
+//	      sol_hiz = motor2.m_speed_ms;
+//
+//	      if (motor1.getDirection() == GERI)
+//	      {
+//	          sag_hiz = -sag_hiz;
+//	          sol_hiz = -sol_hiz;
+//	      }
+//
+//	      // --- Paket oluştur & gönder ---
+//	      TekerPaket.TekerPaketOlustur(sag_hiz, sol_hiz);
+//	      TekerPaket.tekerPaketCagir(tekerBuffer);
+//	      HAL_UART_Transmit_DMA(&huart3, tekerBuffer, sizeof(tekerBuffer));
+//	  }
+
 	  if (flag_20ms)
 	  {
 	      flag_20ms = 0;
 
-	      // --- Yön Al ---
-	      yon_f = ANKUPaket.gelenYonAl();
+	      yon_f     = ANKUPaket.gelenYonAl();
 	      sagRpm_f = ANKUPaket.gelenSagRpmAl();
 	      solRpm_f = ANKUPaket.gelenSolRpmAl();
-//	      sagRpm_f = 200;
-//		  solRpm_f = 100;
-	      if (yon_f == 1) { motor1.setDirection(ILERI); motor2.setDirection(ILERI); }
-	      else if (yon_f == 2) { motor1.setDirection(GERI); motor2.setDirection(GERI); }
 
-	      // --- Hız Filtreleme ---
+	      // --- Paket yönü ---
+	      MotorDirection baseDir;
+	      if (yon_f == 1)
+	          baseDir = ILERI;
+	      else if (yon_f == 2)
+	          baseDir = GERI;
+	      else
+	          baseDir = ILERI;
+
+	      // --- Hedef RPM işaretinden yön ---
+	      MotorDirection hedefDir1 =
+	          (sagRpm_f >= 0) ? baseDir : (baseDir == ILERI ? GERI : ILERI);
+
+	      MotorDirection hedefDir2 =
+	          (solRpm_f >= 0) ? baseDir : (baseDir == ILERI ? GERI : ILERI);
+
+	      motor1.setDirection(hedefDir1);
+	      motor2.setDirection(hedefDir2);
+
+	      // --- Hız filtreleme ---
 	      motor1.hizHesaplaFiltered(0.02f);
 	      motor2.hizHesaplaFiltered(0.02f);
 
-	      // --- RPM bazlı maksimum PWM limit uygula ---
-		  int sagMaxPwm = getMaxPwmFromRpm(motor1.m_rpm); // Anlık RPM okuma
-		  int solMaxPwm = getMaxPwmFromRpm(motor2.m_rpm);
+	      // --- Mutlak hedef RPM ---
+	      int sagRpmAbs = (sagRpm_f >= 0) ? sagRpm_f : -sagRpm_f;
+	      int solRpmAbs = (solRpm_f >= 0) ? solRpm_f : -solRpm_f;
 
-	      // --- PWM hesapla ---
-	      motor1pwm = motor1.updatePWM(sagRpm_f, 0.02f,sagMaxPwm);
-	      motor2pwm = motor2.updatePWM(solRpm_f, 0.02f,solMaxPwm);
+	      // --- Max PWM ---
+	      int sagMaxPwm = getMaxPwmFromRpm(motor1.m_rpm);
+	      int solMaxPwm = getMaxPwmFromRpm(motor2.m_rpm);
+
+	      // --- PWM hesapla (artık her zaman +) ---
+	      motor1pwm = motor1.updatePWM(sagRpmAbs, 0.02f, sagMaxPwm);
+	      motor2pwm = motor2.updatePWM(solRpmAbs, 0.02f, solMaxPwm);
 
 	      if (motor1pwm > sagMaxPwm) motor1pwm = sagMaxPwm;
 	      if (motor2pwm > solMaxPwm) motor2pwm = solMaxPwm;
 
-	      // --- PWM Artış Hesabı (Sadece artış, azalma yok) ---
-//	      float inc1 = 0.0f;
-//	      float inc2 = 0.0f;
-//
-//	      if (motor1pwm > prev_motor1pwm)
-//	          inc1 = motor1pwm - prev_motor1pwm;
-//
-//	      if (motor2pwm > prev_motor2pwm)
-//	          inc2 = motor2pwm - prev_motor2pwm;
-//
-//	      if (inc1 > maxIncrease_motor1) maxIncrease_motor1 = inc1;
-//	      if (inc2 > maxIncrease_motor2) maxIncrease_motor2 = inc2;
-//
-//	      prev_motor1pwm = motor1pwm;
-//	      prev_motor2pwm = motor2pwm;
-
-	      // --- Komutasyon uygula ---
+	      // --- Komütasyon ---
 	      motor1.komutasyon(motor1pwm);
 	      motor2.komutasyon(motor2pwm);
 
@@ -344,12 +413,12 @@ int main(void)
 	      sol_hiz = motor2.m_speed_ms;
 
 	      if (motor1.getDirection() == GERI)
-	      {
 	          sag_hiz = -sag_hiz;
-	          sol_hiz = -sol_hiz;
-	      }
 
-	      // --- Paket oluştur & gönder ---
+	      if (motor2.getDirection() == GERI)
+	          sol_hiz = -sol_hiz;
+
+
 	      TekerPaket.TekerPaketOlustur(sag_hiz, sol_hiz);
 	      TekerPaket.tekerPaketCagir(tekerBuffer);
 	      HAL_UART_Transmit_DMA(&huart3, tekerBuffer, sizeof(tekerBuffer));

@@ -2,5 +2,4 @@
 ../ImuLibrary/Src/Mag.cpp:24:6:void MAG::Yapilandir()	1
 ../ImuLibrary/Src/Mag.cpp:39:6:void MAG::MagDataOku(int16_t*, int16_t*, int16_t*)	1
 ../ImuLibrary/Src/Mag.cpp:49:6:void MAG::XveYKalibreEt()	6
-../ImuLibrary/Src/Mag.cpp:88:6:void MAG::TumEkseniKalibreEt()	9
 ../ImuLibrary/Src/Mag.cpp:133:8:float* MAG::HeadingOlustur(float, float)	3

@@ -56,6 +56,7 @@ extern Paket ArabaArkaPaket;
 extern Paket ArabaOnPaket;
 
 extern uint8_t txState;
+extern float HizdanRPM(float speed_ms);
 
 /* USER CODE END PTD */
 
@@ -93,6 +94,7 @@ float boylam_ref=0;
 int a=0;
 int yoklamaCounter=0;
 
+
 uint8_t GpsVeriPaket[17]={0};
 uint8_t ImuVeriPaket[17]={0};
 uint8_t VersiyonVeriPaket[8]={0};
@@ -118,6 +120,7 @@ osThreadId myPaketTaskHandle;
 osThreadId myImuTaskHandle;
 osThreadId myKonumTaskHandle;
 osThreadId myKalmanTaskHandle;
+osThreadId myKontrolTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -129,6 +132,7 @@ void StartPaketTask(void const * argument);
 void StartImuTask(void const * argument);
 void StartKonumTask(void const * argument);
 void StartKalmanTask(void const * argument);
+void StartKontrolTask(void const * argument);
 
 extern "C" void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -195,6 +199,10 @@ void MX_FREERTOS_Init(void) {
 	osThreadDef(myKalmanTask, StartKalmanTask, osPriorityHigh, 0, 1024);
 	myKalmanTaskHandle = osThreadCreate(osThread(myKalmanTask), NULL);
 
+	/* definition and creation of myKontrolTask */
+	  osThreadDef(myKontrolTask, StartKontrolTask, osPriorityIdle, 0, 1024);
+	  myKontrolTaskHandle = osThreadCreate(osThread(myKontrolTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -219,18 +227,19 @@ void StartDefaultTask(void const * argument)
     {
     	counter++;
         // IMU paketi gönderimi
-        if(ArayuzPaket.YoklamaFlag)
+    	if(txState == 0)
+    	{
+    		YoklamaPaket.YoklamaPaketOlustur();
+			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
+			HAL_UART_Transmit_DMA(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket));
+			txState = 1;
+    	}
+
+        if(ArayuzPaket.YoklamaFlag==0)
         {
-            ImuPaket.ImuPaketOlustur(pitch,roll, heading, imucipsicaklik);
-            ImuPaket.imuPaketCagir(ImuVeriPaket);
-
-            if(txState == 0)
-			{
-				HAL_UART_Transmit_DMA(&huart3, ImuVeriPaket, 17);
-				txState = 1;
-			}
-
+        	txState = 0;
         }
+
         if(counter>=6)
         {
         	counter=0;
@@ -313,10 +322,10 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.sagaGitBayrak==true)
 		{
 			a=5;
-			KomutPaket.KomutPaketOlustur(1, 100, 250);
+			KomutPaket.KomutPaketOlustur(1, 50, 250);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 100, 250);
+			KomutPaket.KomutPaketOlustur(1, 50, 250);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			ArayuzPaket.sagaGitBayrak=false;
@@ -324,10 +333,10 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.solaGitBayrak==true)
 		{
 			a=6;
-			KomutPaket.KomutPaketOlustur(1, 250, 100);
+			KomutPaket.KomutPaketOlustur(1, 250, 50);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 250, 100);
+			KomutPaket.KomutPaketOlustur(1, 250, 50);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			ArayuzPaket.solaGitBayrak=false;
@@ -369,10 +378,10 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.kalibrasyonMAGBayrak==true)
 		{
 			a=10;
-			KomutPaket.KomutPaketOlustur(1, 0,70);
+			KomutPaket.KomutPaketOlustur(1, -70,70);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(2, 70,0);
+			KomutPaket.KomutPaketOlustur(1, -70,70);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			mag.XveYKalibreEt();
@@ -426,6 +435,105 @@ void StartImuTask(void const * argument)
 		osDelayUntil(&prevTime, 20);
 	}
   /* USER CODE END StartImuTask */
+}
+/* ===================== SABİTLER ===================== */
+
+#define WHEEL_RADIUS   0.085f
+#define TRACK_WIDTH    0.45f
+#define CONTROL_DT     0.02f
+#define MAX_RPM        250.0f
+
+#define STOP_ANGLE     30.0f     // derece
+#define KP_HEADING     3.0f      // [rad/s] / [rad]
+#define MIN_RPM        50.0f
+
+/* ===================== YARDIMCI ===================== */
+
+static float normalizeAngle(float angle)
+{
+    while(angle > 180.0f)  angle -= 360.0f;
+    while(angle < -180.0f) angle += 360.0f;
+    return angle;
+}
+
+static float constrain(float val, float min, float max)
+{
+    if(val > max) return max;
+    if(val < min) return min;
+    return val;
+}
+
+static float RPMdenHiz(float rpm)
+{
+    return (rpm * 2.0f * M_PI * WHEEL_RADIUS) / 60.0f;
+}
+
+/* ===================== GLOBAL DURUM ===================== */
+
+float targetHeading = 70.0f;   // örnek
+float omegaMax      = 0.0f;
+
+float errorDeg      = 0.0f;
+float omegaCmd      = 0.0f;
+float wheelSpeed    = 0.0f;
+float rpmCmd        = 0.0f;
+
+uint32_t prevTime   = 0;
+
+/* ===================== TASK ===================== */
+
+void StartKontrolTask(void const * argument)
+{
+    /* Maksimum açısal hız (yerinde dönüş) */
+    float vWheelMax = RPMdenHiz(MAX_RPM);
+    omegaMax = (2.0f * vWheelMax) / TRACK_WIDTH;
+
+    prevTime = xTaskGetTickCount();
+
+    for(;;)
+    {
+        /* === 1️⃣ Heading hatası === */
+        errorDeg = normalizeAngle(targetHeading - heading);
+        float absErrorDeg = fabsf(errorDeg);
+
+        /* === 2️⃣ STOP bölgesi === */
+        if(absErrorDeg <= STOP_ANGLE)
+        {
+            KomutPaket.KomutPaketOlustur(1, 0, 0);
+            KomutPaket.komutPaketCagir(KomutVeriPaket);
+
+            HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
+            HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
+        }
+        else
+        {
+            /* === 3️⃣ P kontrol → ω === */
+            float errorRad = errorDeg * (M_PI / 180.0f);
+            omegaCmd = KP_HEADING * errorRad;
+            omegaCmd = constrain(omegaCmd, -omegaMax, omegaMax);
+
+            /* === 4️⃣ ω → RPM === */
+            wheelSpeed = (omegaCmd * TRACK_WIDTH) * 0.5f;
+            rpmCmd = HizdanRPM(fabsf(wheelSpeed));
+            rpmCmd = constrain(rpmCmd, MIN_RPM, MAX_RPM);
+
+            /* === 5️⃣ Yerinde dönüş yönü === */
+            float sign = (omegaCmd > 0.0f) ? -1.0f : 1.0f;
+
+            KomutPaket.KomutPaketOlustur(
+                1,
+                sign * rpmCmd,
+               -sign * rpmCmd
+            );
+
+            KomutPaket.komutPaketCagir(KomutVeriPaket);
+
+            HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
+            HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
+        }
+
+        osDelayUntil(&prevTime, pdMS_TO_TICKS(20));
+    }
 }
 
 /* USER CODE END Header_StartKonumTask */

@@ -776,7 +776,7 @@ namespace GpsRotaCizme
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
         }
 
-
+        
 
         private void ComboBoxYapilandir()
         {
