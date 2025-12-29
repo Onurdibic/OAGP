@@ -32,7 +32,7 @@
 #include "Mag.h"
 #include "Paket.h"
 #include <stdio.h>
-#include "Matris.h"
+#include "Kontrol.h"
 
 /* USER CODE END Includes */
 
@@ -41,6 +41,7 @@
 extern IMU imu;
 extern MAG mag;
 extern GPS gps;
+extern KontrolLibrary kontrol;
 Paket GpsPaket(0x12, 0x34, 0x01, 0x0D); //veri boyutu 13
 Paket ImuPaket(0x12, 0x34, 0x02, 0x0D);//veri boyutu 13
 Paket VersiyonPaket(0x12, 0x34, 0x03, 0x04); //veri boyutu 4
@@ -56,7 +57,7 @@ extern Paket ArabaArkaPaket;
 extern Paket ArabaOnPaket;
 
 extern uint8_t txState;
-extern float HizdanRPM(float speed_ms);
+
 
 /* USER CODE END PTD */
 
@@ -70,18 +71,18 @@ float arkaSagTekerHiz=0.0f;
 float arkaSolTekerHiz=0.0f;
 float onSagTekerHiz=0.0f;
 float onSolTekerHiz=0.0f;
+//
+//float konumX = 0.0f;
+//float konumY =0.0f;
+//float hizX = 0.0f;
+//float hizY =0.0f;
+//float ivmeX = 0.0f;
+//float ivmeY =0.0f;
 
-float konumX = 0.0f;
-float konumY =0.0f;
-float hizX = 0.0f;
-float hizY =0.0f;
-float ivmeX = 0.0f;
-float ivmeY =0.0f;
-
-float pitch;
-float roll;
-float yaw;
-float heading;
+float pitch_f;
+float roll_f;
+float yaw_f;
+float heading_f;
 float irtifa;
 float imucipsicaklik;
 float barosicaklik;
@@ -225,8 +226,6 @@ void StartDefaultTask(void const * argument)
 
     for(;;)
     {
-    	counter++;
-        // IMU paketi gönderimi
     	if(txState == 0)
     	{
     		YoklamaPaket.YoklamaPaketOlustur();
@@ -234,20 +233,9 @@ void StartDefaultTask(void const * argument)
 			HAL_UART_Transmit_DMA(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket));
 			txState = 1;
     	}
-
-        if(ArayuzPaket.YoklamaFlag==0)
+        if(ArayuzPaket.YoklamaPaketFlag==0)
         {
         	txState = 0;
-        }
-
-        if(counter>=6)
-        {
-        	counter=0;
-        	if(yoklamaCounter<2)
-        	{
-//        		ArayuzPaket.ileriDurBayrak=true;
-        	}
-        	yoklamaCounter=0;
         }
 
         osDelayUntil(&prevTime, 500);
@@ -279,24 +267,6 @@ void StartPaketTask(void const * argument)
 		ArabaOnPaket.PaketCoz();
 		ArayuzPaket.PaketCoz();
 
-
-//		if(ArayuzPaket.VersiyonPaketBayrak==true)
-//		{
-//			a=1;
-//			VersiyonPaket.VersiyonPaketOlustur(0, 0, 7);
-//			VersiyonPaket.versiyonPaketCagir(VersiyonVeriPaket);
-//			HAL_UART_Transmit(&huart3, VersiyonVeriPaket, sizeof(VersiyonVeriPaket), 1000);
-//			ArayuzPaket.VersiyonPaketBayrak=false;
-//		}
-//		if(ArayuzPaket.YoklamaPaketFlag==true)
-//		{
-//			a=2;
-//			YoklamaPaket.YoklamaPaketOlustur();
-//			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
-//			HAL_UART_Transmit(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket), 1000);
-//			ArayuzPaket.YoklamaPaketFlag=false;
-//			yoklamaCounter++;
-//		}
 		if(ArayuzPaket.ileriGitBayrak==true)
 		{
 			a=3;
@@ -322,10 +292,10 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.sagaGitBayrak==true)
 		{
 			a=5;
-			KomutPaket.KomutPaketOlustur(1, 50, 250);
+			KomutPaket.KomutPaketOlustur(1, 0, 200);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 50, 250);
+			KomutPaket.KomutPaketOlustur(1, 0, 200);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			ArayuzPaket.sagaGitBayrak=false;
@@ -333,10 +303,10 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.solaGitBayrak==true)
 		{
 			a=6;
-			KomutPaket.KomutPaketOlustur(1, 250, 50);
+			KomutPaket.KomutPaketOlustur(1, 200, 0);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 250, 50);
+			KomutPaket.KomutPaketOlustur(1, 200, 0);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			ArayuzPaket.solaGitBayrak=false;
@@ -397,18 +367,11 @@ void StartPaketTask(void const * argument)
 			ArayuzPaket.RotaGeldiBayrak=false;
 		}
 
-		osDelayUntil(&prevTime, 10);
+		osDelayUntil(&prevTime, 25);
 	}
   /* USER CODE END StartPaketTask */
 }
 
-/* USER CODE BEGIN Header_StartImuTask */
-/**
-* @brief Function implementing the myImuTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartImuTask */
 void StartImuTask(void const * argument)
 {
   /* USER CODE BEGIN StartImuTask */
@@ -424,11 +387,11 @@ void StartImuTask(void const * argument)
 		prevTimeDt = now;
 
 		imu.aciBul();
-		pitch = *imu.PitchAl();
-		roll = *imu.RollAl();
-		yaw = *imu.YawAl();
+		pitch_f = *imu.PitchAl();
+		roll_f = *imu.RollAl();
+		yaw_f = *imu.YawAl();
 		imucipsicaklik = *imu.SicaklikAl();
-		heading = *mag.HeadingOlustur(pitch,roll);
+		heading_f = *mag.HeadingOlustur(pitch_f,roll_f);
 
 		//imu.AccToKonum(dt);
 
@@ -436,104 +399,39 @@ void StartImuTask(void const * argument)
 	}
   /* USER CODE END StartImuTask */
 }
-/* ===================== SABİTLER ===================== */
 
-#define WHEEL_RADIUS   0.085f
-#define TRACK_WIDTH    0.45f
-#define CONTROL_DT     0.02f
-#define MAX_RPM        250.0f
-
-#define STOP_ANGLE     30.0f     // derece
-#define KP_HEADING     3.0f      // [rad/s] / [rad]
-#define MIN_RPM        50.0f
-
-/* ===================== YARDIMCI ===================== */
-
-static float normalizeAngle(float angle)
-{
-    while(angle > 180.0f)  angle -= 360.0f;
-    while(angle < -180.0f) angle += 360.0f;
-    return angle;
-}
-
-static float constrain(float val, float min, float max)
-{
-    if(val > max) return max;
-    if(val < min) return min;
-    return val;
-}
-
-static float RPMdenHiz(float rpm)
-{
-    return (rpm * 2.0f * M_PI * WHEEL_RADIUS) / 60.0f;
-}
-
-/* ===================== GLOBAL DURUM ===================== */
-
-float targetHeading = 70.0f;   // örnek
-float omegaMax      = 0.0f;
-
-float errorDeg      = 0.0f;
-float omegaCmd      = 0.0f;
-float wheelSpeed    = 0.0f;
-float rpmCmd        = 0.0f;
-
-uint32_t prevTime   = 0;
-
-/* ===================== TASK ===================== */
+/* ===================== KONTROL GÖREVİ ===================== */
 
 void StartKontrolTask(void const * argument)
 {
-    /* Maksimum açısal hız (yerinde dönüş) */
-    float vWheelMax = RPMdenHiz(MAX_RPM);
-    omegaMax = (2.0f * vWheelMax) / TRACK_WIDTH;
+	/* === Maksimum açısal hız (yerinde dönüş) === */
 
-    prevTime = xTaskGetTickCount();
+	uint32_t prevTime = xTaskGetTickCount();
 
-    for(;;)
-    {
-        /* === 1️⃣ Heading hatası === */
-        errorDeg = normalizeAngle(targetHeading - heading);
-        float absErrorDeg = fabsf(errorDeg);
+	for (;;)
+	{
+		if (enlemKalmanCikti_f >= 1.0f && boylamKalmanCikti_f >= 1.0f && ArayuzPaket.GidilecekNoktaBayrak)
+		{
+			kontrol.SetHeading(heading_f);
+			kontrol.SetKonum(enlemKalmanCikti_f, boylamKalmanCikti_f);
+			kontrol.SetHedef(ArayuzPaket.ArayuzEnlem_f, ArayuzPaket.ArayuzBoylam_f);
 
-        /* === 2️⃣ STOP bölgesi === */
-        if(absErrorDeg <= STOP_ANGLE)
-        {
-            KomutPaket.KomutPaketOlustur(1, 0, 0);
-            KomutPaket.komutPaketCagir(KomutVeriPaket);
+			kontrol.Hesapla();
 
-            HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
-            HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
-        }
-        else
-        {
-            /* === 3️⃣ P kontrol → ω === */
-            float errorRad = errorDeg * (M_PI / 180.0f);
-            omegaCmd = KP_HEADING * errorRad;
-            omegaCmd = constrain(omegaCmd, -omegaMax, omegaMax);
+			if (kontrol.hedefMesafe < 1.5f)
+			{
+				ArayuzPaket.GidilecekNoktaBayrak=false;
+			}
+			/* === Komut gönderimi === */
+			KomutPaket.KomutPaketOlustur(1, kontrol.rpmSag, kontrol.rpmSol);
+			KomutPaket.komutPaketCagir(KomutVeriPaket);
 
-            /* === 4️⃣ ω → RPM === */
-            wheelSpeed = (omegaCmd * TRACK_WIDTH) * 0.5f;
-            rpmCmd = HizdanRPM(fabsf(wheelSpeed));
-            rpmCmd = constrain(rpmCmd, MIN_RPM, MAX_RPM);
+			HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
+			HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
+		}
 
-            /* === 5️⃣ Yerinde dönüş yönü === */
-            float sign = (omegaCmd > 0.0f) ? -1.0f : 1.0f;
-
-            KomutPaket.KomutPaketOlustur(
-                1,
-                sign * rpmCmd,
-               -sign * rpmCmd
-            );
-
-            KomutPaket.komutPaketCagir(KomutVeriPaket);
-
-            HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
-            HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
-        }
-
-        osDelayUntil(&prevTime, pdMS_TO_TICKS(20));
-    }
+		osDelayUntil(&prevTime, 30);
+	}
 }
 
 /* USER CODE END Header_StartKonumTask */
@@ -543,30 +441,44 @@ void StartKonumTask(void const * argument)
   uint32_t prevTime = xTaskGetTickCount();
   float dt_f = 0.02f;
 
-  for(;;)
+  for (;;)
   {
-	  enlem_f  = *gps.LatitudeAl();
-	  boylam_f = *gps.LongitudeAl();
+	  // Kalman filtresinden anlamlı konum çıktısı geldiğinde
+	  if(enlemKalmanCikti_f >= 1.0f && boylamKalmanCikti_f >= 1.0f)
+	  {
+		  // GPS ve dead reckoning tabanlı konum güncellemesi
+		  gps.YeniKonumHesapla(
+			  enlemKalmanCikti_f,       // mevcut enlem
+			  boylamKalmanCikti_f,      // mevcut boylam
+			  heading_f,                  // mevcut yönelim
+			  ArabaArkaPaket.saghiz_f,  // sağ tekerlek hızı
+			  ArabaArkaPaket.solhiz_f,  // sol tekerlek hızı
+			  dt_f,                     // zaman adımı
+			  &gps.gpsdeadreset,        // dead reckoning reset flag
+			  &enlemCikti_f,            // çıktı enlem
+			  &boylamCikti_f            // çıktı boylam
+		  );
+	  }
 
-	  gps.YeniKonumHesapla(enlem_f,boylam_f,heading,
-	            ArabaArkaPaket.saghiz_f,ArabaArkaPaket.solhiz_f,dt_f,
-	            &gps.gpsdeadreset,&enlemCikti_f,&boylamCikti_f);
+	  // Ortalama tekerlek hızı üzerinden hareket mesafesi
+	  float ortalamaHiz = (ArabaArkaPaket.saghiz_f + ArabaArkaPaket.solhiz_f) / 2.0f;
+	  float katedilenMesafe = ortalamaHiz * dt_f;
 
-		float ortalama_hiz = (ArabaArkaPaket.saghiz_f + ArabaArkaPaket.solhiz_f) / 2.0f;
-		//float ortalama_hiz = (2.0 + 2.0) / 2.0f;
-		float mesafe = ortalama_hiz * 0.02;
-		float heading_rad = heading * (M_PI/180.0f);
-		if(enlem_f >= 1.0f && boylam_f >= 1.0f)
-		{
-			x_dead += mesafe * sinf(heading_rad); // doğu
-			y_dead += mesafe * cosf(heading_rad); // kuzey
-		}
+	  // Heading açısını radyana çevir
+	  float headingRad = heading_f * (M_PI / 180.0f);
 
+	  // Dead reckoning ile X (doğu) ve Y (kuzey) pozisyon güncellemesi
+	  if(enlemKalmanCikti_f >= 1.0f && boylamKalmanCikti_f >= 1.0f)
+	  {
+		  x_dead += katedilenMesafe * sinf(headingRad); // doğu yönü
+		  y_dead += katedilenMesafe * cosf(headingRad); // kuzey yönü
+	  }
+
+	  // Kontrol döngüsü periyodu
 	  osDelayUntil(&prevTime, 20);
   }
   /* USER CODE END StartKonumTask */
 }
-
 
 void StartKalmanTask(void const * argument)
 {

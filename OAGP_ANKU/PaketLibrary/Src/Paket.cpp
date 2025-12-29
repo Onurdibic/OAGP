@@ -291,6 +291,14 @@ void Paket::PaketCoz()
                                 RotaGeldiBayrak = true;
                             }
                             break;
+						 // -------------------- DUR --------------------
+					     case DUR:
+						    if (dataLength_s16 == 4 &&tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
+						    {
+							    ileriDurBayrak=true;
+							    GidilecekNoktaBayrak = false;
+						    }
+						    break;
 
                         // -------------------- VERSİYON --------------------
                         case VERSIYON:
@@ -304,19 +312,10 @@ void Paket::PaketCoz()
                         case YOKLAMA:
                             if (dataLength_s16 == 4 && tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
                             {
-                                YoklamaFlag = true;
+//                                YoklamaFlag = true;
                                 YoklamaPaketFlag = true;
                             }
                             break;
-
-                        // -------------------- DUR --------------------
-                        case DUR:
-                            if (dataLength_s16 == 4 &&tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
-                            {
-                                arabaDurBayrak = true;
-                            }
-                            break;
-
                         // -------------------- YÖN --------------------
                         case YON:
                             if (dataLength_s16 == 4 &&tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))

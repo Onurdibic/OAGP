@@ -43,7 +43,6 @@ Core/Startup \
 Drivers/STM32F4xx_HAL_Driver/Src \
 GpsLibrary/Src \
 ImuLibrary/Src \
-MatrisLibrary/Src \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS \
 Middlewares/Third_Party/FreeRTOS/Source \
 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F \

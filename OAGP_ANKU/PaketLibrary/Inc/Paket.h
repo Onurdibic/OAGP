@@ -62,7 +62,7 @@ public:
     bool GidilecekNoktaBayrak  = false;
     bool YoklamaPaketFlag      = false;
     bool RotaGeldiBayrak       = false;
-    bool arabaDurBayrak        = false;
+    bool ArabaDurBayrak        = false;
     bool ileriGitBayrak        = false;
     bool geriGitBayrak         = false;
     bool sagaGitBayrak         = false;
@@ -78,6 +78,10 @@ public:
     float solhiz_f=0.0f;
     float sagrpm_f=0.0f;
     float solrpm_f=0.0f;
+
+    // -------------------- ARAYÜZ VERİLERİ --------------------
+       float ArayuzEnlem_f  = 0.0f;
+       float ArayuzBoylam_f = 0.0f;
 
 private:
     // -------------------- UART --------------------
@@ -102,9 +106,7 @@ private:
     uint32_t intBits_u32    = 0;
     float    floatsonuc_f   = 0;
 
-    // -------------------- ARAYÜZ VERİLERİ --------------------
-    float ArayuzEnlem_f  = 0.0f;
-    float ArayuzBoylam_f = 0.0f;
+
 
     // -------------------- PAKET DİZİLERİ --------------------
     uint8_t gpspaket[17];

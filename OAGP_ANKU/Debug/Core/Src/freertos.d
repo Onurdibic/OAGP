@@ -56,7 +56,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.cpp \
  C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mag.h \
  C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mag.h \
  C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/PaketLibrary/Inc/Paket.h \
- C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/MatrisLibrary/Inc/Matris.h
+ C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/GpsLibrary/Inc/Kontrol.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -118,4 +118,4 @@ C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Madgwick.h:
 C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mag.h:
 C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/ImuLibrary/Inc/Mag.h:
 C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/PaketLibrary/Inc/Paket.h:
-C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/MatrisLibrary/Inc/Matris.h:
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/GpsLibrary/Inc/Kontrol.h:

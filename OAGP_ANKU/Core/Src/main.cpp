@@ -41,7 +41,7 @@ extern "C" {
 #include "Mag.h"
 #include "Gps.h"
 #include "Paket.h"
-#include "Matris.h"
+#include "Kontrol.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,6 +49,7 @@ extern "C" {
 IMU imu(&hi2c1);
 MAG mag(&hi2c1);
 GPS gps(&huart2);
+KontrolLibrary kontrol;
 Paket ArayuzPaket(&huart3);
 Paket ArabaArkaPaket(&huart4);
 Paket ArabaOnPaket(&huart5);
@@ -65,7 +66,7 @@ extern uint8_t VersiyonVeriPaket[8];
 extern Paket ImuPaket;
 extern uint8_t ImuVeriPaket[8];
 extern int a;
-extern float pitch,roll, heading, imucipsicaklik;
+extern float pitch_f,roll_f, heading_f, imucipsicaklik;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -105,6 +106,7 @@ extern float enlemCikti_f;
 extern float boylamCikti_f;
 extern float enlemKalmanCikti_f;
 extern float boylamKalmanCikti_f;
+extern float HizdanRPM(float v);
 /* USER CODE END 0 */
 
 /**
@@ -247,11 +249,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
-float HizdanRPM(float speed_ms)
-{
-    return (speed_ms * 60.0f) / (2.0f * 3.14159265f * 0.085);
-}
-
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     if(huart->Instance == USART3)
@@ -264,20 +261,20 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 			HAL_UART_Transmit_DMA(&huart3, VersiyonVeriPaket, sizeof(VersiyonVeriPaket));
 			ArayuzPaket.VersiyonPaketBayrak=false;
 		}
-		if(ArayuzPaket.YoklamaPaketFlag==true)
-		{
-			a=2;
-			YoklamaPaket.YoklamaPaketOlustur();
-			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
-			HAL_UART_Transmit_DMA(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket));
-			ArayuzPaket.YoklamaPaketFlag=false;
-			//yoklamaCounter++;
-		}
-		if(ArayuzPaket.YoklamaFlag)
+//		if(ArayuzPaket.YoklamaPaketFlag==true)
+//		{
+//			a=2;
+//			YoklamaPaket.YoklamaPaketOlustur();
+//			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
+//			HAL_UART_Transmit_DMA(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket));
+//			ArayuzPaket.YoklamaPaketFlag=false;
+//			//yoklamaCounter++;
+//		}
+		if(ArayuzPaket.YoklamaPaketFlag)
 		{
 			if(txState == 1)
 			{
-				ImuPaket.ImuPaketOlustur(pitch,roll, heading, imucipsicaklik);
+				ImuPaket.ImuPaketOlustur(pitch_f,roll_f, heading_f, imucipsicaklik);
 				ImuPaket.imuPaketCagir(ImuVeriPaket);
 				HAL_UART_Transmit_DMA(&huart3, ImuVeriPaket, 17);
 				txState = 2;
@@ -299,8 +296,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 			}
 			else if(txState == 4)
 			{
-				float sag_rpm = HizdanRPM(ArabaOnPaket.saghiz_f);
-				float sol_rpm = HizdanRPM(ArabaOnPaket.solhiz_f);
+				float sag_rpm = kontrol.HizdanRPM(ArabaOnPaket.saghiz_f);
+				float sol_rpm = kontrol.HizdanRPM(ArabaOnPaket.solhiz_f);
 
 				RPMPaket.RPMPaketOlustur(sag_rpm, sol_rpm);
 				RPMPaket.rpmPaketCagir(RPMVeriPaket);

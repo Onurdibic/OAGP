@@ -1,13 +1,13 @@
-../Core/Src/freertos.cpp:146:6:void vApplicationGetIdleTaskMemory(StaticTask_t**, StackType_t**, uint32_t*)	1
-../Core/Src/freertos.cpp:160:6:void MX_FREERTOS_Init()	1
-../Core/Src/freertos.cpp:219:6:void StartDefaultTask(const void*)	4
-../Core/Src/freertos.cpp:266:6:void StartPaketTask(const void*)	11
-../Core/Src/freertos.cpp:412:6:void StartImuTask(const void*)	1
-../Core/Src/freertos.cpp:452:14:float normalizeAngle(float)	3
-../Core/Src/freertos.cpp:459:14:float constrain(float, float, float)	3
-../Core/Src/freertos.cpp:466:14:float RPMdenHiz(float)	1
-../Core/Src/freertos.cpp:485:6:void StartKontrolTask(const void*)	3
-../Core/Src/freertos.cpp:540:6:void StartKonumTask(const void*)	3
-../Core/Src/freertos.cpp:571:6:void StartKalmanTask(const void*)	5
-../Core/Src/freertos.cpp:641:1:void __static_initialization_and_destruction_0()	1
-../Core/Src/freertos.cpp:641:1:cpp)	1
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/GpsLibrary/Inc/Kontrol.h:19:10:void KontrolLibrary::SetHeading(float)	1
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/GpsLibrary/Inc/Kontrol.h:20:10:void KontrolLibrary::SetKonum(float, float)	1
+C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/GpsLibrary/Inc/Kontrol.h:21:10:void KontrolLibrary::SetHedef(float, float)	1
+../Core/Src/freertos.cpp:147:6:void vApplicationGetIdleTaskMemory(StaticTask_t**, StackType_t**, uint32_t*)	1
+../Core/Src/freertos.cpp:161:6:void MX_FREERTOS_Init()	1
+../Core/Src/freertos.cpp:220:6:void StartDefaultTask(const void*)	3
+../Core/Src/freertos.cpp:254:6:void StartPaketTask(const void*)	11
+../Core/Src/freertos.cpp:375:6:void StartImuTask(const void*)	1
+../Core/Src/freertos.cpp:405:6:void StartKontrolTask(const void*)	5
+../Core/Src/freertos.cpp:438:6:void StartKonumTask(const void*)	5
+../Core/Src/freertos.cpp:483:6:void StartKalmanTask(const void*)	5
+../Core/Src/freertos.cpp:553:1:void __static_initialization_and_destruction_0()	1
+../Core/Src/freertos.cpp:553:1:cpp)	1

@@ -21,8 +21,8 @@
 ../PaketLibrary/Src/Paket.cpp:206:6:void Paket::rpmPaketCagir(uint8_t*)	1
 ../PaketLibrary/Src/Paket.cpp:208:6:void Paket::DataAlveBayrakKaldir()	1
 ../PaketLibrary/Src/Paket.cpp:216:6:void Paket::PaketCoz()	51
-../PaketLibrary/Src/Paket.cpp:362:8:float* Paket::ArayuzLatAl()	1
-../PaketLibrary/Src/Paket.cpp:363:8:float* Paket::ArayuzLonAl()	1
-../PaketLibrary/Src/Paket.cpp:365:9:uint8_t Paket::CRC8Hesaplama(uint8_t*, uint8_t, uint8_t)	4
-../PaketLibrary/Src/Paket.cpp:387:7:float Paket::bytesToFloat(uint8_t*, int32_t)	1
-../PaketLibrary/Src/Paket.cpp:398:6:void Paket::floatToBytes(float*, uint8_t*)	2
+../PaketLibrary/Src/Paket.cpp:361:8:float* Paket::ArayuzLatAl()	1
+../PaketLibrary/Src/Paket.cpp:362:8:float* Paket::ArayuzLonAl()	1
+../PaketLibrary/Src/Paket.cpp:364:9:uint8_t Paket::CRC8Hesaplama(uint8_t*, uint8_t, uint8_t)	4
+../PaketLibrary/Src/Paket.cpp:386:7:float Paket::bytesToFloat(uint8_t*, int32_t)	1
+../PaketLibrary/Src/Paket.cpp:397:6:void Paket::floatToBytes(float*, uint8_t*)	2
