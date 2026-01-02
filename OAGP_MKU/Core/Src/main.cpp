@@ -446,14 +446,14 @@ int main(void)
 		  flag_500ms = 0;
 		  // 500 ms işlemleri
 		  // --- PI Kontrol Önce Anlık RPM Değeri ---
-
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
 	  }
 
 	  if(flag_1000ms)
 	  {
 		  flag_1000ms = 0;
 		  // 1 saniyelik işlemler
-		  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+//		  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 
 	  }
 
@@ -547,10 +547,26 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART3)
     {
+    	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_SET);
     	ANKUPaket.DataAlveBayrakKaldir();
     	counterrr++;
+
     }
 }
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART3)
+    {
+        __HAL_UART_CLEAR_OREFLAG(huart);
+        __HAL_UART_CLEAR_FEFLAG(huart);
+        __HAL_UART_CLEAR_NEFLAG(huart);
+
+        HAL_UART_AbortReceive(huart);
+        ANKUPaket.PaketKesmeYapilandir();
+    }
+}
+
 
 /* USER CODE END 4 */
 

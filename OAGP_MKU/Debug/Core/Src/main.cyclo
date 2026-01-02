@@ -5,6 +5,7 @@ C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_MKU/MotorKontrolLibrary/Inc/Moto
 ../Core/Src/main.cpp:504:6:void HAL_GPIO_EXTI_Callback(uint16_t)	7
 ../Core/Src/main.cpp:519:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	7
 ../Core/Src/main.cpp:546:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	2
-../Core/Src/main.cpp:561:6:void Error_Handler()	1
-../Core/Src/main.cpp:570:1:void __static_initialization_and_destruction_0()	1
-../Core/Src/main.cpp:570:1:cpp)	1
+../Core/Src/main.cpp:557:6:void HAL_UART_ErrorCallback(UART_HandleTypeDef*)	2
+../Core/Src/main.cpp:577:6:void Error_Handler()	1
+../Core/Src/main.cpp:586:1:void __static_initialization_and_destruction_0()	1
+../Core/Src/main.cpp:586:1:cpp)	1

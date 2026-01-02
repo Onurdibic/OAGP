@@ -75,7 +75,7 @@ void Paket::RPMPaketOlustur(float sagrpm_f ,float solrpm_f)
 
 void Paket::PaketKesmeYapilandir()
 {
-	HAL_UART_Receive_DMA(huart, &Data, 1);
+	HAL_UART_Receive_IT(huart, &Data, 1);
 }
 
 // -------------------- RING BUFFER: YAZMA KISMI --------------------
@@ -84,7 +84,7 @@ void Paket::DataAlveBayrakKaldir()
 	ArayuzBuffer_u8[writeIndex_u16] = Data;
 	writeIndex_u16 = (writeIndex_u16 + 1) % sizeof(ArayuzBuffer_u8);
 
-	HAL_UART_Receive_DMA(huart, &Data, 1);
+	HAL_UART_Receive_IT(huart, &Data, 1);
 }
 // ----------------------------------------------------------------------
 

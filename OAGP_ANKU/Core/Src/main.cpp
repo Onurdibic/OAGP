@@ -229,6 +229,38 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == UART5)
+    {
+        __HAL_UART_CLEAR_OREFLAG(huart);
+        __HAL_UART_CLEAR_FEFLAG(huart);
+        __HAL_UART_CLEAR_NEFLAG(huart);
+
+        HAL_UART_AbortReceive(huart);
+        ArabaOnPaket.PaketKesmeYapilandir();
+    }
+    if (huart->Instance == UART4)
+	{
+		__HAL_UART_CLEAR_OREFLAG(huart);
+		__HAL_UART_CLEAR_FEFLAG(huart);
+		__HAL_UART_CLEAR_NEFLAG(huart);
+
+		HAL_UART_AbortReceive(huart);
+		ArabaArkaPaket.PaketKesmeYapilandir();
+	}
+    if (huart->Instance == USART3)
+	{
+		__HAL_UART_CLEAR_OREFLAG(huart);
+		__HAL_UART_CLEAR_FEFLAG(huart);
+		__HAL_UART_CLEAR_NEFLAG(huart);
+
+		HAL_UART_AbortReceive(huart);
+		ArayuzPaket.PaketKesmeYapilandir();
+	}
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (huart->Instance == USART2)
@@ -302,7 +334,10 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 				RPMPaket.RPMPaketOlustur(sag_rpm, sol_rpm);
 				RPMPaket.rpmPaketCagir(RPMVeriPaket);
 				HAL_UART_Transmit_DMA(&huart3, RPMVeriPaket, 13);
-
+				ArabaArkaPaket.saghiz_f=0;
+				ArabaOnPaket.saghiz_f=0;
+				ArabaArkaPaket.solhiz_f=0;
+				ArabaOnPaket.solhiz_f=0;
 				txState = 0;
 			}
 		}

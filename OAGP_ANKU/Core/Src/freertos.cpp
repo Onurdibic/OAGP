@@ -320,7 +320,10 @@ void StartPaketTask(void const * argument)
 			KomutPaket.KomutPaketOlustur(1, 0,0);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			ArayuzPaket.ileriDurBayrak=false;
+			if(ArabaArkaPaket.saghiz_f==0 && ArabaArkaPaket.solhiz_f==0 && ArabaOnPaket.solhiz_f==0 && ArabaOnPaket.saghiz_f==0)
+			{
+				ArayuzPaket.ileriDurBayrak=false;
+			}
 		}
 		if(ArayuzPaket.geriDurBayrak==true)
 		{
@@ -331,7 +334,10 @@ void StartPaketTask(void const * argument)
 			KomutPaket.KomutPaketOlustur(2, 0,0);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			ArayuzPaket.geriDurBayrak=false;
+			if(ArabaArkaPaket.saghiz_f==0 && ArabaArkaPaket.solhiz_f==0 && ArabaOnPaket.solhiz_f==0 && ArabaOnPaket.saghiz_f==0)
+			{
+				ArayuzPaket.geriDurBayrak=false;
+			}
 		}
 		if(ArayuzPaket.kalibrasyonIMUBayrak==true)
 		{
@@ -348,10 +354,10 @@ void StartPaketTask(void const * argument)
 		if(ArayuzPaket.kalibrasyonMAGBayrak==true)
 		{
 			a=10;
-			KomutPaket.KomutPaketOlustur(1, -70,70);
+			KomutPaket.KomutPaketOlustur(1, -40,40);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, -70,70);
+			KomutPaket.KomutPaketOlustur(1, -40,40);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
 			mag.XveYKalibreEt();
@@ -439,7 +445,7 @@ void StartKonumTask(void const * argument)
 {
   /* USER CODE BEGIN StartKonumTask */
   uint32_t prevTime = xTaskGetTickCount();
-  float dt_f = 0.02f;
+  float dt_f = 0.05f;
 
   for (;;)
   {
@@ -451,8 +457,8 @@ void StartKonumTask(void const * argument)
 			  enlemKalmanCikti_f,       // mevcut enlem
 			  boylamKalmanCikti_f,      // mevcut boylam
 			  heading_f,                  // mevcut yönelim
-			  ArabaArkaPaket.saghiz_f,  // sağ tekerlek hızı
-			  ArabaArkaPaket.solhiz_f,  // sol tekerlek hızı
+			  ArabaOnPaket.saghiz_f,  // sağ tekerlek hızı
+			  ArabaOnPaket.solhiz_f,  // sol tekerlek hızı
 			  dt_f,                     // zaman adımı
 			  &gps.gpsdeadreset,        // dead reckoning reset flag
 			  &enlemCikti_f,            // çıktı enlem
@@ -475,7 +481,7 @@ void StartKonumTask(void const * argument)
 	  }
 
 	  // Kontrol döngüsü periyodu
-	  osDelayUntil(&prevTime, 20);
+	  osDelayUntil(&prevTime, 50);
   }
   /* USER CODE END StartKonumTask */
 }
