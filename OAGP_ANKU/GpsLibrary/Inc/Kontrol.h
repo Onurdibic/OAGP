@@ -34,8 +34,8 @@ public:
     static constexpr float MAKS_RPM = 210.0f;
     static constexpr float MIN_RPM = 35.0f;
     static constexpr float KP_YONELIM = 3.0f;
-    static constexpr float GIRIS_DONME_ESIGI = 35.0f;
-    static constexpr float CIKIS_DONME_ESIGI = 25.0f;
+    static constexpr float GIRIS_DONME_ESIGI = 30.0f;
+    static constexpr float CIKIS_DONME_ESIGI = 20.0f;
     static constexpr float DUNYA_YARICAPI_METRE = 6371000.0f;
 
     // FSM

@@ -27,13 +27,15 @@ namespace GpsRotaCizme
     public partial class Form1 : Form
     {
         private SerialPort serialPort;
-        private Timer VeriTimer;
-        private Timer IslemTimer;
         
         private GrafikYonetici grafikyonetici;
         private PusulaYonetici pusulayonetici;
         private MapYonetici mapyonetici;
         private Timer yoklamaTimer;
+        private Timer rotaTekrarTimer;
+        private byte[] sonGonderilenRotaPaketi;
+        private byte[] sonGonderilenDurPaketi = null;
+        private bool durTekrarAktif = false;
 
 
         private byte[] bytes =new byte[4];
@@ -43,14 +45,13 @@ namespace GpsRotaCizme
 
         private const int BufferSize = 100;
         private byte[] ringBuffer = new byte[BufferSize];
-        private int writeIndex = 0;
-        private int readIndex = 0;
         private object bufferLock = new object();
 
         private byte[] kullanilanBuffer = new byte[BufferSize];
         private int kullanilanBufferIndex_s8 = 0;
         private int startIndex = 0;
-
+        float sagRPM = 0;
+        float solRPM= 0;
         byte[] RotaPaket = new byte[13];
         byte[] VersiyonPaket = new byte[8];
         byte[] YoklamaPaket = new byte[8];
@@ -123,9 +124,14 @@ namespace GpsRotaCizme
             comboBox1.SelectedIndexChanged += new EventHandler(ComboBox1SecilenIndexDegisimi);
             map.MouseClick += new MouseEventHandler(Map_MouseClick);
 
-            //yoklamaTimer = new Timer();
-            //yoklamaTimer.Interval = 1000; // 1 saniye
-            //yoklamaTimer.Tick += YoklamaTimer_Tick;
+            yoklamaTimer = new Timer();
+            yoklamaTimer.Interval = 1000; 
+            yoklamaTimer.Tick += YoklamaTimer_Tick;
+
+            rotaTekrarTimer = new Timer();
+            rotaTekrarTimer.Interval = 700; // 700 ms
+            rotaTekrarTimer.Tick += RotaTekrarTimer_Tick;
+
 
         }
 
@@ -145,7 +151,7 @@ namespace GpsRotaCizme
                 button1.Visible = false;
 
                 SerialPortYapilandir(secilenPort, secilenBaudRate);
-                //yoklamaTimer.Start();
+                yoklamaTimer.Start();
 
             }
             catch (Exception ex)
@@ -174,10 +180,42 @@ namespace GpsRotaCizme
         }
         private void YoklamaTimer_Tick(object sender, EventArgs e)
         {
-            //YoklamaPaketGonder();
+            if (serialPort != null && serialPort.IsOpen)
+            {
+                YoklamaPaketGonder();
+            }
         }
 
-        // --- Veri geldiğinde otomatik tetiklenen olay ---
+        private void RotaTekrarTimer_Tick(object sender, EventArgs e)
+        {
+            // 🔴 DUR PAKETİ: Tekerlekler dönüyorsa gönder
+            if (durTekrarAktif && (sagRPM != 0 || solRPM != 0))
+            {
+                if (sonGonderilenDurPaketi != null && serialPort.IsOpen)
+                {
+                    foreach (byte b in sonGonderilenDurPaketi)
+                        serialPort.Write(new byte[] { b }, 0, 1);
+                }
+                return; // ROTA tekrarına girmesin
+            }
+
+            // 🟢 ROTA PAKETİ: SENİN KODUN (AYNEN)
+            if (sagRPM == 0 && solRPM == 0)
+            {
+                if (sonGonderilenRotaPaketi != null && serialPort.IsOpen)
+                {
+                    foreach (byte b in sonGonderilenRotaPaketi)
+                        serialPort.Write(new byte[] { b }, 0, 1);
+                }
+            }
+            else
+            {
+                rotaTekrarTimer.Stop();
+                label37.Text = "Araç Hareket Halinde";
+            }
+        }
+
+
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             try
@@ -292,11 +330,9 @@ namespace GpsRotaCizme
                                     break;
                                 case GelenPaketler.IMU:
                                     ImuPaketIsle(dataBuffer, mevcutDataUzunlugu);
-                                    
                                     break;
                                 case GelenPaketler.SISTEM:
                                     SistemPaketIsle(dataBuffer, mevcutDataUzunlugu);
-                                    sistemCounter++;
                                     break;
                                 case GelenPaketler.VERSIYON:
                                     VersiyonPaketIsle(dataBuffer, mevcutDataUzunlugu);
@@ -305,7 +341,7 @@ namespace GpsRotaCizme
                                     YoklamaPaketIsle(dataBuffer, mevcutDataUzunlugu);
                                     break;
                                 case GelenPaketler.ROTA:
-                                    RotaPaketIsle(dataBuffer, mevcutDataUzunlugu);
+                                    RotaTamamlandıPaketIsle(dataBuffer, mevcutDataUzunlugu);
                                     break;
                             }
                         }
@@ -321,7 +357,6 @@ namespace GpsRotaCizme
             }
         }
 
-
         private void GpsPaketIsle(byte[] dataBuffer, Int16 dataLength_s16)
         {
             if (dataLength_s16 == 13 && yoklamaFlag==true)
@@ -331,18 +366,18 @@ namespace GpsRotaCizme
                 {
                     float Enlem = FloataDonustur(dataBuffer, startIndex);
                     float Boylam = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
-                    float Irtifa = FloataDonustur(dataBuffer, (startIndex + 8) % BufferSize);
+                    float Mesafe = FloataDonustur(dataBuffer, (startIndex + 8) % BufferSize);
                     
 
                     if (Enlem != 0 && Boylam != 0)
                     {
-                        label1.Text = Enlem.ToString();
-                        label2.Text = Boylam.ToString();
                         mapyonetici.MapGuncelle(Enlem, Boylam);
                         gpsCounter++;
                         counter++;
                     }
-                    label33.Text = Irtifa.ToString();
+                    label1.Text = Enlem.ToString();
+                    label2.Text = Boylam.ToString();
+                    label33.Text = Mesafe.ToString();
                     //label32.Text = Derece.ToString() + " C";
                     
                     label29.Text = gpsCounter.ToString();
@@ -352,14 +387,14 @@ namespace GpsRotaCizme
 
         private void KalmanPaketIsle(byte[] dataBuffer, Int16 dataLength_s16)
         {
-            if (dataLength_s16 == 9 && yoklamaFlag == true)
+            if (dataLength_s16 == 13 && yoklamaFlag == true)
             {
-                CRC8 = CRC8Hesaplama(dataBuffer, startIndex, startIndex + 8);
-                if (dataBuffer[(startIndex + 8) % BufferSize] == CRC8)
+                CRC8 = CRC8Hesaplama(dataBuffer, startIndex, startIndex + 12);
+                if (dataBuffer[(startIndex + 12) % BufferSize] == CRC8)
                 {
                     float Enlem = FloataDonustur(dataBuffer, startIndex);
                     float Boylam = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
-
+                    float Yonelim = FloataDonustur(dataBuffer, (startIndex + 8) % BufferSize);
 
                     if (Enlem != 0 && Boylam != 0)
                     {
@@ -368,6 +403,7 @@ namespace GpsRotaCizme
                         gpsCounter++;
                         counter++;
                     }
+                    label23.Text = Yonelim.ToString("F3");
                     //label32.Text = Derece.ToString() + " C";
 
                     label29.Text = gpsCounter.ToString();
@@ -382,8 +418,8 @@ namespace GpsRotaCizme
                 CRC8 = CRC8Hesaplama(dataBuffer, startIndex, startIndex + 8);
                 if (dataBuffer[(startIndex + 8) % BufferSize] == CRC8)
                 {
-                    float sagRPM = FloataDonustur(dataBuffer, startIndex);
-                    float solRPM = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
+                    sagRPM = FloataDonustur(dataBuffer, startIndex);
+                    solRPM = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
                     label4.Text = sagRPM.ToString();
                     label41.Text = solRPM.ToString();
 
@@ -401,14 +437,13 @@ namespace GpsRotaCizme
                     float Pitch = FloataDonustur(dataBuffer, startIndex);
                     float Roll = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
                     float Yaw = FloataDonustur(dataBuffer, (startIndex + 8) % BufferSize);
-                    //float Sicaklik = FloataDonustur(dataBuffer, (startIndex + 12) % BufferSize);
                     if ( Yaw != 0)
                     //if (Pitch != 0 && Roll != 0 && Yaw != 0)
                     {
                         label16.Text = Pitch.ToString("F2");
                         label18.Text = Roll.ToString("F2");
                         label14.Text = Yaw.ToString("F2");
-                        //label23.Text = Sicaklik.ToString("F2");
+                        
                         PusulaFotografiniDondur((int)Yaw);
                         grafikyonetici.GrafikGuncelle(chart1, (int)Pitch, -90, +90, min, maks);
                         grafikyonetici.GrafikGuncelle(chart2, (int)Roll, -90, +90, min, maks);
@@ -469,7 +504,7 @@ namespace GpsRotaCizme
                 }
             }
         }
-        private void RotaPaketIsle(byte[] dataBuffer, Int16 dataLength_s16)
+        private void RotaTamamlandıPaketIsle(byte[] dataBuffer, Int16 dataLength_s16)
         {
             if (dataLength_s16 == 4)
             {
@@ -549,10 +584,12 @@ namespace GpsRotaCizme
                 byte[] latBytes = BitConverter.GetBytes(lat);
                 byte[] lngBytes = BitConverter.GetBytes(lng);
 
+                mapyonetici.IsaretciEkle(nokta);
+
                 RotaPaket[0] = Baslik1;
                 RotaPaket[1] = Baslik2;
-                RotaPaket[2] = (byte)GidenPaketler.ROTA; // Rota Paket tanımı
-                RotaPaket[3] = 0x09; // Data uzunluğu
+                RotaPaket[2] = (byte)GidenPaketler.ROTA;
+                RotaPaket[3] = 0x09;
 
                 for (int i = 0; i < 4; i++)
                 {
@@ -564,25 +601,32 @@ namespace GpsRotaCizme
                 RotaPaket[12] = CRC8;
 
                 foreach (byte b in RotaPaket)
-                {
                     serialPort.Write(new byte[] { b }, 0, 1);
-                }
 
-                mapyonetici.IsaretciEkle(nokta);
+                label37.Text = "Rota Paket Gidiyor";
+
+                sonGonderilenRotaPaketi = (byte[])RotaPaket.Clone();
+
+                // 🟢 ROTA gönderildi → DUR tekrarını kapat
+                durTekrarAktif = false;
+                sonGonderilenDurPaketi = null;
+
+                rotaTekrarTimer.Start();
+
                 label19.Visible = true;
                 label20.Visible = true;
                 label37.Visible = true;
-                label37.Text = "Yeni Noktaya İlerleniyor..";
                 rotaGonderFlag = false;
             }
 
             if (e.Button == MouseButtons.Middle)
             {
                 rotaGonderFlag = true;
+
                 DurPaket[0] = Baslik1;
                 DurPaket[1] = Baslik2;
-                DurPaket[2] = (byte)GidenPaketler.DUR; // Dur Paket tanımı
-                DurPaket[3] = 0x04; // Data uzunluğu
+                DurPaket[2] = (byte)GidenPaketler.DUR;
+                DurPaket[3] = 0x04;
                 DurPaket[4] = 0x12;
                 DurPaket[5] = 0x24;
                 DurPaket[6] = 0x48;
@@ -591,11 +635,23 @@ namespace GpsRotaCizme
                 DurPaket[7] = CRC8;
 
                 foreach (byte b in DurPaket)
-                {
                     serialPort.Write(new byte[] { b }, 0, 1);
-                }
+
+                label37.Text = "Dur Paket Gidiyor";
+
+                // 🔴 DUR tekrar aktif
+                sonGonderilenDurPaketi = (byte[])DurPaket.Clone();
+                durTekrarAktif = true;
+
+                // ❗ ESKİ ROTAYI TAMAMEN İPTAL ET
+                sonGonderilenRotaPaketi = null;
+                rotaTekrarTimer.Stop();   // <- EN KRİTİK SATIR
+
+                rotaTekrarTimer.Start();
             }
+
         }
+
         private void button3_Click(object sender, EventArgs e)
         {
 
@@ -619,9 +675,6 @@ namespace GpsRotaCizme
 
         private void YoklamaPaketGonder()
         {
-            // Yoklama aktif değilse paket gönderme
-           
-
             YoklamaPaket[0] = Baslik1;
             YoklamaPaket[1] = Baslik2;
             YoklamaPaket[2] = (byte)GidenPaketler.YOKLAMA;
@@ -636,7 +689,7 @@ namespace GpsRotaCizme
             foreach (byte b in YoklamaPaket)
               serialPort.Write(new byte[] { b }, 0, 1);
 
-            //label35.Text = "Yoklama Bekleniyor..";
+             label35.Text = "Yoklama Bekleniyor..";
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -661,7 +714,7 @@ namespace GpsRotaCizme
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //yoklamaTimer.Stop();
+            yoklamaTimer.Stop();
             serialPort.Close();
             comboBox2.Visible = true;
             comboBox3.Visible = true;
@@ -674,9 +727,9 @@ namespace GpsRotaCizme
         {
             KalibrePaket[0] = Baslik1;
             KalibrePaket[1] = Baslik2;
-            KalibrePaket[2] = (byte)GidenPaketler.KALIBRASYON;//Versiyon Sorgu Paket tanımı
+            KalibrePaket[2] = (byte)GidenPaketler.KALIBRASYON;
             KalibrePaket[3] = 0x02; //Data Uzunluğu
-            KalibrePaket[4] = 0x01;
+            KalibrePaket[4] = 0x01; //MAG
             CRC8 = CRC8Hesaplama(KalibrePaket, 4, 5);
             KalibrePaket[5] = CRC8;
             if (yoklamaFlag == true)
@@ -692,9 +745,9 @@ namespace GpsRotaCizme
         {
             KalibrePaket[0] = Baslik1;
             KalibrePaket[1] = Baslik2;
-            KalibrePaket[2] = (byte)GidenPaketler.KALIBRASYON;//Versiyon Sorgu Paket tanımı
+            KalibrePaket[2] = (byte)GidenPaketler.KALIBRASYON;
             KalibrePaket[3] = 0x02; //Data Uzunluğu
-            KalibrePaket[4] = 0x02;
+            KalibrePaket[4] = 0x02; //IMU
             CRC8 = CRC8Hesaplama(KalibrePaket, 4, 5);
             KalibrePaket[5] = CRC8;
             if (yoklamaFlag == true)
@@ -734,11 +787,6 @@ namespace GpsRotaCizme
                 });
             }
         }
-        // Durum bayrakları
-        private bool ileriAktif = false;
-        private bool geriAktif = false;
-        private bool sagAktif = false;
-        private bool solAktif = false;
         private void ileriButton_Click(object sender, EventArgs e)
         {
             YonPaketGonder(GidenPaketler.YON, 0x01); // İleri 
@@ -776,17 +824,15 @@ namespace GpsRotaCizme
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
         }
 
-        
-
         private void ComboBoxYapilandir()
         {
             comboBox1.Items.AddRange(new string[] { "Pitch", "Roll", "Pusula" });
-            comboBox1.SelectedIndex = 0;
+            comboBox1.SelectedIndex = 2;
             comboBox2.Items.AddRange(SerialPort.GetPortNames());
             if (comboBox2.Items.Count > 0)                      
                 comboBox2.SelectedIndex = 0;
-            comboBox3.Items.AddRange(new string[] { "9600", "57600", "38400", "115200" });
-            comboBox3.SelectedIndex = 0;
+            comboBox3.Items.AddRange(new string[] { "9600", "38400","57600", "115200" });
+            comboBox3.SelectedIndex = 2;
         }
 
 

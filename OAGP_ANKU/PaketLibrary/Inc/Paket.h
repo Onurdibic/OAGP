@@ -25,9 +25,9 @@ public:
           uint8_t paketTipi_u8, uint8_t dataBoyutu_u8);
 
     // -------------------- PAKET OLUŞTURMA --------------------
-    void GpsPaketOlustur(float latitude, float longitude, float altitude, float derece);
-    void KalmanPaketOlustur(float latitude, float longitude);
-    void ImuPaketOlustur(float pitch, float roll, float yaw, float sicaklik);
+    void GpsPaketOlustur(float latitude, float longitude, float mesafe);
+    void KalmanPaketOlustur(float latitude, float longitude, float yonelim);
+    void ImuPaketOlustur(float pitch, float roll, float yaw);
     void RPMPaketOlustur(float sagrpm_f ,float solrpm_f);
     void VersiyonPaketOlustur(uint8_t b, uint8_t o, uint8_t s);
     void YoklamaPaketOlustur();
@@ -110,7 +110,7 @@ private:
 
     // -------------------- PAKET DİZİLERİ --------------------
     uint8_t gpspaket[17];
-    uint8_t kalmanpaket[13];
+    uint8_t kalmanpaket[17];
     uint8_t rpmpaket[13];
     uint8_t imupaket[17];
     uint8_t versiyonpaket[8];
@@ -128,6 +128,8 @@ private:
     uint8_t latBytes_u8[4];
     uint8_t lonBytes_u8[4];
     uint8_t altBytes_u8[4];
+    uint8_t yonelimBytes_u8[4];
+    uint8_t mesafeBytes_u8[4];
     uint8_t dereceBytes_u8[4];
     uint8_t yonBytes_u8[4];
     uint8_t rpmSagBytes_u8[4];

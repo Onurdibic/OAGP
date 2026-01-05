@@ -58,7 +58,7 @@ void Paket::PaketKesmeYapilandir()
 	HAL_UART_Receive_DMA(huart, &Data,1);
 }
 
-void Paket::GpsPaketOlustur(float latitude,float longitude,float altitude,float derece)
+void Paket::GpsPaketOlustur(float latitude,float longitude,float mesafe)
 {
     gpspaket[0] = baslik1_u8;
     gpspaket[1] = baslik2_u8;
@@ -67,16 +67,16 @@ void Paket::GpsPaketOlustur(float latitude,float longitude,float altitude,float 
 
     floatToBytes(&latitude, latBytes_u8);
     floatToBytes(&longitude, lonBytes_u8);
-    floatToBytes(&altitude, altBytes_u8);
+    floatToBytes(&mesafe, mesafeBytes_u8);
 
     memcpy(gpspaket + 4, latBytes_u8, 4);
     memcpy(gpspaket + 8, lonBytes_u8, 4);
-    memcpy(gpspaket + 12, altBytes_u8, 4);
+    memcpy(gpspaket + 12, mesafeBytes_u8, 4);
 
     gpspaket[16]=CRC8Hesaplama(gpspaket,4, 16);
 }
 
-void Paket::KalmanPaketOlustur(float latitude,float longitude)
+void Paket::KalmanPaketOlustur(float latitude,float longitude, float yonelim)
 {
     kalmanpaket[0] = baslik1_u8;
     kalmanpaket[1] = baslik2_u8;
@@ -85,15 +85,17 @@ void Paket::KalmanPaketOlustur(float latitude,float longitude)
 
     floatToBytes(&latitude, latBytes_u8);
     floatToBytes(&longitude, lonBytes_u8);
+    floatToBytes(&yonelim, yonelimBytes_u8);
 
     memcpy(kalmanpaket + 4, latBytes_u8, 4);
     memcpy(kalmanpaket + 8, lonBytes_u8, 4);
+    memcpy(kalmanpaket + 12, yonelimBytes_u8, 4);
 
-    kalmanpaket[12]=CRC8Hesaplama(kalmanpaket,4, 12);
+    kalmanpaket[16]=CRC8Hesaplama(kalmanpaket,4, 16);
 }
 
 
-void Paket::ImuPaketOlustur(float pitch,float roll,float heading,float sicaklik)
+void Paket::ImuPaketOlustur(float pitch,float roll,float heading)
 {
     imupaket[0] = baslik1_u8;
     imupaket[1] = baslik2_u8;
@@ -103,7 +105,6 @@ void Paket::ImuPaketOlustur(float pitch,float roll,float heading,float sicaklik)
     floatToBytes(&pitch, pitchBytes_u8);
     floatToBytes(&roll, rollBytes_u8);
     floatToBytes(&heading, headingBytes_u8);
-    floatToBytes(&sicaklik, sicaklikBytes_u8);
 
     memcpy(imupaket + 4, pitchBytes_u8, 4);
     memcpy(imupaket + 8, rollBytes_u8, 4);
@@ -312,7 +313,7 @@ void Paket::PaketCoz()
                         case YOKLAMA:
                             if (dataLength_s16 == 4 && tempBuffer[3] == CRC8Hesaplama(tempBuffer, 0, 3))
                             {
-//                                YoklamaFlag = true;
+                                YoklamaFlag = true;
                                 YoklamaPaketFlag = true;
                             }
                             break;

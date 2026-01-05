@@ -56,7 +56,7 @@ Paket ArabaOnPaket(&huart5);
 extern Paket GpsPaket;
 extern uint8_t GpsVeriPaket[17];
 extern Paket KalmanPaket;
-extern uint8_t KalmanVeriPaket[13];
+extern uint8_t KalmanVeriPaket[17];
 extern Paket RPMPaket;
 extern uint8_t RPMVeriPaket[13];
 extern Paket YoklamaPaket;
@@ -259,6 +259,15 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 		HAL_UART_AbortReceive(huart);
 		ArayuzPaket.PaketKesmeYapilandir();
 	}
+    if (huart->Instance == USART2)
+	{
+		__HAL_UART_CLEAR_OREFLAG(huart);
+		__HAL_UART_CLEAR_FEFLAG(huart);
+		__HAL_UART_CLEAR_NEFLAG(huart);
+
+		HAL_UART_AbortReceive(huart);
+		gps.Yapilandir();
+	}
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -306,14 +315,16 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 		{
 			if(txState == 1)
 			{
-				ImuPaket.ImuPaketOlustur(pitch_f,roll_f, heading_f, imucipsicaklik);
+				ImuPaket.ImuPaketOlustur(pitch_f,roll_f, heading_f);
 				ImuPaket.imuPaketCagir(ImuVeriPaket);
 				HAL_UART_Transmit_DMA(&huart3, ImuVeriPaket, 17);
 				txState = 2;
 			}
 			else if(txState == 2)
 			{
-				GpsPaket.GpsPaketOlustur(enlemCikti_f,boylamCikti_f,0,0);
+				float enlem=*gps.LatitudeAl();
+				float boylam=*gps.LongitudeAl();
+				GpsPaket.GpsPaketOlustur(enlem,boylam,kontrol.hedefMesafe);
 				GpsPaket.gpsPaketCagir(GpsVeriPaket);
 				HAL_UART_Transmit_DMA(&huart3, GpsVeriPaket, 17);
 
@@ -321,9 +332,9 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 			}
 			else if(txState == 3)
 			{
-				KalmanPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f);
+				KalmanPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f,kontrol.hedefYonelim);
 				KalmanPaket.kalmanPaketCagir(KalmanVeriPaket);
-				HAL_UART_Transmit_DMA(&huart3, KalmanVeriPaket, 13);
+				HAL_UART_Transmit_DMA(&huart3, KalmanVeriPaket, 17);
 				txState = 4;
 			}
 			else if(txState == 4)

@@ -64,33 +64,32 @@ void KontrolLibrary::Hesapla()
     // STAGE 2: ILERLEME_MODU
     else
     {
-//        float omegaKomut = KP_YONELIM * aciHatasiRad;
-//        omegaKomut = sinirla(omegaKomut, -maksAciHizi, maksAciHizi);
-//
-//        float yonelimOlcegi = 1.0f - (mutlakAciHatasi / GIRIS_DONME_ESIGI);
-//        yonelimOlcegi = sinirla(yonelimOlcegi, 0.0f, 1.0f);
-//
-//        float temelHiz;
-//        if (hedefMesafe > 20.0f)
-//            temelHiz = 1.80f;
-//        else if (hedefMesafe > 1.5f)
-//            temelHiz = 1.55f * (hedefMesafe / 20.0f) + 0.25f;
-//        else
-//        {
-//            temelHiz = 0.0f;
-//            omegaKomut = 0.0f;
-//            yonelimOlcegi = 0.0f;
-//        }
-//
-//        float hizKomut = temelHiz * (0.5f + 0.5f * yonelimOlcegi);
-//
-//        float hizSol  = hizKomut + omegaKomut * IZ_ACIKLIGI * 0.5f;
-//        float hizSag  = hizKomut - omegaKomut * IZ_ACIKLIGI * 0.5f;
-//
-//        rpmSol = sinirla(HizdanRPM(hizSol),  -MAKS_RPM, MAKS_RPM);
-//        rpmSag = sinirla(HizdanRPM(hizSag),  -MAKS_RPM, MAKS_RPM);
-    	        rpmSol =0;
-    	        rpmSag = 0;
+        float omegaKomut = KP_YONELIM * aciHatasiRad;
+        omegaKomut = sinirla(omegaKomut, -maksAciHizi, maksAciHizi);
+
+        float yonelimOlcegi = 1.0f - (mutlakAciHatasi / GIRIS_DONME_ESIGI);
+        yonelimOlcegi = sinirla(yonelimOlcegi, 0.0f, 1.0f);
+
+        float temelHiz;
+        if (hedefMesafe > 20.0f)
+            temelHiz = 1.80f;
+        else if (hedefMesafe > 1.5f)
+            temelHiz = 1.55f * (hedefMesafe / 20.0f) + 0.25f;
+        else
+        {
+            temelHiz = 0.0f;
+            omegaKomut = 0.0f;
+            yonelimOlcegi = 0.0f;
+        }
+
+        float hizKomut = temelHiz * (0.5f + 0.5f * yonelimOlcegi);
+
+        float hizSol  = hizKomut + omegaKomut * IZ_ACIKLIGI * 0.5f;
+        float hizSag  = hizKomut - omegaKomut * IZ_ACIKLIGI * 0.5f;
+
+        rpmSol = sinirla(HizdanRPM(hizSol),  -MAKS_RPM, MAKS_RPM);
+        rpmSag = sinirla(HizdanRPM(hizSag),  -MAKS_RPM, MAKS_RPM);
+
     }
 }
 

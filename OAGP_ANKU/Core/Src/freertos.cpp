@@ -49,7 +49,7 @@ Paket YoklamaPaket(0x12, 0x34, 0x04, 0x04);//veri boyutu 4
 Paket RotaPaket(0x12, 0x34, 0x05, 0x04);//veri boyutu 4
 Paket SistemPaket(0x12, 0x34, 0x06, 0x09);//veri boyutu 9
 Paket KomutPaket(0x12,0x34, 0x07, 0x0D); //veri boyutu 13
-Paket KalmanPaket(0x12, 0x34, 0x08, 0x09); //veri boyutu 9
+Paket KalmanPaket(0x12, 0x34, 0x08, 0x0D); //veri boyutu 13
 Paket RPMPaket(0x12,0x34, 0x09, 0x09); //veri boyutu 9
 
 extern Paket ArayuzPaket;
@@ -103,7 +103,7 @@ uint8_t YoklamaVeriPaket[8]={0};
 uint8_t RotaVeriPaket[8]={0};
 uint8_t SistemVeriPaket[13]={0};
 uint8_t KomutVeriPaket[17]={0};
-uint8_t KalmanVeriPaket[13]={0};
+uint8_t KalmanVeriPaket[17]={0};
 uint8_t RPMVeriPaket[13]={0};
 /* USER CODE END PD */
 
@@ -222,7 +222,8 @@ void StartDefaultTask(void const * argument)
     /* init code for USB_HOST */
     /* USER CODE BEGIN StartDefaultTask */
     uint32_t prevTime = xTaskGetTickCount();
-    uint16_t counter = 0;
+
+    int sureCounter=0;
 
     for(;;)
     {
@@ -237,6 +238,26 @@ void StartDefaultTask(void const * argument)
         {
         	txState = 0;
         }
+        sureCounter++;
+        if(ArayuzPaket.YoklamaFlag==true)
+        {
+        	yoklamaCounter++;
+        	ArayuzPaket.YoklamaFlag=false;
+        	GPIOD->ODR ^= GPIO_PIN_13;
+        }
+        if(sureCounter==5)
+        {
+        	sureCounter=0;
+        	 if(yoklamaCounter==0)
+			{
+//				ArayuzPaket.ileriDurBayrak=true;
+//				ArayuzPaket.GidilecekNoktaBayrak=false;
+
+			}
+        	 yoklamaCounter=0;
+        }
+
+
 
         osDelayUntil(&prevTime, 500);
     }
@@ -492,8 +513,8 @@ void StartKalmanTask(void const * argument)
     bool refAtama=true;
     float X[2] = {0.0f, 0.0f}; // x, y (sadece delta)
     float P[2][2] = {{1.0f,0},{0,1.0f}}; // covariance
-    float Q[2][2] = {{1.0f,0},{0,1.0f}};     // process noise (tekerlek hatası)
-    float R[2][2] = {{4.0f,0},{0,4.0f}};    // measurement noise (GPS ~2m hatası)
+    float Q[2][2] = {{0.5f,0},{0,0.5f}};     // process noise (tekerlek hatası)
+    float R[2][2] = {{7.0f,0},{0,7.0f}};    // measurement noise (GPS ~2m hatası)
 
     uint32_t prevTime = xTaskGetTickCount();
 
