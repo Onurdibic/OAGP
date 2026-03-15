@@ -30,9 +30,9 @@ public:
     void ImuPaketOlustur(float pitch, float roll, float yaw);
     void RPMPaketOlustur(float sagrpm_f ,float solrpm_f);
     void VersiyonPaketOlustur(uint8_t b, uint8_t o, uint8_t s);
-    void YoklamaPaketOlustur();
+    void YoklamaPaketOlustur(uint8_t jetsonBilgi);
     void RotaPaketOlustur();
-    void SistemPaketOlustur(float derece, float batarya);
+    void SistemPaketOlustur(float birinciveri,float ikinciveri);
     void KomutPaketOlustur(float yon, float rpmSag, float rpmSol);
 
     // -------------------- PAKET KOPYALAMA --------------------
@@ -76,12 +76,13 @@ public:
     //--------------------TEKER VERİLERİ----------------------
     float saghiz_f=0.0f;
     float solhiz_f=0.0f;
+    // -------------------- ENGEL VERİLERİ --------------------
     float sagrpm_f=0.0f;
-    float solrpm_f=0.0f;
-
+	float solrpm_f=0.0f;
+	uint8_t engel_u8=0;
     // -------------------- ARAYÜZ VERİLERİ --------------------
-       float ArayuzEnlem_f  = 0.0f;
-       float ArayuzBoylam_f = 0.0f;
+   float ArayuzEnlem_f  = 0.0f;
+   float ArayuzBoylam_f = 0.0f;
 
 private:
     // -------------------- UART --------------------
@@ -144,3 +145,119 @@ private:
 };
 
 #endif /* INC_PAKET_H_ */
+//
+//#ifndef INC_PAKET_H_
+//#define INC_PAKET_H_
+//
+//#include "stm32f4xx_hal.h"
+//#include <stdint.h>
+//#include <string.h>
+//
+//class Paket
+//{
+//public:
+//
+//    // HEADER
+//    static const uint8_t HEADER1 = 0x12;
+//    static const uint8_t HEADER2 = 0x34;
+//
+//    // GELEN PAKETLER
+//    enum GelenPaketler
+//    {
+//        ROTA=0x01,
+//        VERSIYON=0x02,
+//        YOKLAMA=0x03,
+//        DUR=0x04,
+//        YON=0x05,
+//        TEKER=0x06,
+//        KALIBRASYON=0x07,
+//        ENGEL=0x08
+//    };
+//
+//    Paket(UART_HandleTypeDef* huart);
+//
+//    // UART
+//    void PaketKesmeYapilandir();
+//    void DataAlveBayrakKaldir();
+//    void PaketCoz();
+//
+//    // Paket oluşturma
+//    uint16_t GpsPaketOlustur(float lat,float lon,float mesafe);
+//    uint16_t KalmanPaketOlustur(float lat,float lon,float yon);
+//    uint16_t ImuPaketOlustur(float pitch,float roll,float yaw);
+//    uint16_t RPMPaketOlustur(float sag,float sol);
+//    uint16_t RotaPaketOlustur();
+//    uint16_t KomutPaketOlustur(float yon,float rpmSag,float rpmSol);
+//    uint16_t SistemPaketOlustur(float sicaklik,float batarya);
+//    uint16_t VersiyonPaketOlustur(uint8_t b,uint8_t o,uint8_t s);
+//    uint16_t YoklamaPaketOlustur(uint8_t jetsonBilgi);
+//
+//    uint8_t* GetTxBuffer();
+//
+//    // Arayüz verileri
+//    float* ArayuzLatAl();
+//    float* ArayuzLonAl();
+//
+//    // Bayraklar
+//    bool VersiyonPaketBayrak=false;
+//    bool YoklamaFlag=false;
+//    bool YoklamaPaketFlag=false;
+//    bool RotaGeldiBayrak=false;
+//    bool GidilecekNoktaBayrak=false;
+//
+//    bool ileriGitBayrak=false;
+//    bool geriGitBayrak=false;
+//    bool sagaGitBayrak=false;
+//    bool solaGitBayrak=false;
+//
+//    bool ileriDurBayrak=false;
+//    bool geriDurBayrak=false;
+//
+//    bool kalibrasyonMAGBayrak=false;
+//    bool kalibrasyonIMUBayrak=false;
+//
+//    // TEKER
+//    float saghiz_f=0;
+//    float solhiz_f=0;
+//
+//    // ENGEL
+//    float sagrpm_f=0;
+//    float solrpm_f=0;
+//    uint8_t engel_u8=0;
+//
+//    float ArayuzEnlem_f=0;
+//	float ArayuzBoylam_f=0;
+//
+//private:
+//
+//    UART_HandleTypeDef* huart;
+//    uint8_t Data;
+//
+//    // RX BUFFER
+//    uint8_t rxBuffer[128];
+//    uint16_t readIndex=0;
+//    uint16_t writeIndex=0;
+//
+//    // TX BUFFER
+//    uint8_t txBuffer[64];
+//
+//    // TEMP
+//    uint8_t tempBuffer[32];
+//    uint8_t tempIndex=0;
+//    uint8_t dataLength=0;
+//
+//
+//
+//    union FloatBytes
+//    {
+//        float f;
+//        uint8_t b[4];
+//    };
+//
+//    uint16_t BuildPacket(uint8_t type,uint8_t* data,uint8_t len);
+//    uint8_t CRC8(uint8_t* data,uint8_t start,uint8_t end);
+//    float bytesToFloat(uint8_t* b);
+//};
+//
+//#endif
+//

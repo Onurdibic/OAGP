@@ -67,7 +67,7 @@ public:
 
     // Motor yönünü al
     MotorDirection getDirection() const { return direction; }
-
+    void setDirectionSoft(MotorDirection newDir);
     // Motor hızı hesaplama
     void hizHesaplaFiltered(float deltaSaniye);
 
@@ -97,7 +97,9 @@ private:
     float Kp = 0.4f;
     float Ki = 0.5f;
     float I_LIMIT = 2000.0f;
-
+    bool changingDirection = false;   // yön değişikliği ongoing
+	int dirChangeCounter = 0;         // PWM=0 kaç loop kaldı
+	const int DIR_CHANGE_DELAY = 30;   // kaç 20ms step PWM=0 kalacak
     float integral = 0.0f;   // PI integral
     MotorDirection direction;
 };

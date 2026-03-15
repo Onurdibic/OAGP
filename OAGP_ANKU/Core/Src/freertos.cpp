@@ -55,9 +55,9 @@ Paket RPMPaket(0x12,0x34, 0x09, 0x09); //veri boyutu 9
 extern Paket ArayuzPaket;
 extern Paket ArabaArkaPaket;
 extern Paket ArabaOnPaket;
-
+extern Paket JetsonPaket;
 extern uint8_t txState;
-
+extern uint32_t lastJetsonTime;
 
 /* USER CODE END PTD */
 
@@ -229,7 +229,7 @@ void StartDefaultTask(void const * argument)
     {
     	if(txState == 0)
     	{
-    		YoklamaPaket.YoklamaPaketOlustur();
+    		YoklamaPaket.YoklamaPaketOlustur(JetsonPaket.engel_u8);
 			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
 			HAL_UART_Transmit_DMA(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket));
 			txState = 1;
@@ -257,8 +257,6 @@ void StartDefaultTask(void const * argument)
         	 yoklamaCounter=0;
         }
 
-
-
         osDelayUntil(&prevTime, 500);
     }
     /* USER CODE END StartDefaultTask */
@@ -272,6 +270,22 @@ void StartDefaultTask(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartPaketTask */
+
+// Tek bir fonksiyon ile motorlara RPM gönderimi
+void MotorBilgiGonder(float yon, float rpmSag, float rpmSol)
+{
+    KomutPaket.KomutPaketOlustur(yon, rpmSag, rpmSol);
+    KomutPaket.komutPaketCagir(KomutVeriPaket);
+    HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
+    HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
+}
+
+// Motorların durup durmadığını kontrol eder
+bool CheckIfStopped(void)
+{
+    return !(ArabaArkaPaket.saghiz_f || ArabaArkaPaket.solhiz_f || ArabaOnPaket.saghiz_f || ArabaOnPaket.solhiz_f);
+}
+
 void StartPaketTask(void const * argument)
 {
   /* USER CODE BEGIN StartPaketTask */
@@ -281,117 +295,44 @@ void StartPaketTask(void const * argument)
 	ArayuzPaket.PaketKesmeYapilandir();
 	ArabaArkaPaket.PaketKesmeYapilandir();
 	ArabaOnPaket.PaketKesmeYapilandir();
+	JetsonPaket.PaketKesmeYapilandir();
 
 	for(;;)
 	{
 		ArabaArkaPaket.PaketCoz();
 		ArabaOnPaket.PaketCoz();
 		ArayuzPaket.PaketCoz();
-
-		if(ArayuzPaket.ileriGitBayrak==true)
+		JetsonPaket.PaketCoz();
+		// -------------------- Jetson engel kontrolü --------------------
+		if ((HAL_GetTick() - lastJetsonTime) > 2000)
 		{
-			a=3;
-			KomutPaket.KomutPaketOlustur(1, 200, 200);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 200, 200);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			ArayuzPaket.ileriGitBayrak=false;
+			JetsonPaket.sagrpm_f = 0.0f;
+			JetsonPaket.solrpm_f = 0.0f;
+			JetsonPaket.engel_u8 = 0;
+			ArayuzPaket.ileriDurBayrak=true;
 		}
-		if(ArayuzPaket.geriGitBayrak==true)
+		if(JetsonPaket.engel_u8 == 2)//2 engel var - 1 engel yok - 0 Jetson yok
 		{
-			a=4;
-			KomutPaket.KomutPaketOlustur(2, 200, 200);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(2, 200, 200);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			ArayuzPaket.geriGitBayrak=false;
-		}
-		if(ArayuzPaket.sagaGitBayrak==true)
-		{
-			a=5;
-			KomutPaket.KomutPaketOlustur(1, 0, 200);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 0, 200);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			ArayuzPaket.sagaGitBayrak=false;
-		}
-		if(ArayuzPaket.solaGitBayrak==true)
-		{
-			a=6;
-			KomutPaket.KomutPaketOlustur(1, 200, 0);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 200, 0);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			ArayuzPaket.solaGitBayrak=false;
-		}
-		if(ArayuzPaket.ileriDurBayrak==true)
-		{
-			a=7;
-			KomutPaket.KomutPaketOlustur(1, 0,0);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 0,0);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			if(ArabaArkaPaket.saghiz_f==0 && ArabaArkaPaket.solhiz_f==0 && ArabaOnPaket.solhiz_f==0 && ArabaOnPaket.saghiz_f==0)
-			{
-				ArayuzPaket.ileriDurBayrak=false;
-			}
-		}
-		if(ArayuzPaket.geriDurBayrak==true)
-		{
-			a=8;
-			KomutPaket.KomutPaketOlustur(2, 0,0);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(2, 0,0);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			if(ArabaArkaPaket.saghiz_f==0 && ArabaArkaPaket.solhiz_f==0 && ArabaOnPaket.solhiz_f==0 && ArabaOnPaket.saghiz_f==0)
-			{
-				ArayuzPaket.geriDurBayrak=false;
-			}
-		}
-		if(ArayuzPaket.kalibrasyonIMUBayrak==true)
-		{
-			a=9;
-			KomutPaket.KomutPaketOlustur(1, 0,0);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, 0,0);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			imu.kalibreEt();
-			ArayuzPaket.kalibrasyonIMUBayrak=false;
-		}
-		if(ArayuzPaket.kalibrasyonMAGBayrak==true)
-		{
-			a=10;
-			KomutPaket.KomutPaketOlustur(1, -40,40);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			KomutPaket.KomutPaketOlustur(1, -40,40);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
-			HAL_UART_Transmit(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket), 1000);
-			mag.XveYKalibreEt();
-
-			ArayuzPaket.kalibrasyonMAGBayrak=false;
+			MotorBilgiGonder(1,JetsonPaket.sagrpm_f, JetsonPaket.solrpm_f);
 		}
 
-		if(ArayuzPaket.GidilecekNoktaBayrak==false && ArayuzPaket.RotaGeldiBayrak==true)
+		// -------------------- Arayüz komutları --------------------
+		if(ArayuzPaket.ileriGitBayrak)       { MotorBilgiGonder(1, 200, 200); ArayuzPaket.ileriGitBayrak = false; }
+		if(ArayuzPaket.geriGitBayrak)        { MotorBilgiGonder(1, 200, 200); ArayuzPaket.geriGitBayrak = false; }
+		if(ArayuzPaket.sagaGitBayrak)        { MotorBilgiGonder(1, 0, 200);   ArayuzPaket.sagaGitBayrak = false; }
+		if(ArayuzPaket.solaGitBayrak)        { MotorBilgiGonder(1, 200, 0);   ArayuzPaket.solaGitBayrak = false; }
+		if(ArayuzPaket.ileriDurBayrak)       { MotorBilgiGonder(1, 0, 0); ArayuzPaket.ileriDurBayrak = CheckIfStopped(); }
+		if(ArayuzPaket.geriDurBayrak)        { MotorBilgiGonder(2, 0, 0); ArayuzPaket.geriDurBayrak = CheckIfStopped(); }
+		if(ArayuzPaket.kalibrasyonIMUBayrak) { imu.kalibreEt(); ArayuzPaket.kalibrasyonIMUBayrak = false; }
+		if(ArayuzPaket.kalibrasyonMAGBayrak) { mag.XveYKalibreEt(); ArayuzPaket.kalibrasyonMAGBayrak = false; }
+
+		// -------------------- Rota gönder --------------------
+		if(!ArayuzPaket.GidilecekNoktaBayrak && ArayuzPaket.RotaGeldiBayrak)
 		{
 			RotaPaket.RotaPaketOlustur();
 			RotaPaket.rotaPaketCagir(RotaVeriPaket);
 			HAL_UART_Transmit(&huart3, RotaVeriPaket, sizeof(RotaVeriPaket), 1000);
-			ArayuzPaket.RotaGeldiBayrak=false;
+			ArayuzPaket.RotaGeldiBayrak = false;
 		}
 
 		osDelayUntil(&prevTime, 25);
@@ -437,7 +378,7 @@ void StartKontrolTask(void const * argument)
 
 	for (;;)
 	{
-		if (enlemKalmanCikti_f >= 1.0f && boylamKalmanCikti_f >= 1.0f && ArayuzPaket.GidilecekNoktaBayrak)
+		if (enlemKalmanCikti_f >= 1.0f && boylamKalmanCikti_f >= 1.0f && ArayuzPaket.GidilecekNoktaBayrak && JetsonPaket.engel_u8==1) //1 engel yok - 2 engel var - 0 Jetson yok
 		{
 			kontrol.SetHeading(heading_f);
 			kontrol.SetKonum(enlemKalmanCikti_f, boylamKalmanCikti_f);
@@ -445,11 +386,31 @@ void StartKontrolTask(void const * argument)
 
 			kontrol.Hesapla();
 
-			if (kontrol.hedefMesafe < 1.5f)
+			if (kontrol.hedefMesafe < 1.0f)
 			{
 				ArayuzPaket.GidilecekNoktaBayrak=false;
 			}
 			/* === Komut gönderimi === */
+			KomutPaket.KomutPaketOlustur(1, kontrol.rpmSag, kontrol.rpmSol);
+			KomutPaket.komutPaketCagir(KomutVeriPaket);
+
+			HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
+			HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
+		}
+		if(ArayuzPaket.GidilecekNoktaBayrak && JetsonPaket.engel_u8==0)
+		{
+			kontrol.rpmSag=0;
+			kontrol.rpmSol=0;
+			KomutPaket.KomutPaketOlustur(1, kontrol.rpmSag, kontrol.rpmSol);
+			KomutPaket.komutPaketCagir(KomutVeriPaket);
+
+			HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
+			HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
+		}
+		if(ArayuzPaket.GidilecekNoktaBayrak==0 && JetsonPaket.engel_u8==1 )
+		{
+			kontrol.rpmSag=0;
+			kontrol.rpmSol=0;
 			KomutPaket.KomutPaketOlustur(1, kontrol.rpmSag, kontrol.rpmSol);
 			KomutPaket.komutPaketCagir(KomutVeriPaket);
 

@@ -382,8 +382,8 @@ int main(void)
 	      MotorDirection hedefDir2 =
 	          (solRpm_f >= 0) ? baseDir : (baseDir == ILERI ? GERI : ILERI);
 
-	      motor1.setDirection(hedefDir1);
-	      motor2.setDirection(hedefDir2);
+	      motor1.setDirectionSoft(hedefDir1);
+	      motor2.setDirectionSoft(hedefDir2);
 
 	      // --- Hız filtreleme ---
 	      motor1.hizHesaplaFiltered(0.02f);

@@ -75,7 +75,6 @@ namespace GpsRotaCizme
         static int imuCounter = 0;
         static int sistemCounter = 0;
 
-
         private enum Durumlar
         {
             Baslik1Coz,
@@ -352,6 +351,7 @@ namespace GpsRotaCizme
 
                         startIndex = (startIndex + mevcutDataUzunlugu) % BufferSize;
                         mevcutDurum = Durumlar.Baslik1Coz;
+                        label3.Text = counter.ToString();
                         break;
                 }
             }
@@ -422,7 +422,7 @@ namespace GpsRotaCizme
                     solRPM = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
                     label4.Text = sagRPM.ToString();
                     label41.Text = solRPM.ToString();
-
+                    counter++;
                 }
             }
         }
@@ -460,16 +460,17 @@ namespace GpsRotaCizme
         }
         private void SistemPaketIsle(byte[] dataBuffer, Int16 dataLength_s16)
         {
+            // Veri uzunluğu kontrolü (Header + Tip + Boyut + 4 byte float1 + 4 byte float2 + CRC = 13 byte)
+            // Sizin sisteminizde dataLength sadece payload'u mu yoksa tüm paketi mi temsil ediyor kontrol edin.
             if (dataLength_s16 == 9 && yoklamaFlag == true)
             {
                 CRC8 = CRC8Hesaplama(dataBuffer, startIndex, startIndex + 8);
                 if (dataBuffer[(startIndex + 8) % BufferSize] == CRC8)
                 {
-                    float Derece = FloataDonustur(dataBuffer, startIndex);
+                    float jetsonDurumRaw = FloataDonustur(dataBuffer, startIndex);
                     float Batarya = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
 
-                    label32.Text = Derece.ToString() + " C";
-                    label38.Text = "% "+ Batarya.ToString();
+                    
                     counter++;
                 }
             }
@@ -500,6 +501,33 @@ namespace GpsRotaCizme
                     yoklamaFlag = true;
                     
                     label35.Text = "Veri Alınıyor ve Işleniyor..";
+                    // jetsonBilgi verisi dataBuffer içindeki ilk veri byte'ıdır (STM32'deki yoklamapaket[4])
+                    byte jetsonDurum = dataBuffer[startIndex % BufferSize];
+
+                    string durumMesaji = "";
+                    Color labelRenk = Color.Black;
+
+                    switch (jetsonDurum)
+                    {
+                        case 0:
+                            durumMesaji = "JETSON NANO YOK";
+                            labelRenk = Color.Red;
+                            break;
+                        case 1:
+                            durumMesaji = "Hazır, Engel Yok";
+                            labelRenk = Color.Green;
+                            break;
+                        case 2:
+                            durumMesaji = "Hazır, Engel Var";
+                            labelRenk = Color.Yellow;
+                            break;
+                        default:
+                            durumMesaji = "Bilinmeyen Durum (" + jetsonDurum + ")";
+                            labelRenk = Color.Gray;
+                            break;
+                    }
+                    label32.Text = durumMesaji;
+                    label32.ForeColor = labelRenk;
                     counter++;
                 }
             }
@@ -728,16 +756,14 @@ namespace GpsRotaCizme
             KalibrePaket[0] = Baslik1;
             KalibrePaket[1] = Baslik2;
             KalibrePaket[2] = (byte)GidenPaketler.KALIBRASYON;
-            KalibrePaket[3] = 0x02; //Data Uzunluğu
-            KalibrePaket[4] = 0x01; //MAG
+            KalibrePaket[3] = 0x02; // Data Uzunluğu
+            KalibrePaket[4] = 0x01; // MAG
             CRC8 = CRC8Hesaplama(KalibrePaket, 4, 5);
             KalibrePaket[5] = CRC8;
-            if (yoklamaFlag == true)
+
+            if (serialPort != null && serialPort.IsOpen)
             {
-                foreach (byte b in KalibrePaket)
-                {
-                    serialPort.Write(new byte[] { b }, 0, 1);
-                }
+                serialPort.Write(KalibrePaket, 0, KalibrePaket.Length); // Paket tek seferde gönder
             }
         }
 
@@ -746,16 +772,14 @@ namespace GpsRotaCizme
             KalibrePaket[0] = Baslik1;
             KalibrePaket[1] = Baslik2;
             KalibrePaket[2] = (byte)GidenPaketler.KALIBRASYON;
-            KalibrePaket[3] = 0x02; //Data Uzunluğu
-            KalibrePaket[4] = 0x02; //IMU
+            KalibrePaket[3] = 0x02; // Data Uzunluğu
+            KalibrePaket[4] = 0x02; // IMU
             CRC8 = CRC8Hesaplama(KalibrePaket, 4, 5);
             KalibrePaket[5] = CRC8;
-            if (yoklamaFlag == true)
+
+            if (serialPort != null && serialPort.IsOpen)
             {
-                foreach (byte b in KalibrePaket)
-                {
-                    serialPort.Write(new byte[] { b }, 0, 1);
-                }
+                serialPort.Write(KalibrePaket, 0, KalibrePaket.Length); // Paket tek seferde gönder
             }
         }
 
@@ -809,11 +833,6 @@ namespace GpsRotaCizme
         private void ileriDurButon_Click(object sender, EventArgs e)
         {
             YonPaketGonder(GidenPaketler.YON, 0x05);
-        }
-
-        private void geriDurButon_Click(object sender, EventArgs e)
-        {
-            YonPaketGonder(GidenPaketler.YON, 0x06);
         }
 
         private void PusulaYoneticisiYapilandir()

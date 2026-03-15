@@ -6,7 +6,7 @@
 ../PaketLibrary/Src/Paket.cpp:98:6:void Paket::ImuPaketOlustur(float, float, float)	1
 ../PaketLibrary/Src/Paket.cpp:116:6:void Paket::RPMPaketOlustur(float, float)	1
 ../PaketLibrary/Src/Paket.cpp:133:6:void Paket::VersiyonPaketOlustur(uint8_t, uint8_t, uint8_t)	1
-../PaketLibrary/Src/Paket.cpp:145:6:void Paket::YoklamaPaketOlustur()	1
+../PaketLibrary/Src/Paket.cpp:145:6:void Paket::YoklamaPaketOlustur(uint8_t)	1
 ../PaketLibrary/Src/Paket.cpp:157:6:void Paket::RotaPaketOlustur()	1
 ../PaketLibrary/Src/Paket.cpp:169:6:void Paket::SistemPaketOlustur(float, float)	1
 ../PaketLibrary/Src/Paket.cpp:183:6:void Paket::KomutPaketOlustur(float, float, float)	1
@@ -21,8 +21,8 @@
 ../PaketLibrary/Src/Paket.cpp:207:6:void Paket::rpmPaketCagir(uint8_t*)	1
 ../PaketLibrary/Src/Paket.cpp:209:6:void Paket::DataAlveBayrakKaldir()	1
 ../PaketLibrary/Src/Paket.cpp:217:6:void Paket::PaketCoz()	51
-../PaketLibrary/Src/Paket.cpp:362:8:float* Paket::ArayuzLatAl()	1
-../PaketLibrary/Src/Paket.cpp:363:8:float* Paket::ArayuzLonAl()	1
-../PaketLibrary/Src/Paket.cpp:365:9:uint8_t Paket::CRC8Hesaplama(uint8_t*, uint8_t, uint8_t)	4
-../PaketLibrary/Src/Paket.cpp:387:7:float Paket::bytesToFloat(uint8_t*, int32_t)	1
-../PaketLibrary/Src/Paket.cpp:398:6:void Paket::floatToBytes(float*, uint8_t*)	2
+../PaketLibrary/Src/Paket.cpp:363:8:float* Paket::ArayuzLatAl()	1
+../PaketLibrary/Src/Paket.cpp:364:8:float* Paket::ArayuzLonAl()	1
+../PaketLibrary/Src/Paket.cpp:366:9:uint8_t Paket::CRC8Hesaplama(uint8_t*, uint8_t, uint8_t)	4
+../PaketLibrary/Src/Paket.cpp:388:7:float Paket::bytesToFloat(uint8_t*, int32_t)	1
+../PaketLibrary/Src/Paket.cpp:399:6:void Paket::floatToBytes(float*, uint8_t*)	2

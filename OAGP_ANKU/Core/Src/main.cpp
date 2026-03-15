@@ -49,10 +49,14 @@ extern "C" {
 IMU imu(&hi2c1);
 MAG mag(&hi2c1);
 GPS gps(&huart2);
+
 KontrolLibrary kontrol;
+
 Paket ArayuzPaket(&huart3);
 Paket ArabaArkaPaket(&huart4);
 Paket ArabaOnPaket(&huart5);
+Paket JetsonPaket(&huart6);
+
 extern Paket GpsPaket;
 extern uint8_t GpsVeriPaket[17];
 extern Paket KalmanPaket;
@@ -65,6 +69,9 @@ extern Paket VersiyonPaket;
 extern uint8_t VersiyonVeriPaket[8];
 extern Paket ImuPaket;
 extern uint8_t ImuVeriPaket[8];
+extern Paket SistemPaket;
+extern uint8_t SistemVeriPaket[13];
+
 extern int a;
 extern float pitch_f,roll_f, heading_f, imucipsicaklik;
 /* USER CODE END PTD */
@@ -101,7 +108,7 @@ uint8_t rxBuffer[RX_BUFFER_SIZE];   // CPU buffer
 volatile uint16_t rxIndex = 0;
 uint8_t txState=0;
 uint8_t rxData;
-
+uint32_t lastJetsonTime = 0; // Son başarılı paket zamanı
 extern float enlemCikti_f;
 extern float boylamCikti_f;
 extern float enlemKalmanCikti_f;
@@ -145,6 +152,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_UART4_Init();
   MX_UART5_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
   mag.Yapilandir();
@@ -159,7 +167,6 @@ int main(void)
 //  GPIOD->ODR ^= GPIO_PIN_12;
   gps.Yapilandir();
 
-  // --- Matris Test SONU ---
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -288,6 +295,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
     	ArabaOnPaket.DataAlveBayrakKaldir();
 	}
+    if (huart->Instance == USART6)
+   	{
+       	JetsonPaket.DataAlveBayrakKaldir();
+       	lastJetsonTime = HAL_GetTick();
+
+   	}
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
@@ -351,12 +364,100 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 				ArabaOnPaket.solhiz_f=0;
 				txState = 0;
 			}
+//			else if(txState == 5)
+//			{
+//				SistemPaket.SistemPaketOlustur((float)JetsonPaket.engel_u8, 0);
+//				SistemPaket.sistemPaketCagir(SistemVeriPaket);
+//				HAL_UART_Transmit_DMA(&huart3, SistemVeriPaket, 13);
+//				txState = 0;
+//			}
 		}
 
 
     }
 }
-
+//
+//void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+//{
+//    if(huart->Instance == USART3)
+//    {
+//
+//        if(ArayuzPaket.VersiyonPaketBayrak)
+//        {
+//            uint16_t len;
+//
+//            len = ArayuzPaket.VersiyonPaketOlustur(0,0,7);
+//
+//            HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(),len);
+//
+//            ArayuzPaket.VersiyonPaketBayrak=false;
+//            return;
+//        }
+//
+////        if(ArayuzPaket.YoklamaPaketFlag)
+//        {
+//
+//            if(txState == 1)
+//            {
+//
+//                uint16_t len;
+//
+//                len = ArayuzPaket.ImuPaketOlustur(pitch_f,roll_f,heading_f);
+//
+//                HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(), len);
+//
+//                txState = 2;
+//            }
+//
+//            else if(txState == 2)
+//            {
+//
+//                float enlem=*gps.LatitudeAl();
+//                float boylam=*gps.LongitudeAl();
+//
+//                uint16_t len;
+//
+//                len = ArayuzPaket.GpsPaketOlustur( enlem,boylam,kontrol.hedefMesafe);
+//
+//                HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(),len);
+//
+//                txState = 3;
+//            }
+//
+//            else if(txState == 3)
+//            {
+//
+//                uint16_t len;
+//
+//                len = ArayuzPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f,kontrol.hedefYonelim);
+//
+//                HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(),len);
+//                txState = 4;
+//            }
+//
+//            else if(txState == 4)
+//            {
+//
+//                float sag_rpm = kontrol.HizdanRPM(ArabaOnPaket.saghiz_f);
+//                float sol_rpm = kontrol.HizdanRPM(ArabaOnPaket.solhiz_f);
+//
+//                uint16_t len;
+//
+//                len = ArayuzPaket.RPMPaketOlustur(sag_rpm,sol_rpm);
+//
+//                HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(), len);
+//
+//                ArabaArkaPaket.saghiz_f=0;
+//                ArabaOnPaket.saghiz_f=0;
+//                ArabaArkaPaket.solhiz_f=0;
+//                ArabaOnPaket.solhiz_f=0;
+//
+//                txState = 0;
+//            }
+//        }
+//
+//    }
+//}
 /* USER CODE END 4 */
 
 /**

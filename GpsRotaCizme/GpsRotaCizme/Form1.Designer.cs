@@ -28,15 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea19 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend19 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series19 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea20 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend20 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series20 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea21 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend21 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series21 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.map = new GMap.NET.WindowsForms.GMapControl();
             this.Enlem = new System.Windows.Forms.Label();
             this.Boylam = new System.Windows.Forms.Label();
@@ -93,27 +93,26 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label41 = new System.Windows.Forms.Label();
+            this.label44 = new System.Windows.Forms.Label();
+            this.label45 = new System.Windows.Forms.Label();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.label21 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
             this.label37 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
             this.label33 = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
             this.Manuel = new System.Windows.Forms.TabPage();
-            this.geriDurButon = new System.Windows.Forms.Button();
             this.ileriDurButon = new System.Windows.Forms.Button();
             this.solButton = new System.Windows.Forms.Button();
             this.geriButton = new System.Windows.Forms.Button();
             this.sagButton = new System.Windows.Forms.Button();
             this.ileriButton = new System.Windows.Forms.Button();
             this.label36 = new System.Windows.Forms.Label();
-            this.label23 = new System.Windows.Forms.Label();
-            this.label24 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.label44 = new System.Windows.Forms.Label();
-            this.label45 = new System.Windows.Forms.Label();
-            this.label41 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
@@ -126,8 +125,8 @@
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tabPage3.SuspendLayout();
-            this.Manuel.SuspendLayout();
             this.panel3.SuspendLayout();
+            this.Manuel.SuspendLayout();
             this.SuspendLayout();
             // 
             // map
@@ -341,19 +340,19 @@
             // 
             // chart1
             // 
-            chartArea19.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea19);
+            chartArea4.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea4);
             this.chart1.Cursor = System.Windows.Forms.Cursors.Default;
-            legend19.Name = "Legend1";
-            this.chart1.Legends.Add(legend19);
+            legend4.Name = "Legend1";
+            this.chart1.Legends.Add(legend4);
             this.chart1.Location = new System.Drawing.Point(28, 54);
             this.chart1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chart1.Name = "chart1";
-            series19.ChartArea = "ChartArea1";
-            series19.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series19.Legend = "Legend1";
-            series19.Name = "Pitch";
-            this.chart1.Series.Add(series19);
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series4.Legend = "Legend1";
+            series4.Name = "Pitch";
+            this.chart1.Series.Add(series4);
             this.chart1.Size = new System.Drawing.Size(381, 258);
             this.chart1.TabIndex = 28;
             this.chart1.Text = "chart1";
@@ -369,36 +368,36 @@
             // 
             // chart2
             // 
-            chartArea20.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea20);
-            legend20.Name = "Legend1";
-            this.chart2.Legends.Add(legend20);
+            chartArea5.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea5);
+            legend5.Name = "Legend1";
+            this.chart2.Legends.Add(legend5);
             this.chart2.Location = new System.Drawing.Point(17, 54);
             this.chart2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chart2.Name = "chart2";
-            series20.ChartArea = "ChartArea1";
-            series20.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series20.Legend = "Legend1";
-            series20.Name = "Roll";
-            this.chart2.Series.Add(series20);
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series5.Legend = "Legend1";
+            series5.Name = "Roll";
+            this.chart2.Series.Add(series5);
             this.chart2.Size = new System.Drawing.Size(381, 258);
             this.chart2.TabIndex = 30;
             this.chart2.Text = "chart2";
             // 
             // chart3
             // 
-            chartArea21.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea21);
-            legend21.Name = "Legend1";
-            this.chart3.Legends.Add(legend21);
+            chartArea6.Name = "ChartArea1";
+            this.chart3.ChartAreas.Add(chartArea6);
+            legend6.Name = "Legend1";
+            this.chart3.Legends.Add(legend6);
             this.chart3.Location = new System.Drawing.Point(17, 54);
             this.chart3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chart3.Name = "chart3";
-            series21.ChartArea = "ChartArea1";
-            series21.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series21.Legend = "Legend1";
-            series21.Name = "Pusula";
-            this.chart3.Series.Add(series21);
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series6.Legend = "Legend1";
+            series6.Name = "Pusula";
+            this.chart3.Series.Add(series6);
             this.chart3.Size = new System.Drawing.Size(392, 258);
             this.chart3.TabIndex = 31;
             this.chart3.Text = "chart3";
@@ -768,6 +767,82 @@
             this.tabPage3.Text = "Gps";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(986, 416);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(44, 16);
+            this.label4.TabIndex = 53;
+            this.label4.Text = "label4";
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(839, 416);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(51, 16);
+            this.label41.TabIndex = 52;
+            this.label41.Text = "label41";
+            // 
+            // label44
+            // 
+            this.label44.AutoSize = true;
+            this.label44.Location = new System.Drawing.Point(811, 369);
+            this.label44.Name = "label44";
+            this.label44.Size = new System.Drawing.Size(106, 16);
+            this.label44.TabIndex = 51;
+            this.label44.Text = "Sol Tekerlek Hız";
+            // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.Location = new System.Drawing.Point(962, 369);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(111, 16);
+            this.label45.TabIndex = 50;
+            this.label45.Text = "Sağ Tekerlek Hız";
+            // 
+            // panel3
+            // 
+            this.panel3.BackColor = System.Drawing.Color.Gainsboro;
+            this.panel3.Controls.Add(this.label21);
+            this.panel3.Controls.Add(this.label19);
+            this.panel3.Controls.Add(this.label20);
+            this.panel3.Controls.Add(this.label37);
+            this.panel3.Location = new System.Drawing.Point(842, 177);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(226, 128);
+            this.panel3.TabIndex = 49;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.BackColor = System.Drawing.Color.Gainsboro;
+            this.label21.Location = new System.Drawing.Point(36, 18);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(152, 16);
+            this.label21.TabIndex = 39;
+            this.label21.Text = "Hedef Enlem ve Boylam";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(25, 45);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(51, 16);
+            this.label19.TabIndex = 35;
+            this.label19.Text = "label19";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(126, 45);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(51, 16);
+            this.label20.TabIndex = 27;
+            this.label20.Text = "label20";
+            // 
             // label37
             // 
             this.label37.AutoSize = true;
@@ -776,6 +851,26 @@
             this.label37.Size = new System.Drawing.Size(51, 16);
             this.label37.TabIndex = 44;
             this.label37.Text = "label37";
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.label23.Location = new System.Drawing.Point(1024, 127);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(51, 16);
+            this.label23.TabIndex = 45;
+            this.label23.Text = "label23";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.label24.Location = new System.Drawing.Point(962, 127);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(83, 16);
+            this.label24.TabIndex = 46;
+            this.label24.Text = "Yonelim         ";
             // 
             // label33
             // 
@@ -799,7 +894,6 @@
             // 
             // Manuel
             // 
-            this.Manuel.Controls.Add(this.geriDurButon);
             this.Manuel.Controls.Add(this.ileriDurButon);
             this.Manuel.Controls.Add(this.solButton);
             this.Manuel.Controls.Add(this.geriButton);
@@ -812,17 +906,6 @@
             this.Manuel.TabIndex = 3;
             this.Manuel.Text = "Manuel";
             this.Manuel.UseVisualStyleBackColor = true;
-            // 
-            // geriDurButon
-            // 
-            this.geriDurButon.BackColor = System.Drawing.Color.Red;
-            this.geriDurButon.Location = new System.Drawing.Point(257, 366);
-            this.geriDurButon.Name = "geriDurButon";
-            this.geriDurButon.Size = new System.Drawing.Size(110, 88);
-            this.geriDurButon.TabIndex = 17;
-            this.geriDurButon.Text = "GERİ DUR";
-            this.geriDurButon.UseVisualStyleBackColor = false;
-            this.geriDurButon.Click += new System.EventHandler(this.geriDurButon_Click);
             // 
             // ileriDurButon
             // 
@@ -885,105 +968,9 @@
             this.label36.AutoSize = true;
             this.label36.Location = new System.Drawing.Point(17, 22);
             this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(54, 16);
+            this.label36.Size = new System.Drawing.Size(76, 16);
             this.label36.TabIndex = 48;
-            this.label36.Text = "Sıcaklık";
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.label23.Location = new System.Drawing.Point(1024, 127);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(51, 16);
-            this.label23.TabIndex = 45;
-            this.label23.Text = "label23";
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.label24.Location = new System.Drawing.Point(962, 127);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(83, 16);
-            this.label24.TabIndex = 46;
-            this.label24.Text = "Yonelim         ";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(126, 45);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(51, 16);
-            this.label20.TabIndex = 27;
-            this.label20.Text = "label20";
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(25, 45);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(51, 16);
-            this.label19.TabIndex = 35;
-            this.label19.Text = "label19";
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.BackColor = System.Drawing.Color.Gainsboro;
-            this.label21.Location = new System.Drawing.Point(36, 18);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(152, 16);
-            this.label21.TabIndex = 39;
-            this.label21.Text = "Hedef Enlem ve Boylam";
-            // 
-            // panel3
-            // 
-            this.panel3.BackColor = System.Drawing.Color.Gainsboro;
-            this.panel3.Controls.Add(this.label21);
-            this.panel3.Controls.Add(this.label19);
-            this.panel3.Controls.Add(this.label20);
-            this.panel3.Controls.Add(this.label37);
-            this.panel3.Location = new System.Drawing.Point(842, 177);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(226, 128);
-            this.panel3.TabIndex = 49;
-            // 
-            // label44
-            // 
-            this.label44.AutoSize = true;
-            this.label44.Location = new System.Drawing.Point(811, 369);
-            this.label44.Name = "label44";
-            this.label44.Size = new System.Drawing.Size(106, 16);
-            this.label44.TabIndex = 51;
-            this.label44.Text = "Sol Tekerlek Hız";
-            // 
-            // label45
-            // 
-            this.label45.AutoSize = true;
-            this.label45.Location = new System.Drawing.Point(962, 369);
-            this.label45.Name = "label45";
-            this.label45.Size = new System.Drawing.Size(111, 16);
-            this.label45.TabIndex = 50;
-            this.label45.Text = "Sağ Tekerlek Hız";
-            // 
-            // label41
-            // 
-            this.label41.AutoSize = true;
-            this.label41.Location = new System.Drawing.Point(839, 416);
-            this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(51, 16);
-            this.label41.TabIndex = 52;
-            this.label41.Text = "label41";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(986, 416);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(44, 16);
-            this.label4.TabIndex = 53;
-            this.label4.Text = "label4";
+            this.label36.Text = "Jetson Bilgi";
             // 
             // Form1
             // 
@@ -1015,9 +1002,9 @@
             this.panel1.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
-            this.Manuel.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
+            this.Manuel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1089,8 +1076,6 @@
         private System.Windows.Forms.Button ileriDurButon;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button geriDurButon;
-        private System.Windows.Forms.Label label36;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.Label label21;
@@ -1101,6 +1086,7 @@
         private System.Windows.Forms.Label label41;
         private System.Windows.Forms.Label label44;
         private System.Windows.Forms.Label label45;
+        private System.Windows.Forms.Label label36;
     }
 }
 

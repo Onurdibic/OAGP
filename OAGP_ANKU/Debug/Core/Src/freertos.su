@@ -4,10 +4,12 @@ C:/Users/T_rab/OneDrive/Desktop/STM32/OAGP/OAGP_ANKU/GpsLibrary/Inc/Kontrol.h:21
 ../Core/Src/freertos.cpp:147:6:void vApplicationGetIdleTaskMemory(StaticTask_t**, StackType_t**, uint32_t*)	24	static
 ../Core/Src/freertos.cpp:161:6:void MX_FREERTOS_Init()	184	static
 ../Core/Src/freertos.cpp:220:6:void StartDefaultTask(const void*)	24	static
-../Core/Src/freertos.cpp:275:6:void StartPaketTask(const void*)	24	static
-../Core/Src/freertos.cpp:402:6:void StartImuTask(const void*)	32	static
-../Core/Src/freertos.cpp:432:6:void StartKontrolTask(const void*)	24	static
-../Core/Src/freertos.cpp:465:6:void StartKonumTask(const void*)	40	static
-../Core/Src/freertos.cpp:510:6:void StartKalmanTask(const void*)	144	static
-../Core/Src/freertos.cpp:580:1:void __static_initialization_and_destruction_0()	16	static
-../Core/Src/freertos.cpp:580:1:cpp)	8	static
+../Core/Src/freertos.cpp:275:6:void MotorBilgiGonder(float, float, float)	24	static
+../Core/Src/freertos.cpp:284:6:bool CheckIfStopped()	4	static
+../Core/Src/freertos.cpp:289:6:void StartPaketTask(const void*)	24	static
+../Core/Src/freertos.cpp:342:6:void StartImuTask(const void*)	32	static
+../Core/Src/freertos.cpp:372:6:void StartKontrolTask(const void*)	24	static
+../Core/Src/freertos.cpp:415:6:void StartKonumTask(const void*)	40	static
+../Core/Src/freertos.cpp:460:6:void StartKalmanTask(const void*)	144	static
+../Core/Src/freertos.cpp:530:1:void __static_initialization_and_destruction_0()	16	static
+../Core/Src/freertos.cpp:530:1:cpp)	8	static

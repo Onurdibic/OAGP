@@ -82,6 +82,17 @@ void Motor::hizHesaplaFiltered(float deltaSaniye)
 
 void Motor::setDirection(MotorDirection dir) { direction = dir; }
 
+void Motor::setDirectionSoft(MotorDirection newDir)
+{
+    if (newDir != direction && !changingDirection)
+    {
+        // Yön değişikliği başlat
+        changingDirection = true;
+        dirChangeCounter = DIR_CHANGE_DELAY; // 30 loop boyunca PWM=0
+        integral = 0.0f;                     // anti-windup
+    }
+}
+
 //int Motor::updatePWM(int rpm_hedef, float dt)
 //{
 //    float hata = rpm_hedef - m_rpm;
@@ -104,6 +115,25 @@ void Motor::setDirection(MotorDirection dir) { direction = dir; }
 
 int Motor::updatePWM(int rpm_hedef, float dt, int max_pwm)
 {
+
+	if (changingDirection)
+	{
+		// PWM sıfırla
+		komutasyon(0);
+
+		// Counter’ı azalt
+		dirChangeCounter--;
+		if (dirChangeCounter <= 0)
+		{
+			// PWM=0 süresi bitti, yönü değiştir
+			direction = (direction == ILERI) ? GERI : ILERI;
+			changingDirection = false;
+			integral = 0.0f;
+		}
+
+		// Bu loop’ta PWM 0
+		return 0;
+	}
     float hata = rpm_hedef - m_rpm;
 
     // --- Oransal ---
