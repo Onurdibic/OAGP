@@ -94,7 +94,7 @@ private:
     int ma_index = 0;
 
     // PID parametreleri
-    float Kp = 0.4f;
+    float Kp = 0.35f;
     float Ki = 0.5f;
     float I_LIMIT = 2000.0f;
     bool changingDirection = false;   // yön değişikliği ongoing

@@ -5,8 +5,6 @@
  *      Author: T_rab
  */
 
-#ifndef INC_PAKET_H_
-#define INC_PAKET_H_
 
 #include "stm32f4xx_hal.h"
 #include <stdint.h>
@@ -34,17 +32,10 @@ public:
     void RotaPaketOlustur();
     void SistemPaketOlustur(float birinciveri,float ikinciveri);
     void KomutPaketOlustur(float yon, float rpmSag, float rpmSol);
+    void PaketBaslikYaz();
 
     // -------------------- PAKET KOPYALAMA --------------------
-    void gpsPaketCagir(uint8_t *kopyaDizi);
-    void kalmanPaketCagir(uint8_t *kopyaDizi);
-    void imuPaketCagir(uint8_t *kopyaDizi);
-    void rpmPaketCagir(uint8_t *kopyaDizi);
-    void sistemPaketCagir(uint8_t *kopyaDizi);
-    void versiyonPaketCagir(uint8_t *kopyaDizi);
-    void yoklamaPaketCagir(uint8_t *kopyaDizi);
-    void rotaPaketCagir(uint8_t *kopyaDizi);
-    void komutPaketCagir(uint8_t *kopyaDizi);
+    void txPaketCagir(uint8_t *kopyaDizi);
 
     // -------------------- PAKET ALIMI & ÇÖZÜMLEME --------------------
     void PaketKesmeYapilandir();
@@ -79,7 +70,7 @@ public:
     // -------------------- ENGEL VERİLERİ --------------------
     float sagrpm_f=0.0f;
 	float solrpm_f=0.0f;
-	uint8_t engel_u8=0;
+	uint8_t durum_u8=0;
     // -------------------- ARAYÜZ VERİLERİ --------------------
    float ArayuzEnlem_f  = 0.0f;
    float ArayuzBoylam_f = 0.0f;
@@ -95,169 +86,24 @@ private:
     uint16_t writeIndex_u16 = 0;
 
     // -------------------- PAKET DEĞİŞKENLERİ --------------------
-    uint8_t tempBuffer[32];   // Maksimum beklenen data boyutu
+    uint8_t tempBuffer[25];   // Maksimum beklenen data boyutu
 	uint8_t tempIndex = 0;
     uint8_t baslik1_u8;
     uint8_t baslik2_u8;
     uint8_t paketTipi_u8;
     uint8_t dataBoyutu_u8;
-
+    uint8_t txPaketBoyutu;
     int16_t  dataLength_s16 = 0;
     uint32_t startIndex_u32 = 0;
     uint32_t intBits_u32    = 0;
     float    floatsonuc_f   = 0;
 
-
-
     // -------------------- PAKET DİZİLERİ --------------------
-    uint8_t gpspaket[17];
-    uint8_t kalmanpaket[17];
-    uint8_t rpmpaket[13];
-    uint8_t imupaket[17];
-    uint8_t versiyonpaket[8];
-    uint8_t yoklamapaket[8];
-    uint8_t rotapaket[8];
-    uint8_t sistempaket[13];
-    uint8_t komutpaket[17];
+    uint8_t txBuffer[17];
 
-    // -------------------- BYTE DÖNÜŞÜM YARDIMCILARI --------------------
-    uint8_t pitchBytes_u8[4];
-    uint8_t rollBytes_u8[4];
-    uint8_t headingBytes_u8[4];
-    uint8_t sicaklikBytes_u8[4];
-    uint8_t bataryaBytes_u8[4];
-    uint8_t latBytes_u8[4];
-    uint8_t lonBytes_u8[4];
-    uint8_t altBytes_u8[4];
-    uint8_t yonelimBytes_u8[4];
-    uint8_t mesafeBytes_u8[4];
-    uint8_t dereceBytes_u8[4];
-    uint8_t yonBytes_u8[4];
-    uint8_t rpmSagBytes_u8[4];
-    uint8_t rpmSolBytes_u8[4];
-    uint8_t solrpmBytes_u8[4];
- 	uint8_t sagrpmBytes_u8[4];
 
     // -------------------- ÖZEL FONKSİYONLAR --------------------
     uint8_t CRC8Hesaplama(uint8_t *data, uint8_t baslangic, uint8_t bitis);
     void floatToBytes(float *Deger_f, uint8_t* bytes);
     float bytesToFloat(uint8_t* buffer_u8, int32_t startIndex_s32);
 };
-
-#endif /* INC_PAKET_H_ */
-//
-//#ifndef INC_PAKET_H_
-//#define INC_PAKET_H_
-//
-//#include "stm32f4xx_hal.h"
-//#include <stdint.h>
-//#include <string.h>
-//
-//class Paket
-//{
-//public:
-//
-//    // HEADER
-//    static const uint8_t HEADER1 = 0x12;
-//    static const uint8_t HEADER2 = 0x34;
-//
-//    // GELEN PAKETLER
-//    enum GelenPaketler
-//    {
-//        ROTA=0x01,
-//        VERSIYON=0x02,
-//        YOKLAMA=0x03,
-//        DUR=0x04,
-//        YON=0x05,
-//        TEKER=0x06,
-//        KALIBRASYON=0x07,
-//        ENGEL=0x08
-//    };
-//
-//    Paket(UART_HandleTypeDef* huart);
-//
-//    // UART
-//    void PaketKesmeYapilandir();
-//    void DataAlveBayrakKaldir();
-//    void PaketCoz();
-//
-//    // Paket oluşturma
-//    uint16_t GpsPaketOlustur(float lat,float lon,float mesafe);
-//    uint16_t KalmanPaketOlustur(float lat,float lon,float yon);
-//    uint16_t ImuPaketOlustur(float pitch,float roll,float yaw);
-//    uint16_t RPMPaketOlustur(float sag,float sol);
-//    uint16_t RotaPaketOlustur();
-//    uint16_t KomutPaketOlustur(float yon,float rpmSag,float rpmSol);
-//    uint16_t SistemPaketOlustur(float sicaklik,float batarya);
-//    uint16_t VersiyonPaketOlustur(uint8_t b,uint8_t o,uint8_t s);
-//    uint16_t YoklamaPaketOlustur(uint8_t jetsonBilgi);
-//
-//    uint8_t* GetTxBuffer();
-//
-//    // Arayüz verileri
-//    float* ArayuzLatAl();
-//    float* ArayuzLonAl();
-//
-//    // Bayraklar
-//    bool VersiyonPaketBayrak=false;
-//    bool YoklamaFlag=false;
-//    bool YoklamaPaketFlag=false;
-//    bool RotaGeldiBayrak=false;
-//    bool GidilecekNoktaBayrak=false;
-//
-//    bool ileriGitBayrak=false;
-//    bool geriGitBayrak=false;
-//    bool sagaGitBayrak=false;
-//    bool solaGitBayrak=false;
-//
-//    bool ileriDurBayrak=false;
-//    bool geriDurBayrak=false;
-//
-//    bool kalibrasyonMAGBayrak=false;
-//    bool kalibrasyonIMUBayrak=false;
-//
-//    // TEKER
-//    float saghiz_f=0;
-//    float solhiz_f=0;
-//
-//    // ENGEL
-//    float sagrpm_f=0;
-//    float solrpm_f=0;
-//    uint8_t engel_u8=0;
-//
-//    float ArayuzEnlem_f=0;
-//	float ArayuzBoylam_f=0;
-//
-//private:
-//
-//    UART_HandleTypeDef* huart;
-//    uint8_t Data;
-//
-//    // RX BUFFER
-//    uint8_t rxBuffer[128];
-//    uint16_t readIndex=0;
-//    uint16_t writeIndex=0;
-//
-//    // TX BUFFER
-//    uint8_t txBuffer[64];
-//
-//    // TEMP
-//    uint8_t tempBuffer[32];
-//    uint8_t tempIndex=0;
-//    uint8_t dataLength=0;
-//
-//
-//
-//    union FloatBytes
-//    {
-//        float f;
-//        uint8_t b[4];
-//    };
-//
-//    uint16_t BuildPacket(uint8_t type,uint8_t* data,uint8_t len);
-//    uint8_t CRC8(uint8_t* data,uint8_t start,uint8_t end);
-//    float bytesToFloat(uint8_t* b);
-//};
-//
-//#endif
-//

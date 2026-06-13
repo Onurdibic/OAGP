@@ -901,7 +901,7 @@ int getMaxPwmFromRpm(float rpm)
  80009c0:	af00      	add	r7, sp, #0
  80009c2:	6078      	str	r0, [r7, #4]
     int last = rpmLimitTable[0].maxPwm;
- 80009c4:	2382      	movs	r3, #130	@ 0x82
+ 80009c4:	2364      	movs	r3, #100	@ 0x64
  80009c6:	60fb      	str	r3, [r7, #12]
 
     for (int i = 0; i < rpmLimitTableSize; i++)
@@ -2573,17 +2573,17 @@ void MX_TIM1_Init(void)
  80013b8:	4b3f      	ldr	r3, [pc, #252]	@ (80014b8 <MX_TIM1_Init+0x130>)
  80013ba:	4a40      	ldr	r2, [pc, #256]	@ (80014bc <MX_TIM1_Init+0x134>)
  80013bc:	601a      	str	r2, [r3, #0]
-  htim1.Init.Prescaler = 8-1;
+  htim1.Init.Prescaler = 1-1;
  80013be:	4b3e      	ldr	r3, [pc, #248]	@ (80014b8 <MX_TIM1_Init+0x130>)
- 80013c0:	2207      	movs	r2, #7
+ 80013c0:	2200      	movs	r2, #0
  80013c2:	605a      	str	r2, [r3, #4]
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
  80013c4:	4b3c      	ldr	r3, [pc, #240]	@ (80014b8 <MX_TIM1_Init+0x130>)
  80013c6:	2200      	movs	r2, #0
  80013c8:	609a      	str	r2, [r3, #8]
-  htim1.Init.Period = 1000-1;
+  htim1.Init.Period = 500-1;
  80013ca:	4b3b      	ldr	r3, [pc, #236]	@ (80014b8 <MX_TIM1_Init+0x130>)
- 80013cc:	f240 32e7 	movw	r2, #999	@ 0x3e7
+ 80013cc:	f240 12f3 	movw	r2, #499	@ 0x1f3
  80013d0:	60da      	str	r2, [r3, #12]
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
  80013d2:	4b39      	ldr	r3, [pc, #228]	@ (80014b8 <MX_TIM1_Init+0x130>)
@@ -2881,17 +2881,17 @@ void MX_TIM8_Init(void)
  8001588:	4b3f      	ldr	r3, [pc, #252]	@ (8001688 <MX_TIM8_Init+0x130>)
  800158a:	4a40      	ldr	r2, [pc, #256]	@ (800168c <MX_TIM8_Init+0x134>)
  800158c:	601a      	str	r2, [r3, #0]
-  htim8.Init.Prescaler = 8-1;
+  htim8.Init.Prescaler = 1-1;
  800158e:	4b3e      	ldr	r3, [pc, #248]	@ (8001688 <MX_TIM8_Init+0x130>)
- 8001590:	2207      	movs	r2, #7
+ 8001590:	2200      	movs	r2, #0
  8001592:	605a      	str	r2, [r3, #4]
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
  8001594:	4b3c      	ldr	r3, [pc, #240]	@ (8001688 <MX_TIM8_Init+0x130>)
  8001596:	2200      	movs	r2, #0
  8001598:	609a      	str	r2, [r3, #8]
-  htim8.Init.Period = 1000-1;
+  htim8.Init.Period = 500-1;
  800159a:	4b3b      	ldr	r3, [pc, #236]	@ (8001688 <MX_TIM8_Init+0x130>)
- 800159c:	f240 32e7 	movw	r2, #999	@ 0x3e7
+ 800159c:	f240 12f3 	movw	r2, #499	@ 0x1f3
  80015a0:	60da      	str	r2, [r3, #12]
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
  80015a2:	4b39      	ldr	r3, [pc, #228]	@ (8001688 <MX_TIM8_Init+0x130>)
@@ -13266,7 +13266,7 @@ Motor::Motor(TIM_HandleTypeDef *htim_, TIM_HandleTypeDef *htim_timebase_,
  8005162:	3710      	adds	r7, #16
  8005164:	46bd      	mov	sp, r7
  8005166:	bd80      	pop	{r7, pc}
- 8005168:	3ecccccd 	.word	0x3ecccccd
+ 8005168:	3eb33333 	.word	0x3eb33333
  800516c:	44fa0000 	.word	0x44fa0000
 
 08005170 <_ZN5Motor4initEv>:

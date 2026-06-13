@@ -32,6 +32,7 @@ namespace GpsRotaCizme
         private PusulaYonetici pusulayonetici;
         private MapYonetici mapyonetici;
         private Timer yoklamaTimer;
+        private Timer manuelKontrolTimer;
         private Timer rotaTekrarTimer;
         private byte[] sonGonderilenRotaPaketi;
         private byte[] sonGonderilenDurPaketi = null;
@@ -74,6 +75,8 @@ namespace GpsRotaCizme
         static int gpsCounter = 0;
         static int imuCounter = 0;
         static int sistemCounter = 0;
+        private bool mouseSolBasili = false;
+        private bool mouseSagBasili = false;
 
         private enum Durumlar
         {
@@ -122,6 +125,7 @@ namespace GpsRotaCizme
 
             comboBox1.SelectedIndexChanged += new EventHandler(ComboBox1SecilenIndexDegisimi);
             map.MouseClick += new MouseEventHandler(Map_MouseClick);
+         
 
             yoklamaTimer = new Timer();
             yoklamaTimer.Interval = 1000; 
@@ -131,7 +135,9 @@ namespace GpsRotaCizme
             rotaTekrarTimer.Interval = 700; // 700 ms
             rotaTekrarTimer.Tick += RotaTekrarTimer_Tick;
 
-
+            manuelKontrolTimer = new Timer();
+            manuelKontrolTimer.Interval = 300; // 300 ms
+            manuelKontrolTimer.Tick += manuelKontrolTimer_Tick;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -151,7 +157,7 @@ namespace GpsRotaCizme
 
                 SerialPortYapilandir(secilenPort, secilenBaudRate);
                 yoklamaTimer.Start();
-
+                manuelKontrolTimer.Start();
             }
             catch (Exception ex)
             {
@@ -182,6 +188,80 @@ namespace GpsRotaCizme
             if (serialPort != null && serialPort.IsOpen)
             {
                 YoklamaPaketGonder();
+            }
+        }
+
+        private void manuelKontrolTimer_Tick(object sender, EventArgs e)
+        {
+            // 1. Manuel sürüş aktif değilse hiçbir şey yapma
+            if (!chkManuelSurus.Checked)
+            {
+                label42.Text = "MANUEL KONTROL KAPALI";
+                return;
+            }
+
+            // 2. Farenin anlık konumunu al ve panelin üzerinde mi diye kontrol et
+            Point mousePozisyonu = pnlDireksiyon.PointToClient(System.Windows.Forms.Cursor.Position);
+            bool panelUzerindeMi = pnlDireksiyon.ClientRectangle.Contains(mousePozisyonu);
+
+            // 3. Farenin anlık buton durumlarını Windows'tan direkt oku (Yan tuşlar eklendi)
+            bool solTıkBasili = (Control.MouseButtons == MouseButtons.Left);
+            bool sagTıkBasili = (Control.MouseButtons == MouseButtons.Right);
+            bool yanArkaTıkBasili = (Control.MouseButtons == MouseButtons.XButton1); // Genellikle arka taraftaki yan tuş
+            bool yanOnTıkBasili = (Control.MouseButtons == MouseButtons.XButton2);   // Genellikle ön taraftaki yan tuş
+
+            // Eğer fare panelin dışındaysa güvenlik için direkt durdur ve 'd' yaz
+            if (!panelUzerindeMi)
+            {
+                // Eğer araç hareket halindeyken dışarı kaçtıysa 'd' yaz
+                if (label42.Text == "MANUEL KONTROL KAPALI" || label42.Text == "İLERİ" || label42.Text == "GERİ" || label42.Text == "SOLA" || label42.Text == "SAĞA" ||  label42.Text == "DUR")
+                {
+                    label42.Text = "MOUSE KAYMASI";
+                }
+
+                YonPaketGonder(GidenPaketler.YON, 0x05); // DUR komutu
+                pnlDireksiyon.BackColor = Color.SkyBlue;
+                return;
+            }
+
+            // 4. Durum Kontrolleri ve Paket Gönderimleri (Panel içindeyse)
+            if (solTıkBasili)
+            {
+                YonPaketGonder(GidenPaketler.YON, 0x01); // İLERİ
+                pnlDireksiyon.BackColor = Color.Green;
+                label42.Text = "İLERİ";
+            }
+            else if (sagTıkBasili)
+            {
+                YonPaketGonder(GidenPaketler.YON, 0x02); // GERİ
+                pnlDireksiyon.BackColor = Color.Orange;
+                label42.Text = "GERİ";
+            }
+            else if (yanArkaTıkBasili)
+            {
+                // NOT: Buradaki dönme paket değerini (örn: 0x03) kendi protokolüne göre düzenle
+                YonPaketGonder(GidenPaketler.YON, 0x04); // SOLA DÖN
+                pnlDireksiyon.BackColor = Color.Yellow;  // Sola sinyal gibi sarı feedback
+                label42.Text = "SOLA";
+            }
+            else if (yanOnTıkBasili)
+            {
+                // NOT: Buradaki dönme paket değerini (örn: 0x04) kendi protokolüne göre düzenle
+                YonPaketGonder(GidenPaketler.YON, 0x03); // SAĞA DÖN
+                pnlDireksiyon.BackColor = Color.Khaki; // Sağa dönme feedback
+                label42.Text = "SAĞA";
+            }
+            else
+            {
+                // Hiçbir tuşa basılmıyorsa veya aynı anda çelişkili tuşlara basılıyorsa DUR
+                YonPaketGonder(GidenPaketler.YON, 0x05); // DUR komutu
+                pnlDireksiyon.BackColor = Color.SkyBlue;
+
+                // Eğer panelin içindeyken durduysa ve eski durum 'd' değilse 'c' yaz
+                if (label42.Text != "MOUSE ALANDA DEĞİL DUR")
+                {
+                    label42.Text = "DUR";
+                }
             }
         }
 
@@ -420,8 +500,8 @@ namespace GpsRotaCizme
                 {
                     sagRPM = FloataDonustur(dataBuffer, startIndex);
                     solRPM = FloataDonustur(dataBuffer, (startIndex + 4) % BufferSize);
-                    label4.Text = sagRPM.ToString();
-                    label41.Text = solRPM.ToString();
+                    label4.Text = sagRPM.ToString("F2");
+                    label41.Text = solRPM.ToString("F2");
                     counter++;
                 }
             }
@@ -600,6 +680,11 @@ namespace GpsRotaCizme
 
         private void Map_MouseClick(object sender, MouseEventArgs e)
         {
+            if (chkManuelSurus.Checked)
+            {
+                return;
+            }
+
             if (e.Button == MouseButtons.Left && rotaGonderFlag == true)
             {
                 // Harita tıklaması ile koordinat alımı
@@ -811,6 +896,7 @@ namespace GpsRotaCizme
                 });
             }
         }
+
         private void ileriButton_Click(object sender, EventArgs e)
         {
             YonPaketGonder(GidenPaketler.YON, 0x01); // İleri 

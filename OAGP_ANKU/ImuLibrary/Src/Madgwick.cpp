@@ -48,7 +48,7 @@ void MadgwickAHRS::updateIMU(float gx, float gy, float gz, float ax, float ay, f
     s2 *= recipNorm;
     s3 *= recipNorm;
 
-    // Quaternion tï¿½revleri
+    // Quaternion turevleri
     qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz) - beta * s0;
     qDot2 = 0.5f * (q0 * gx + q2 * gz - q3 * gy) - beta * s1;
     qDot3 = 0.5f * (q0 * gy - q1 * gz + q3 * gx) - beta * s2;

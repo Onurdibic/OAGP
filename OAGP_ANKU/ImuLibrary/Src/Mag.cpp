@@ -153,6 +153,7 @@ float* MAG::HeadingOlustur(float pitch, float roll)
 
   // Başlık (heading) açısı hesapla
   heading_f = atan2(Yh, Xh);
+  heading_f += PI;
 
   // Manyetik sapma düzeltmesi (İstanbul ~ +6°)
   heading_f += 6.03f * (PI / 180.0f);

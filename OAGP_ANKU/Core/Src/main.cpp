@@ -236,45 +236,47 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
+    uint32_t err = huart->ErrorCode;
+
+    if (err == HAL_UART_ERROR_NONE)
+        return;
+
+    __HAL_UART_CLEAR_OREFLAG(huart);
+    __HAL_UART_CLEAR_FEFLAG(huart);
+    __HAL_UART_CLEAR_NEFLAG(huart);
+
+    // SADECE gerçekten gerekiyorsa restart
+    if (huart->Instance == USART2)
+    {
+        gps.Yapilandir();
+        return;
+    }
+
+    if (huart->Instance == USART6)
+    {
+        JetsonPaket.PaketKesmeYapilandir();
+        return;
+    }
+
+    if (huart->Instance == USART3)
+    {
+        ArayuzPaket.PaketKesmeYapilandir();
+        return;
+    }
+
+    if (huart->Instance == UART4)
+    {
+        ArabaArkaPaket.PaketKesmeYapilandir();
+        return;
+    }
+
     if (huart->Instance == UART5)
     {
-        __HAL_UART_CLEAR_OREFLAG(huart);
-        __HAL_UART_CLEAR_FEFLAG(huart);
-        __HAL_UART_CLEAR_NEFLAG(huart);
-
-        HAL_UART_AbortReceive(huart);
         ArabaOnPaket.PaketKesmeYapilandir();
+        return;
     }
-    if (huart->Instance == UART4)
-	{
-		__HAL_UART_CLEAR_OREFLAG(huart);
-		__HAL_UART_CLEAR_FEFLAG(huart);
-		__HAL_UART_CLEAR_NEFLAG(huart);
-
-		HAL_UART_AbortReceive(huart);
-		ArabaArkaPaket.PaketKesmeYapilandir();
-	}
-    if (huart->Instance == USART3)
-	{
-		__HAL_UART_CLEAR_OREFLAG(huart);
-		__HAL_UART_CLEAR_FEFLAG(huart);
-		__HAL_UART_CLEAR_NEFLAG(huart);
-
-		HAL_UART_AbortReceive(huart);
-		ArayuzPaket.PaketKesmeYapilandir();
-	}
-    if (huart->Instance == USART2)
-	{
-		__HAL_UART_CLEAR_OREFLAG(huart);
-		__HAL_UART_CLEAR_FEFLAG(huart);
-		__HAL_UART_CLEAR_NEFLAG(huart);
-
-		HAL_UART_AbortReceive(huart);
-		gps.Yapilandir();
-	}
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -311,7 +313,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 		{
 			a=1;
 			VersiyonPaket.VersiyonPaketOlustur(0, 0, 7);
-			VersiyonPaket.versiyonPaketCagir(VersiyonVeriPaket);
+			VersiyonPaket.txPaketCagir(VersiyonVeriPaket);
 			HAL_UART_Transmit_DMA(&huart3, VersiyonVeriPaket, sizeof(VersiyonVeriPaket));
 			ArayuzPaket.VersiyonPaketBayrak=false;
 		}
@@ -329,7 +331,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 			if(txState == 1)
 			{
 				ImuPaket.ImuPaketOlustur(pitch_f,roll_f, heading_f);
-				ImuPaket.imuPaketCagir(ImuVeriPaket);
+				ImuPaket.txPaketCagir(ImuVeriPaket);
 				HAL_UART_Transmit_DMA(&huart3, ImuVeriPaket, 17);
 				txState = 2;
 			}
@@ -338,7 +340,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 				float enlem=*gps.LatitudeAl();
 				float boylam=*gps.LongitudeAl();
 				GpsPaket.GpsPaketOlustur(enlem,boylam,kontrol.hedefMesafe);
-				GpsPaket.gpsPaketCagir(GpsVeriPaket);
+				GpsPaket.txPaketCagir(GpsVeriPaket);
 				HAL_UART_Transmit_DMA(&huart3, GpsVeriPaket, 17);
 
 				txState = 3;
@@ -346,7 +348,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 			else if(txState == 3)
 			{
 				KalmanPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f,kontrol.hedefYonelim);
-				KalmanPaket.kalmanPaketCagir(KalmanVeriPaket);
+				KalmanPaket.txPaketCagir(KalmanVeriPaket);
 				HAL_UART_Transmit_DMA(&huart3, KalmanVeriPaket, 17);
 				txState = 4;
 			}
@@ -356,7 +358,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 				float sol_rpm = kontrol.HizdanRPM(ArabaOnPaket.solhiz_f);
 
 				RPMPaket.RPMPaketOlustur(sag_rpm, sol_rpm);
-				RPMPaket.rpmPaketCagir(RPMVeriPaket);
+				RPMPaket.txPaketCagir(RPMVeriPaket);
 				HAL_UART_Transmit_DMA(&huart3, RPMVeriPaket, 13);
 				ArabaArkaPaket.saghiz_f=0;
 				ArabaOnPaket.saghiz_f=0;
@@ -376,88 +378,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
     }
 }
-//
-//void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-//{
-//    if(huart->Instance == USART3)
-//    {
-//
-//        if(ArayuzPaket.VersiyonPaketBayrak)
-//        {
-//            uint16_t len;
-//
-//            len = ArayuzPaket.VersiyonPaketOlustur(0,0,7);
-//
-//            HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(),len);
-//
-//            ArayuzPaket.VersiyonPaketBayrak=false;
-//            return;
-//        }
-//
-////        if(ArayuzPaket.YoklamaPaketFlag)
-//        {
-//
-//            if(txState == 1)
-//            {
-//
-//                uint16_t len;
-//
-//                len = ArayuzPaket.ImuPaketOlustur(pitch_f,roll_f,heading_f);
-//
-//                HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(), len);
-//
-//                txState = 2;
-//            }
-//
-//            else if(txState == 2)
-//            {
-//
-//                float enlem=*gps.LatitudeAl();
-//                float boylam=*gps.LongitudeAl();
-//
-//                uint16_t len;
-//
-//                len = ArayuzPaket.GpsPaketOlustur( enlem,boylam,kontrol.hedefMesafe);
-//
-//                HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(),len);
-//
-//                txState = 3;
-//            }
-//
-//            else if(txState == 3)
-//            {
-//
-//                uint16_t len;
-//
-//                len = ArayuzPaket.KalmanPaketOlustur(enlemKalmanCikti_f,boylamKalmanCikti_f,kontrol.hedefYonelim);
-//
-//                HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(),len);
-//                txState = 4;
-//            }
-//
-//            else if(txState == 4)
-//            {
-//
-//                float sag_rpm = kontrol.HizdanRPM(ArabaOnPaket.saghiz_f);
-//                float sol_rpm = kontrol.HizdanRPM(ArabaOnPaket.solhiz_f);
-//
-//                uint16_t len;
-//
-//                len = ArayuzPaket.RPMPaketOlustur(sag_rpm,sol_rpm);
-//
-//                HAL_UART_Transmit_DMA(&huart3,ArayuzPaket.GetTxBuffer(), len);
-//
-//                ArabaArkaPaket.saghiz_f=0;
-//                ArabaOnPaket.saghiz_f=0;
-//                ArabaArkaPaket.solhiz_f=0;
-//                ArabaOnPaket.solhiz_f=0;
-//
-//                txState = 0;
-//            }
-//        }
-//
-//    }
-//}
 /* USER CODE END 4 */
 
 /**

@@ -1,9 +1,9 @@
 ../Core/Src/main.cpp:123:5:int main()	1
 ../Core/Src/main.cpp:197:6:void SystemClock_Config()	3
-../Core/Src/main.cpp:240:6:void HAL_UART_ErrorCallback(UART_HandleTypeDef*)	5
-../Core/Src/main.cpp:280:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	6
-../Core/Src/main.cpp:306:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	8
-../Core/Src/main.cpp:471:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	2
-../Core/Src/main.cpp:489:6:void Error_Handler()	1
-../Core/Src/main.cpp:498:1:void __static_initialization_and_destruction_0()	1
-../Core/Src/main.cpp:498:1:cpp)	1
+../Core/Src/main.cpp:239:6:void HAL_UART_ErrorCallback(UART_HandleTypeDef*)	7
+../Core/Src/main.cpp:282:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	6
+../Core/Src/main.cpp:308:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	8
+../Core/Src/main.cpp:391:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	2
+../Core/Src/main.cpp:409:6:void Error_Handler()	1
+../Core/Src/main.cpp:418:1:void __static_initialization_and_destruction_0()	1
+../Core/Src/main.cpp:418:1:cpp)	1

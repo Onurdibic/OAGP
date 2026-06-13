@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\gpsrotacizme\\mapyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\mapyonetici.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\gpsrotacizme\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{3A98AB5F-6158-4CFE-AEFD-A51305726B0B}|GpsRotaCizme\\GpsRotaCizme.csproj|solutionrelative:gpsrotacizme\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
@@ -18,8 +22,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MapYonetici.cs",
+              "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\MapYonetici.cs",
+              "RelativeDocumentMoniker": "GpsRotaCizme\\MapYonetici.cs",
+              "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\MapYonetici.cs",
+              "RelativeToolTip": "GpsRotaCizme\\MapYonetici.cs",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-10T21:14:08.031Z"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -28,22 +44,21 @@
               "RelativeDocumentMoniker": "GpsRotaCizme\\Form1.cs",
               "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.cs",
               "RelativeToolTip": "GpsRotaCizme\\Form1.cs",
-              "ViewState": "AgIAALICAAAAAAAAAAAAAMYCAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAOcBAAAAAAAAAAAAAO4BAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-04T10:53:12.926Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Form1.cs [Tasar\u0131m]",
               "DocumentMoniker": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.cs",
               "RelativeDocumentMoniker": "GpsRotaCizme\\Form1.cs",
               "ToolTip": "C:\\Users\\T_rab\\source\\repos\\GpsRotaCizme\\GpsRotaCizme\\Form1.cs [Tasar\u0131m]",
               "RelativeToolTip": "GpsRotaCizme\\Form1.cs [Tasar\u0131m]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-04T05:22:50.474Z",
-              "EditorCaption": " [Tasar\u0131m]"
+              "WhenOpened": "2025-10-04T05:22:50.474Z"
             }
           ]
         }

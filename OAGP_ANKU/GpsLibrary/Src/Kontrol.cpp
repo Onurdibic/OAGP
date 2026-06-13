@@ -53,7 +53,7 @@ void KontrolLibrary::Hesapla()
 
         float isaret = (omegaKomut > 0.0f) ? 1.0f : -1.0f;
 
-        if (hedefMesafe < 1.5f)
+        if (hedefMesafe < 1.0f)
 		{
         	rpm=0;
 		}

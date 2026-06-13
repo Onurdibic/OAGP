@@ -119,7 +119,7 @@ uint8_t RPMVeriPaket[13]={0};
 osThreadId defaultTaskHandle;
 osThreadId myPaketTaskHandle;
 osThreadId myImuTaskHandle;
-osThreadId myKonumTaskHandle;
+osThreadId myDeadRecTaskHandle;
 osThreadId myKalmanTaskHandle;
 osThreadId myKontrolTaskHandle;
 
@@ -131,8 +131,8 @@ osThreadId myKontrolTaskHandle;
 void StartDefaultTask(void const * argument);
 void StartPaketTask(void const * argument);
 void StartImuTask(void const * argument);
-void StartKonumTask(void const * argument);
-void StartKalmanTask(void const * argument);
+void StartDeadReckoningTask(void const * argument);
+void StartKalmanKonumTask(void const * argument);
 void StartKontrolTask(void const * argument);
 
 extern "C" void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -192,12 +192,12 @@ void MX_FREERTOS_Init(void) {
 	osThreadDef(myImuTask, StartImuTask, osPriorityIdle, 0, 1024);
 	myImuTaskHandle = osThreadCreate(osThread(myImuTask), NULL);
 
-	/* definition and creation of myKonumTask */
-	osThreadDef(myKonumTask, StartKonumTask, osPriorityIdle, 0, 1024);
-	myKonumTaskHandle = osThreadCreate(osThread(myKonumTask), NULL);
+	/* definition and creation of myDeadRecTask */
+	osThreadDef(myDeadRecTask, StartDeadReckoningTask, osPriorityIdle, 0, 1024);
+	myDeadRecTaskHandle = osThreadCreate(osThread(myDeadRecTask), NULL);
 
 	/* definition and creation of myKalmanTask */
-	osThreadDef(myKalmanTask, StartKalmanTask, osPriorityHigh, 0, 1024);
+	osThreadDef(myKalmanTask, StartKalmanKonumTask, osPriorityHigh, 0, 1024);
 	myKalmanTaskHandle = osThreadCreate(osThread(myKalmanTask), NULL);
 
 	/* definition and creation of myKontrolTask */
@@ -229,8 +229,8 @@ void StartDefaultTask(void const * argument)
     {
     	if(txState == 0)
     	{
-    		YoklamaPaket.YoklamaPaketOlustur(JetsonPaket.engel_u8);
-			YoklamaPaket.yoklamaPaketCagir(YoklamaVeriPaket);
+    		YoklamaPaket.YoklamaPaketOlustur(JetsonPaket.durum_u8);
+			YoklamaPaket.txPaketCagir(YoklamaVeriPaket);
 			HAL_UART_Transmit_DMA(&huart3, YoklamaVeriPaket, sizeof(YoklamaVeriPaket));
 			txState = 1;
     	}
@@ -275,7 +275,7 @@ void StartDefaultTask(void const * argument)
 void MotorBilgiGonder(float yon, float rpmSag, float rpmSol)
 {
     KomutPaket.KomutPaketOlustur(yon, rpmSag, rpmSol);
-    KomutPaket.komutPaketCagir(KomutVeriPaket);
+    KomutPaket.txPaketCagir(KomutVeriPaket);
     HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
     HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
 }
@@ -283,7 +283,7 @@ void MotorBilgiGonder(float yon, float rpmSag, float rpmSol)
 // Motorların durup durmadığını kontrol eder
 bool CheckIfStopped(void)
 {
-    return !(ArabaArkaPaket.saghiz_f || ArabaArkaPaket.solhiz_f || ArabaOnPaket.saghiz_f || ArabaOnPaket.solhiz_f);
+    return (ArabaArkaPaket.saghiz_f || ArabaArkaPaket.solhiz_f || ArabaOnPaket.saghiz_f || ArabaOnPaket.solhiz_f);
 }
 
 void StartPaketTask(void const * argument)
@@ -304,23 +304,19 @@ void StartPaketTask(void const * argument)
 		ArayuzPaket.PaketCoz();
 		JetsonPaket.PaketCoz();
 		// -------------------- Jetson engel kontrolü --------------------
-		if ((HAL_GetTick() - lastJetsonTime) > 2000)
+		if ((HAL_GetTick() - lastJetsonTime) > 500)
 		{
 			JetsonPaket.sagrpm_f = 0.0f;
 			JetsonPaket.solrpm_f = 0.0f;
-			JetsonPaket.engel_u8 = 0;
-			ArayuzPaket.ileriDurBayrak=true;
-		}
-		if(JetsonPaket.engel_u8 == 2)//2 engel var - 1 engel yok - 0 Jetson yok
-		{
-			MotorBilgiGonder(1,JetsonPaket.sagrpm_f, JetsonPaket.solrpm_f);
+			JetsonPaket.durum_u8 = 0;
+//			ArayuzPaket.ileriDurBayrak=true;
 		}
 
 		// -------------------- Arayüz komutları --------------------
-		if(ArayuzPaket.ileriGitBayrak)       { MotorBilgiGonder(1, 200, 200); ArayuzPaket.ileriGitBayrak = false; }
-		if(ArayuzPaket.geriGitBayrak)        { MotorBilgiGonder(1, 200, 200); ArayuzPaket.geriGitBayrak = false; }
-		if(ArayuzPaket.sagaGitBayrak)        { MotorBilgiGonder(1, 0, 200);   ArayuzPaket.sagaGitBayrak = false; }
-		if(ArayuzPaket.solaGitBayrak)        { MotorBilgiGonder(1, 200, 0);   ArayuzPaket.solaGitBayrak = false; }
+		if(ArayuzPaket.ileriGitBayrak)       { MotorBilgiGonder(1, 120, 120); ArayuzPaket.ileriGitBayrak = false; }
+		if(ArayuzPaket.geriGitBayrak)        { MotorBilgiGonder(1, -120, -120); ArayuzPaket.geriGitBayrak = false; }
+		if(ArayuzPaket.sagaGitBayrak)        { MotorBilgiGonder(1, -40, 120);   ArayuzPaket.sagaGitBayrak = false; }
+		if(ArayuzPaket.solaGitBayrak)        { MotorBilgiGonder(1, 120, -40);   ArayuzPaket.solaGitBayrak = false; }
 		if(ArayuzPaket.ileriDurBayrak)       { MotorBilgiGonder(1, 0, 0); ArayuzPaket.ileriDurBayrak = CheckIfStopped(); }
 		if(ArayuzPaket.geriDurBayrak)        { MotorBilgiGonder(2, 0, 0); ArayuzPaket.geriDurBayrak = CheckIfStopped(); }
 		if(ArayuzPaket.kalibrasyonIMUBayrak) { imu.kalibreEt(); ArayuzPaket.kalibrasyonIMUBayrak = false; }
@@ -330,7 +326,7 @@ void StartPaketTask(void const * argument)
 		if(!ArayuzPaket.GidilecekNoktaBayrak && ArayuzPaket.RotaGeldiBayrak)
 		{
 			RotaPaket.RotaPaketOlustur();
-			RotaPaket.rotaPaketCagir(RotaVeriPaket);
+			RotaPaket.txPaketCagir(RotaVeriPaket);
 			HAL_UART_Transmit(&huart3, RotaVeriPaket, sizeof(RotaVeriPaket), 1000);
 			ArayuzPaket.RotaGeldiBayrak = false;
 		}
@@ -369,61 +365,102 @@ void StartImuTask(void const * argument)
 }
 
 /* ===================== KONTROL GÖREVİ ===================== */
-
 void StartKontrolTask(void const * argument)
 {
-	/* === Maksimum açısal hız (yerinde dönüş) === */
+    uint32_t prevTime = xTaskGetTickCount();
 
-	uint32_t prevTime = xTaskGetTickCount();
+    for (;;)
+    {
+        bool konumGecerli = (enlemKalmanCikti_f >= 1.0f && boylamKalmanCikti_f >= 1.0f);
+        bool hedeflikDurum = ArayuzPaket.GidilecekNoktaBayrak; // Hedef var mı kontrolü
+        uint8_t durum = JetsonPaket.durum_u8;
 
-	for (;;)
-	{
-		if (enlemKalmanCikti_f >= 1.0f && boylamKalmanCikti_f >= 1.0f && ArayuzPaket.GidilecekNoktaBayrak && JetsonPaket.engel_u8==1) //1 engel yok - 2 engel var - 0 Jetson yok
-		{
-			kontrol.SetHeading(heading_f);
-			kontrol.SetKonum(enlemKalmanCikti_f, boylamKalmanCikti_f);
-			kontrol.SetHedef(ArayuzPaket.ArayuzEnlem_f, ArayuzPaket.ArayuzBoylam_f);
+        float rpmSagFinal = 0.0f;
+        float rpmSolFinal = 0.0f;
 
-			kontrol.Hesapla();
+        // =================================================================
+        // GENEL KONTROL: Yalnızca gidilecek bir hedef varsa algoritmaları çalıştır
+        // =================================================================
+        if (hedeflikDurum)
+        {
+            /* =================================================================
+             * A) DEPTH (ENGELDEN KAÇINMA) ALGORİTMASI AKTİF (Durum: 1 veya 2)
+             * =================================================================
+             */
 
-			if (kontrol.hedefMesafe < 1.0f)
-			{
-				ArayuzPaket.GidilecekNoktaBayrak=false;
-			}
-			/* === Komut gönderimi === */
-			KomutPaket.KomutPaketOlustur(1, kontrol.rpmSag, kontrol.rpmSol);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
+            // --- Durum 1: Engel Yok -> Kontrol STM32 GPS Algoritmasında ---
+            if (konumGecerli && durum == 1)
+            {
+                kontrol.SetHeading(heading_f);
+                kontrol.SetKonum(enlemKalmanCikti_f, boylamKalmanCikti_f);
+                kontrol.SetHedef(ArayuzPaket.ArayuzEnlem_f, ArayuzPaket.ArayuzBoylam_f);
 
-			HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
-			HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
-		}
-		if(ArayuzPaket.GidilecekNoktaBayrak && JetsonPaket.engel_u8==0)
-		{
-			kontrol.rpmSag=0;
-			kontrol.rpmSol=0;
-			KomutPaket.KomutPaketOlustur(1, kontrol.rpmSag, kontrol.rpmSol);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
+                kontrol.Hesapla();
 
-			HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
-			HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
-		}
-		if(ArayuzPaket.GidilecekNoktaBayrak==0 && JetsonPaket.engel_u8==1 )
-		{
-			kontrol.rpmSag=0;
-			kontrol.rpmSol=0;
-			KomutPaket.KomutPaketOlustur(1, kontrol.rpmSag, kontrol.rpmSol);
-			KomutPaket.komutPaketCagir(KomutVeriPaket);
+                rpmSagFinal = kontrol.rpmSag;
+                rpmSolFinal = kontrol.rpmSol;
 
-			HAL_UART_Transmit_DMA(&huart4, KomutVeriPaket, sizeof(KomutVeriPaket));
-			HAL_UART_Transmit_DMA(&huart5, KomutVeriPaket, sizeof(KomutVeriPaket));
-		}
+                if (kontrol.hedefMesafe < 1.0f)
+                {
+                    ArayuzPaket.GidilecekNoktaBayrak = false;
+                }
+            }
+            // --- Durum 2: Engel Var -> Kaçış RPM'leri Doğrudan Jetson'dan Alınır ---
+            else if (konumGecerli && durum == 2)
+            {
+                rpmSagFinal = JetsonPaket.sagrpm_f;
+                rpmSolFinal = JetsonPaket.solrpm_f;
+            }
 
-		osDelayUntil(&prevTime, 30);
-	}
+            /* =================================================================
+             * B) SÜRÜŞ ALGORİTMASI AKTİF (Durum: 3, 4 veya 5)
+             * =================================================================
+             */
+
+            // --- Durum 3 veya 4: Şerit İhlali veya Sürülebilir Alan Var ---
+            else if (konumGecerli && (durum == 3 || durum == 4))
+            {
+                rpmSagFinal = JetsonPaket.sagrpm_f;
+                rpmSolFinal = JetsonPaket.solrpm_f;
+            }
+
+            // --- Durum 5: Sürülebilir Alan Yok (STOP) ---
+            else if (durum == 5)
+            {
+                rpmSagFinal = 0.0f;
+                rpmSolFinal = 0.0f;
+            }
+
+            /* =================================================================
+             * C) GÜVENLİK VE İSTİSNAİ DURUMLAR (Fail-Safe)
+             * =================================================================
+             */
+
+            // --- Durum 0: Jetson İletişimi Koptu (500ms Zaman Aşımı) ---
+            else if (durum == 0)
+            {
+                rpmSagFinal = 0.0f;
+                rpmSolFinal = 0.0f;
+            }
+
+            // --- Konum Geçersizse (Diğer üstteki durumlara girmediyse güvenlik freni) ---
+            else if (!konumGecerli)
+            {
+                rpmSagFinal = 0.0f;
+                rpmSolFinal = 0.0f;
+            }
+
+            /* === Komut Gönderimi (Hedef Varken Hesaplanan Değerler) === */
+            MotorBilgiGonder(1, rpmSagFinal, rpmSolFinal);
+        }
+
+        // Periyot süresini bozmamak için task gecikmesi en dışta kalmalı
+        osDelayUntil(&prevTime, 30);
+    }
 }
 
 /* USER CODE END Header_StartKonumTask */
-void StartKonumTask(void const * argument)
+void StartDeadReckoningTask(void const * argument)
 {
   /* USER CODE BEGIN StartKonumTask */
   uint32_t prevTime = xTaskGetTickCount();
@@ -468,14 +505,14 @@ void StartKonumTask(void const * argument)
   /* USER CODE END StartKonumTask */
 }
 
-void StartKalmanTask(void const * argument)
+void StartKalmanKonumTask(void const * argument)
 {
     /* USER CODE BEGIN StartKalmanTask */
     bool refAtama=true;
     float X[2] = {0.0f, 0.0f}; // x, y (sadece delta)
     float P[2][2] = {{1.0f,0},{0,1.0f}}; // covariance
-    float Q[2][2] = {{0.5f,0},{0,0.5f}};     // process noise (tekerlek hatası)
-    float R[2][2] = {{7.0f,0},{0,7.0f}};    // measurement noise (GPS ~2m hatası)
+    float Q[2][2] = {{0.4f,0},{0,0.4f}};     // process noise (tekerlek hatası)
+    float R[2][2] = {{9.0f,0},{0,7.0f}};    // measurement noise (GPS ~5m hatası)
 
     uint32_t prevTime = xTaskGetTickCount();
 

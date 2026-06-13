@@ -28,15 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.map = new GMap.NET.WindowsForms.GMapControl();
             this.Enlem = new System.Windows.Forms.Label();
             this.Boylam = new System.Windows.Forms.Label();
@@ -84,19 +84,17 @@
             this.button3 = new System.Windows.Forms.Button();
             this.label31 = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.label36 = new System.Windows.Forms.Label();
             this.label39 = new System.Windows.Forms.Label();
             this.label38 = new System.Windows.Forms.Label();
             this.label32 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.panel8 = new System.Windows.Forms.Panel();
             this.button6 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label41 = new System.Windows.Forms.Label();
-            this.label44 = new System.Windows.Forms.Label();
-            this.label45 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.label21 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
@@ -106,13 +104,21 @@
             this.label24 = new System.Windows.Forms.Label();
             this.label33 = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.label41 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label44 = new System.Windows.Forms.Label();
+            this.label45 = new System.Windows.Forms.Label();
             this.Manuel = new System.Windows.Forms.TabPage();
-            this.ileriDurButon = new System.Windows.Forms.Button();
+            this.pnlDireksiyon = new System.Windows.Forms.Panel();
+            this.label42 = new System.Windows.Forms.Label();
+            this.chkManuelSurus = new System.Windows.Forms.CheckBox();
+            this.panel7 = new System.Windows.Forms.Panel();
             this.solButton = new System.Windows.Forms.Button();
+            this.ileriDurButon = new System.Windows.Forms.Button();
             this.geriButton = new System.Windows.Forms.Button();
             this.sagButton = new System.Windows.Forms.Button();
             this.ileriButton = new System.Windows.Forms.Button();
-            this.label36 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
@@ -122,11 +128,15 @@
             this.panel5.SuspendLayout();
             this.panel4.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.panel8.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.panel3.SuspendLayout();
+            this.panel6.SuspendLayout();
             this.Manuel.SuspendLayout();
+            this.pnlDireksiyon.SuspendLayout();
+            this.panel7.SuspendLayout();
             this.SuspendLayout();
             // 
             // map
@@ -305,7 +315,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(363, 34);
+            this.label15.Location = new System.Drawing.Point(39, 23);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(36, 16);
             this.label15.TabIndex = 23;
@@ -314,7 +324,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(435, 34);
+            this.label16.Location = new System.Drawing.Point(106, 23);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(51, 16);
             this.label16.TabIndex = 22;
@@ -323,7 +333,7 @@
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(363, 60);
+            this.label17.Location = new System.Drawing.Point(39, 62);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(31, 16);
             this.label17.TabIndex = 25;
@@ -332,7 +342,7 @@
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(435, 60);
+            this.label18.Location = new System.Drawing.Point(106, 62);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(51, 16);
             this.label18.TabIndex = 24;
@@ -340,20 +350,20 @@
             // 
             // chart1
             // 
-            chartArea4.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea4);
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Cursor = System.Windows.Forms.Cursors.Default;
-            legend4.Name = "Legend1";
-            this.chart1.Legends.Add(legend4);
-            this.chart1.Location = new System.Drawing.Point(28, 54);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
+            this.chart1.Location = new System.Drawing.Point(17, 54);
             this.chart1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chart1.Name = "chart1";
-            series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series4.Legend = "Legend1";
-            series4.Name = "Pitch";
-            this.chart1.Series.Add(series4);
-            this.chart1.Size = new System.Drawing.Size(381, 258);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series1.Legend = "Legend1";
+            series1.Name = "Pitch";
+            this.chart1.Series.Add(series1);
+            this.chart1.Size = new System.Drawing.Size(392, 269);
             this.chart1.TabIndex = 28;
             this.chart1.Text = "chart1";
             // 
@@ -368,37 +378,37 @@
             // 
             // chart2
             // 
-            chartArea5.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea5);
-            legend5.Name = "Legend1";
-            this.chart2.Legends.Add(legend5);
+            chartArea2.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart2.Legends.Add(legend2);
             this.chart2.Location = new System.Drawing.Point(17, 54);
             this.chart2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chart2.Name = "chart2";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series5.Legend = "Legend1";
-            series5.Name = "Roll";
-            this.chart2.Series.Add(series5);
-            this.chart2.Size = new System.Drawing.Size(381, 258);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series2.Legend = "Legend1";
+            series2.Name = "Roll";
+            this.chart2.Series.Add(series2);
+            this.chart2.Size = new System.Drawing.Size(392, 273);
             this.chart2.TabIndex = 30;
             this.chart2.Text = "chart2";
             // 
             // chart3
             // 
-            chartArea6.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea6);
-            legend6.Name = "Legend1";
-            this.chart3.Legends.Add(legend6);
+            chartArea3.Name = "ChartArea1";
+            this.chart3.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.chart3.Legends.Add(legend3);
             this.chart3.Location = new System.Drawing.Point(17, 54);
             this.chart3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chart3.Name = "chart3";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series6.Legend = "Legend1";
-            series6.Name = "Pusula";
-            this.chart3.Series.Add(series6);
-            this.chart3.Size = new System.Drawing.Size(392, 258);
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.Legend = "Legend1";
+            series3.Name = "Pusula";
+            this.chart3.Series.Add(series3);
+            this.chart3.Size = new System.Drawing.Size(403, 277);
             this.chart3.TabIndex = 31;
             this.chart3.Text = "chart3";
             // 
@@ -414,7 +424,7 @@
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(433, 34);
+            this.label26.Location = new System.Drawing.Point(561, 34);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(120, 16);
             this.label26.TabIndex = 35;
@@ -426,7 +436,7 @@
             this.button1.Location = new System.Drawing.Point(49, 34);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(147, 85);
+            this.button1.Size = new System.Drawing.Size(290, 120);
             this.button1.TabIndex = 36;
             this.button1.Text = "START";
             this.button1.UseVisualStyleBackColor = false;
@@ -438,7 +448,7 @@
             this.button2.Location = new System.Drawing.Point(49, 34);
             this.button2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(147, 85);
+            this.button2.Size = new System.Drawing.Size(290, 120);
             this.button2.TabIndex = 31;
             this.button2.Text = "STOP";
             this.button2.UseVisualStyleBackColor = false;
@@ -447,7 +457,7 @@
             // comboBox2
             // 
             this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(257, 60);
+            this.comboBox2.Location = new System.Drawing.Point(385, 60);
             this.comboBox2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(121, 24);
@@ -456,7 +466,7 @@
             // comboBox3
             // 
             this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(433, 60);
+            this.comboBox3.Location = new System.Drawing.Point(561, 60);
             this.comboBox3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(121, 24);
@@ -465,7 +475,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(257, 34);
+            this.label25.Location = new System.Drawing.Point(385, 34);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(121, 16);
             this.label25.TabIndex = 34;
@@ -633,6 +643,15 @@
             this.panel4.Size = new System.Drawing.Size(290, 92);
             this.panel4.TabIndex = 48;
             // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(17, 22);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(76, 16);
+            this.label36.TabIndex = 48;
+            this.label36.Text = "Jetson Bilgi";
+            // 
             // label39
             // 
             this.label39.AutoSize = true;
@@ -647,9 +666,9 @@
             this.label38.AutoSize = true;
             this.label38.Location = new System.Drawing.Point(126, 57);
             this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(51, 16);
+            this.label38.Size = new System.Drawing.Size(58, 16);
             this.label38.TabIndex = 46;
-            this.label38.Text = "label38";
+            this.label38.Text = "Veri Yok";
             // 
             // label32
             // 
@@ -663,6 +682,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.panel8);
             this.tabPage2.Controls.Add(this.button6);
             this.tabPage2.Controls.Add(this.button5);
             this.tabPage2.Controls.Add(this.label27);
@@ -678,15 +698,27 @@
             this.tabPage2.Text = "Imu";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // panel8
+            // 
+            this.panel8.BackColor = System.Drawing.Color.Silver;
+            this.panel8.Controls.Add(this.label17);
+            this.panel8.Controls.Add(this.label15);
+            this.panel8.Controls.Add(this.label16);
+            this.panel8.Controls.Add(this.label18);
+            this.panel8.Location = new System.Drawing.Point(885, 54);
+            this.panel8.Name = "panel8";
+            this.panel8.Size = new System.Drawing.Size(200, 100);
+            this.panel8.TabIndex = 46;
+            // 
             // button6
             // 
             this.button6.BackColor = System.Drawing.Color.YellowGreen;
             this.button6.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.button6.Location = new System.Drawing.Point(204, 435);
+            this.button6.Location = new System.Drawing.Point(178, 449);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(168, 113);
             this.button6.TabIndex = 45;
-            this.button6.Text = "IMU KALİBRE";
+            this.button6.Text = "IMU KALİBRASYON";
             this.button6.UseVisualStyleBackColor = false;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
@@ -694,11 +726,11 @@
             // 
             this.button5.BackColor = System.Drawing.Color.YellowGreen;
             this.button5.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.button5.Location = new System.Drawing.Point(769, 435);
+            this.button5.Location = new System.Drawing.Point(610, 449);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(165, 113);
             this.button5.TabIndex = 44;
-            this.button5.Text = "MANYETOMETRE KALİBRE";
+            this.button5.Text = "MANYETOMETRE KALİBRASYON";
             this.button5.UseVisualStyleBackColor = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
@@ -713,39 +745,31 @@
             this.panel2.Location = new System.Drawing.Point(53, 52);
             this.panel2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(445, 347);
+            this.panel2.Size = new System.Drawing.Size(448, 364);
             this.panel2.TabIndex = 43;
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.LightGray;
             this.panel1.Controls.Add(this.label5);
-            this.panel1.Controls.Add(this.label15);
             this.panel1.Controls.Add(this.label10);
             this.panel1.Controls.Add(this.label11);
-            this.panel1.Controls.Add(this.label18);
-            this.panel1.Controls.Add(this.label16);
             this.panel1.Controls.Add(this.label9);
             this.panel1.Controls.Add(this.label12);
-            this.panel1.Controls.Add(this.label17);
             this.panel1.Controls.Add(this.label13);
             this.panel1.Controls.Add(this.label8);
             this.panel1.Controls.Add(this.label14);
             this.panel1.Controls.Add(this.label7);
             this.panel1.Controls.Add(this.label6);
             this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Location = new System.Drawing.Point(573, 52);
+            this.panel1.Location = new System.Drawing.Point(526, 52);
             this.panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(495, 347);
+            this.panel1.Size = new System.Drawing.Size(344, 364);
             this.panel1.TabIndex = 42;
             // 
             // tabPage3
             // 
-            this.tabPage3.Controls.Add(this.label4);
-            this.tabPage3.Controls.Add(this.label41);
-            this.tabPage3.Controls.Add(this.label44);
-            this.tabPage3.Controls.Add(this.label45);
             this.tabPage3.Controls.Add(this.panel3);
             this.tabPage3.Controls.Add(this.label23);
             this.tabPage3.Controls.Add(this.label24);
@@ -758,6 +782,7 @@
             this.tabPage3.Controls.Add(this.label30);
             this.tabPage3.Controls.Add(this.label34);
             this.tabPage3.Controls.Add(this.map);
+            this.tabPage3.Controls.Add(this.panel6);
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tabPage3.Name = "tabPage3";
@@ -766,42 +791,6 @@
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Gps";
             this.tabPage3.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(986, 416);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(44, 16);
-            this.label4.TabIndex = 53;
-            this.label4.Text = "label4";
-            // 
-            // label41
-            // 
-            this.label41.AutoSize = true;
-            this.label41.Location = new System.Drawing.Point(839, 416);
-            this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(51, 16);
-            this.label41.TabIndex = 52;
-            this.label41.Text = "label41";
-            // 
-            // label44
-            // 
-            this.label44.AutoSize = true;
-            this.label44.Location = new System.Drawing.Point(811, 369);
-            this.label44.Name = "label44";
-            this.label44.Size = new System.Drawing.Size(106, 16);
-            this.label44.TabIndex = 51;
-            this.label44.Text = "Sol Tekerlek Hız";
-            // 
-            // label45
-            // 
-            this.label45.AutoSize = true;
-            this.label45.Location = new System.Drawing.Point(962, 369);
-            this.label45.Name = "label45";
-            this.label45.Size = new System.Drawing.Size(111, 16);
-            this.label45.TabIndex = 50;
-            this.label45.Text = "Sağ Tekerlek Hız";
             // 
             // panel3
             // 
@@ -892,13 +881,60 @@
             this.label34.TabIndex = 43;
             this.label34.Text = "Mesafe            ";
             // 
+            // panel6
+            // 
+            this.panel6.BackColor = System.Drawing.Color.Linen;
+            this.panel6.Controls.Add(this.label41);
+            this.panel6.Controls.Add(this.label4);
+            this.panel6.Controls.Add(this.label44);
+            this.panel6.Controls.Add(this.label45);
+            this.panel6.Location = new System.Drawing.Point(814, 345);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(279, 104);
+            this.panel6.TabIndex = 50;
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(49, 64);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(51, 16);
+            this.label41.TabIndex = 52;
+            this.label41.Text = "label41";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(182, 64);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(44, 16);
+            this.label4.TabIndex = 53;
+            this.label4.Text = "label4";
+            // 
+            // label44
+            // 
+            this.label44.AutoSize = true;
+            this.label44.BackColor = System.Drawing.Color.Transparent;
+            this.label44.Location = new System.Drawing.Point(25, 21);
+            this.label44.Name = "label44";
+            this.label44.Size = new System.Drawing.Size(106, 16);
+            this.label44.TabIndex = 51;
+            this.label44.Text = "Sol Tekerlek Hız";
+            // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.Location = new System.Drawing.Point(154, 21);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(111, 16);
+            this.label45.TabIndex = 50;
+            this.label45.Text = "Sağ Tekerlek Hız";
+            // 
             // Manuel
             // 
-            this.Manuel.Controls.Add(this.ileriDurButon);
-            this.Manuel.Controls.Add(this.solButton);
-            this.Manuel.Controls.Add(this.geriButton);
-            this.Manuel.Controls.Add(this.sagButton);
-            this.Manuel.Controls.Add(this.ileriButton);
+            this.Manuel.Controls.Add(this.pnlDireksiyon);
+            this.Manuel.Controls.Add(this.chkManuelSurus);
+            this.Manuel.Controls.Add(this.panel7);
             this.Manuel.Location = new System.Drawing.Point(4, 25);
             this.Manuel.Name = "Manuel";
             this.Manuel.Padding = new System.Windows.Forms.Padding(3);
@@ -907,21 +943,53 @@
             this.Manuel.Text = "Manuel";
             this.Manuel.UseVisualStyleBackColor = true;
             // 
-            // ileriDurButon
+            // pnlDireksiyon
             // 
-            this.ileriDurButon.BackColor = System.Drawing.Color.Red;
-            this.ileriDurButon.Location = new System.Drawing.Point(257, 174);
-            this.ileriDurButon.Name = "ileriDurButon";
-            this.ileriDurButon.Size = new System.Drawing.Size(109, 96);
-            this.ileriDurButon.TabIndex = 9;
-            this.ileriDurButon.Text = "DUR";
-            this.ileriDurButon.UseVisualStyleBackColor = false;
-            this.ileriDurButon.Click += new System.EventHandler(this.ileriDurButon_Click);
+            this.pnlDireksiyon.BackColor = System.Drawing.Color.SkyBlue;
+            this.pnlDireksiyon.Controls.Add(this.label42);
+            this.pnlDireksiyon.Location = new System.Drawing.Point(575, 124);
+            this.pnlDireksiyon.Name = "pnlDireksiyon";
+            this.pnlDireksiyon.Size = new System.Drawing.Size(465, 369);
+            this.pnlDireksiyon.TabIndex = 11;
+            // 
+            // label42
+            // 
+            this.label42.AutoSize = true;
+            this.label42.BackColor = System.Drawing.Color.Transparent;
+            this.label42.Location = new System.Drawing.Point(21, 28);
+            this.label42.Name = "label42";
+            this.label42.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.label42.Size = new System.Drawing.Size(171, 16);
+            this.label42.TabIndex = 12;
+            this.label42.Text = "MANUEL KONTROL ALANI";
+            // 
+            // chkManuelSurus
+            // 
+            this.chkManuelSurus.AutoSize = true;
+            this.chkManuelSurus.Location = new System.Drawing.Point(723, 84);
+            this.chkManuelSurus.Name = "chkManuelSurus";
+            this.chkManuelSurus.Size = new System.Drawing.Size(147, 20);
+            this.chkManuelSurus.TabIndex = 10;
+            this.chkManuelSurus.Text = "Manuel Sürüş Modu";
+            this.chkManuelSurus.UseVisualStyleBackColor = true;
+            // 
+            // panel7
+            // 
+            this.panel7.BackColor = System.Drawing.Color.OldLace;
+            this.panel7.Controls.Add(this.solButton);
+            this.panel7.Controls.Add(this.ileriDurButon);
+            this.panel7.Controls.Add(this.geriButton);
+            this.panel7.Controls.Add(this.sagButton);
+            this.panel7.Controls.Add(this.ileriButton);
+            this.panel7.Location = new System.Drawing.Point(95, 124);
+            this.panel7.Name = "panel7";
+            this.panel7.Size = new System.Drawing.Size(418, 369);
+            this.panel7.TabIndex = 13;
             // 
             // solButton
             // 
             this.solButton.BackColor = System.Drawing.Color.Yellow;
-            this.solButton.Location = new System.Drawing.Point(145, 174);
+            this.solButton.Location = new System.Drawing.Point(14, 128);
             this.solButton.Name = "solButton";
             this.solButton.Size = new System.Drawing.Size(106, 92);
             this.solButton.TabIndex = 8;
@@ -929,10 +997,21 @@
             this.solButton.UseVisualStyleBackColor = false;
             this.solButton.Click += new System.EventHandler(this.solButton_Click);
             // 
+            // ileriDurButon
+            // 
+            this.ileriDurButon.BackColor = System.Drawing.Color.Red;
+            this.ileriDurButon.Location = new System.Drawing.Point(144, 124);
+            this.ileriDurButon.Name = "ileriDurButon";
+            this.ileriDurButon.Size = new System.Drawing.Size(109, 96);
+            this.ileriDurButon.TabIndex = 9;
+            this.ileriDurButon.Text = "DUR";
+            this.ileriDurButon.UseVisualStyleBackColor = false;
+            this.ileriDurButon.Click += new System.EventHandler(this.ileriDurButon_Click);
+            // 
             // geriButton
             // 
             this.geriButton.BackColor = System.Drawing.Color.Yellow;
-            this.geriButton.Location = new System.Drawing.Point(256, 272);
+            this.geriButton.Location = new System.Drawing.Point(144, 236);
             this.geriButton.Name = "geriButton";
             this.geriButton.Size = new System.Drawing.Size(110, 88);
             this.geriButton.TabIndex = 7;
@@ -943,7 +1022,7 @@
             // sagButton
             // 
             this.sagButton.BackColor = System.Drawing.Color.Yellow;
-            this.sagButton.Location = new System.Drawing.Point(372, 170);
+            this.sagButton.Location = new System.Drawing.Point(273, 124);
             this.sagButton.Name = "sagButton";
             this.sagButton.Size = new System.Drawing.Size(106, 96);
             this.sagButton.TabIndex = 6;
@@ -955,22 +1034,13 @@
             // 
             this.ileriButton.BackColor = System.Drawing.Color.Yellow;
             this.ileriButton.ForeColor = System.Drawing.Color.Black;
-            this.ileriButton.Location = new System.Drawing.Point(257, 84);
+            this.ileriButton.Location = new System.Drawing.Point(145, 19);
             this.ileriButton.Name = "ileriButton";
             this.ileriButton.Size = new System.Drawing.Size(109, 84);
             this.ileriButton.TabIndex = 5;
             this.ileriButton.Text = "ILERI";
             this.ileriButton.UseVisualStyleBackColor = false;
             this.ileriButton.Click += new System.EventHandler(this.ileriButton_Click);
-            // 
-            // label36
-            // 
-            this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(17, 22);
-            this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(76, 16);
-            this.label36.TabIndex = 48;
-            this.label36.Text = "Jetson Bilgi";
             // 
             // Form1
             // 
@@ -996,6 +1066,8 @@
             this.panel4.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.panel8.ResumeLayout(false);
+            this.panel8.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -1004,7 +1076,13 @@
             this.tabPage3.PerformLayout();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.Manuel.ResumeLayout(false);
+            this.Manuel.PerformLayout();
+            this.pnlDireksiyon.ResumeLayout(false);
+            this.pnlDireksiyon.PerformLayout();
+            this.panel7.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1087,6 +1165,12 @@
         private System.Windows.Forms.Label label44;
         private System.Windows.Forms.Label label45;
         private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.Panel pnlDireksiyon;
+        private System.Windows.Forms.CheckBox chkManuelSurus;
+        private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.Panel panel8;
+        private System.Windows.Forms.Panel panel7;
     }
 }
 
